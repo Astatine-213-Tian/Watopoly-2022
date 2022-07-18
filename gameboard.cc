@@ -15,13 +15,16 @@ Player *GameBoard::getPlayer(string name) {
 }
 
 Property *GameBoard::getProperty(string name) {
-	for (auto i : ownable) {
-		if (i->name == name) return i;
+    Cell* c;
+	for (auto i : cells) {
+		if (i->name == name) c = i; break;
 	}
+    if (!c) return nullptr;
+    Property *p = dynamic_cast<Property*>(c);
 	return nullptr;
 }
 
-void GameBoard::trade(Player &player, int value, Property &property) {
+void GameBoard::trade(Player &player, float value, Property &property) {
     if (curPlayer->payMoney(value) && property.getOwner() == &player) {
         player.receiveMoney(value);
         curPlayer->addProperty(property);
@@ -44,12 +47,12 @@ void GameBoard::trade(Player &player, Property &p1, Property &p2) {
     }
 }
 
-void GameBoard::trade(Player &player, Property &property, int value) {
+void GameBoard::trade(Player &player, Property &property, float value) {
     if (property.getOwner() == curPlayer && player.payMoney(value)){
         curPlayer->receiveMoney(value);
         curPlayer->removeProperty(property);
         player.addProperty(property);
-    } else if (!(cutPlayer->hasProperty(property))) {
+    } else if (!(curPlayer->hasProperty(property))) {
         cout << "Invalid trade." << endl;
     } else {
         // bankrupt
@@ -57,21 +60,21 @@ void GameBoard::trade(Player &player, Property &property, int value) {
 }
 
 void GameBoard::buyImprove(Property &p) {
-	try {
-        Academic ab = p;
-        ab.addImprove();
-    } catch (bad_cast &bc) {
-        cout << "This is not an academic building." << endl;
+    Academic *ab = dynamic_cast<Academic *>(&p);
+    if (!ab) {
+        cout << "You cannot improve a non-academic building." << endl;
+        return;
     }
+    ab.addImprove();
 }
 
 void GameBoard::sellImprove(Property &p) {
-    try {
-        Academic ab = p;
-        ab.sellImprove();
-    } catch (bad_cast &bc) {
-        cout << "This is not an academic building." << endl;
+    Academic *ab = dynamic_cast<Academic *>(&p);
+    if (!ab) {
+        cout << "You cannot improve a non-academic building." << endl;
+        return;
     }
+    ab.setllImprove();
 }
 
 void GameBoard::mortgage(Property &p) {
