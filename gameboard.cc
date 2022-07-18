@@ -16,7 +16,7 @@ Player *GameBoard::getPlayer(string name) {
 }
 
 Property *GameBoard::getProperty(string name) {
-	for (auto i : ownable) {
+	for (auto i : cells) {
 		if (i->getName() == name) return i;
 	}
 	return nullptr;
