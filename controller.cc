@@ -4,6 +4,7 @@
 #include <vector>
 #include "controller.h"
 #include "gameboard.h"
+#include "player.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ void Controller::play() {
             
             Player *toWhom = g->getPlayer(name);
 
-            cout << "Player " << toWhom->name << ", do you accept this trade?" << endl;
+            cout << "Player " << toWhom->getName() << ", do you accept this trade?" << endl;
             cin >> answer;
 
             if (toWhom && answer == "accept") {
@@ -42,7 +43,7 @@ void Controller::play() {
                 } else if (!(inGive >> giveMoney) && !(inReceive >> receiveMoney)) {
                     if (g->getProperty(give) && g->getProperty(receive)) {
                         g->trade(*toWhom, *(g->getProperty(give)), *(g->getProperty(receive)));
-                    } else if {
+                    } else {
                         cout << "Invalid property entered." << endl;
                     }
                 } else if (inGive >> giveMoney) {
@@ -57,7 +58,7 @@ void Controller::play() {
             } else if (!toWhom) {
                 cout << "This player doesn't exist." << endl;
             } else {
-                cout << "Player " << toWhom->name << " does not accept this trade." << endl;
+                cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
             }
         } else if (cmd == "improve") {
             string p;

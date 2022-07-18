@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     } else if (argc == 3) {
         c.load();
         c.play();
-    } else if (argc == 4) {
+    } else if (argc == 2) {
         istringstream die1{argv[2]};
         istringstream die2{argv[3]};
         int roll1;
