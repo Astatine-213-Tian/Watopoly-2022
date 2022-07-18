@@ -13,5 +13,6 @@ void Property::passBy(Player &p) { return; }
 
 void Property::landOn(Player &p) {
     float rent = calculateRent(p);
+
     if (&p == owner) return;
 }
