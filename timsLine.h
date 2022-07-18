@@ -12,6 +12,8 @@ class TimsLine: public NonProperty {
 public:
     void passBy(Player &p);
     void landOn(Player &p);
+    void addPlayerToLine(Player &p);
+    int getPlayerRound(Player &p);
 };
 
 #endif
