@@ -10,3 +10,7 @@ string Player::getName() { return name; }
 vector<Property *> Player::getProperties() { return properties; }
 
 float Player::getCash() { return cash; }
+
+int Player::getNumCup() { return numCup; }
+
+void Player::useCup() { numCup --;}
