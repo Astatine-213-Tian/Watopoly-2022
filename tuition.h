@@ -1,4 +1,4 @@
-#ifndef _TUITION_H
+#ifndef _TUITION_H_
 #define _TUITION_H_
 
 #include "NonProperty.h"
