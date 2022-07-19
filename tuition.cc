@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Tuition::Tuition() : NonProperty{"tuition"} {}
+Tuition::Tuition() : NonProperty{"TUITION"} {}
 
 void Tuition::passBy(Player &p) {}
 
