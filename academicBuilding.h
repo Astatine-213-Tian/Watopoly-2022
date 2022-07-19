@@ -13,8 +13,8 @@ class AcademicBuilding : public Property {
  public:
   AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb);
   int getImproveNum() const;
-  void addImprove(Player &p);
-  void sellImprove(Player &p);
+  void addImprove();
+  void removeImprove();
 };
 
 #endif //WATOPOLY__ACADEMICBUILDING_H_

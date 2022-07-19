@@ -18,26 +18,12 @@ int AcademicBuilding::getImproveNum() const {
     return mb->getImproveNum();
 }
 
-void AcademicBuilding::addImprove(Player &p) {
-    if (&p != owner) {
-        throw NotOwner{};
-    } else if (!mb->isMonopolizedBy(p)) {
-        throw NotMonopolized{};
-    } else if (mb->getImproveNum() >= 5) {
-        throw MaxImprove{};
-    }
-    p.payMoney(mb->getImproveCost());
+void AcademicBuilding::addImprove() {
     mb->addImprove();
 }
 
-void AcademicBuilding::sellImprove(Player &p) {
-    if (&p != owner) {
-        throw NotOwner{};
-    } else if (mb->getImproveNum() <= 0) {
-        throw ZeroImprove{};
-    }
+void AcademicBuilding::removeImprove() {
     mb->removeImprove();
-    p.receiveMoney(mb->getImproveCost() / 2);
 }
 
 
