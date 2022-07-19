@@ -3,8 +3,49 @@
 #include <memory>
 #include "gameboard.h"
 #include "player.h"
+#include "property.h"
+#include "academicBuilding.h"
+#include "cell.h"
+#include "dice.h"
 
 using namespace std;
+
+void GameBoard::roll() {
+    int diceSum = 0;
+    Dice d;
+    int roll1 = d.roll();
+    int roll2 = d.roll();
+    diceSum = roll1 + roll2;
+    curPlayer->setRollState(false);
+    curPlayer->addRollTimes(); // 1->2
+
+    if (!checkInTimsLine()) {
+        if (curPlayer->getRollTimes() == 3) {
+            curPlayer->initRollTimes();
+            //send to Tims
+        } else {
+            for (int i = 0; i < diceSum - 1; i++) {
+                curPlayer->advanceCurLocation();
+                cells[curPlayer->getLocation()]->passBy(*curPlayer);
+            }
+            curPlayer->advanceCurLocation();
+            cells[curPlayer->getLocation()]->landOn(*curPlayer);
+
+            if (roll1 == roll2) {
+                curPlayer->setRollState(true);
+                cout << "Lucky! You may roll again." << endl;
+            } else {
+                curPlayer->initRollTimes();
+            }
+        }
+    } else {
+        if (roll1 == roll2) {
+            cout << "Congrats for getting out of the line!" << endl;
+            curPlayer->removeFromTimsLine();
+            // roll again once getting out of Tims line??
+        }
+    }
+}
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
 
@@ -59,8 +100,8 @@ void GameBoard::trade(Player &player, Property &property, double value) {
 
 void GameBoard::buyImprove(Property &p) {
 	try {
-        Academic ab = p;
-        ab.addImprove();
+        AcademicBuilding ab = p;
+        ab.addImprove(*curPlayer);
     } catch (bad_cast &bc) {
         cout << "This is not an academic building." << endl;
     }
@@ -68,8 +109,8 @@ void GameBoard::buyImprove(Property &p) {
 
 void GameBoard::sellImprove(Property &p) {
     try {
-        Academic ab = p;
-        ab.sellImprove();
+        AcademicBuilding ab = p;
+        ab.sellImprove(*curPlayer);
     } catch (bad_cast &bc) {
         cout << "This is not an academic building." << endl;
     }
@@ -86,7 +127,7 @@ void GameBoard::mortgage(Property &p) {
 
 void GameBoard::unmortgage(Property &p) {
     if (p.getMortgage() && p.getOwner() == curPlayer) {
-        if (curPlayer->payMoney(p.getCash() * 0.6)) {
+        if (curPlayer->payMoney(p.getCost() * 0.6)) {
             p.setMortgage(false);
         } else {
             // bankrupt
