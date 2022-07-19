@@ -4,10 +4,12 @@
 #include <stdexcept>
 #include <utility>
 
-class Player;
-class Property;
-
-class Error : public std::exception {};
+class Error : public std::exception {
+  std::string msg;
+ public:
+  explicit Error(std::string msg);
+  const char * what() const noexcept override;
+};
 
 // throw when player is not the owner of a property
 class NotOwner : public Error {
@@ -17,13 +19,38 @@ class NotOwner : public Error {
   NotOwner(std::string playerName, std::string propertyName);
 };
 
-NotOwner::NotOwner(std::string playerName, std::string propertyName) : playerName{std::move(playerName)}, propertyName{std::move(propertyName)} {}
+class NotMonopolized: public Error {
+  std::string blockName;
+ public:
+  explicit NotMonopolized(std::string blockName);
+};
 
-// throw when player try to improve an un-monopolized block
-class NotMonopolized: public Error {};
-// throw when a block reaches maximum improvement number
-class MaxImprove: public Error {};
-// throw when a block cannot be removed more improvement
-class ZeroImprove: public Error {};
+class MaxImprove: public Error {
+  std::string blockName;
+ public:
+  explicit MaxImprove(std::string blockName);
+};
+
+
+class ZeroImprove: public Error {
+  std::string blockName;
+ public:
+  explicit ZeroImprove(std::string blockName);
+};
+
+class NotAcademicBuilding: public Error {
+ public:
+  explicit NotAcademicBuilding(const std::string &name);
+};
+
+class NotProperty: public Error {
+ public:
+  explicit NotProperty(const std::string &name);
+};
+
+class NotPlayer: public Error {
+ public:
+  explicit NotPlayer(const std::string &name);
+};
 
 #endif //WATOPOLY__ERROR_H_
