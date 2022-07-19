@@ -17,7 +17,7 @@ void GameBoard::roll() {
     int roll2 = d.roll();
     diceSum = roll1 + roll2;
     curPlayer->setRollState(false);
-    curPlayer->addRollTimes(); // 1->2
+    curPlayer->addRollTimes();
 
     if (!checkInTimsLine()) {
         if (curPlayer->getRollTimes() == 3) {
@@ -44,6 +44,15 @@ void GameBoard::roll() {
             curPlayer->removeFromTimsLine();
             // roll again once getting out of Tims line??
         }
+    }
+}
+
+void GameBoard::next() {
+    curPlayer->setRollState(true);
+    if (curPlayer == *players.end()) {
+        curPlayer = *players.begin();
+    } else {
+        curPlayer++;
     }
 }
 

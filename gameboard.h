@@ -11,7 +11,9 @@ class Player;
 class GameBoard {
     std::vector<Cell *> cells;
     std::vector<Player *> players;
+	const int numPlayers;
     Player *curPlayer;
+	int curPlayerIndex;
 	bool checkInTimsLine();
 	// map, roll
 

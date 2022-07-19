@@ -35,6 +35,7 @@ public:
     void initRollTimes();
     int getLocation() const;
     void advanceCurLocation();
+    bool getRollState() const;
     void setRollState(bool state);
 };
 
