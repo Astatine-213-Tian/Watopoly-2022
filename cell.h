@@ -14,6 +14,7 @@ class Cell{
   virtual ~Cell();
   virtual void passBy(Player &p) = 0;
   virtual void landOn(Player &p) = 0;
+  std::string getName();
 };
 
 #endif
