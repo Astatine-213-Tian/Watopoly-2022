@@ -5,6 +5,8 @@
 
 using namespace std;
 
+TimsLine::TimsLine() : NonProperty{"DC Tims Line"} {}
+
 void TimsLine::passBy(Player &p) {}
 
 void TimsLine::landOn(Player &p) {

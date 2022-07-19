@@ -5,9 +5,10 @@
 class Player;
 
 class Geese: public NonProperty {
-public:
-    void passBy(Player &p);
-    void landOn(Player &p);
+ public:
+  Geese();
+  void passBy(Player &p);
+  void landOn(Player &p);
 };
 
 #endif

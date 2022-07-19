@@ -4,6 +4,8 @@
 
 using namespace std;
 
+Geese::Geese() : NonProperty{"Goose Nesting"} {}
+
 void Geese::passBy(Player &p) {}
 
 void Geese::landOn(Player &p) {
