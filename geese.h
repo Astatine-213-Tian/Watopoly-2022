@@ -7,8 +7,8 @@ class Player;
 class Geese: public NonProperty {
  public:
   Geese();
-  void passBy(Player &p);
-  void landOn(Player &p);
+  void passBy(Player &p) override;
+  void landOn(Player &p) override;
 };
 
 #endif
