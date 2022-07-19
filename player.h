@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 class Property;
+class AcademicBuilding;
 
 class Player {
     std::string name;
@@ -21,7 +22,7 @@ public:
     std::vector<Property *> getProperties() const;
     double getCash() const;
     int getNumCup() const;
-    void move(const int index);
+    void move(int index);
     void useCup();
     bool payMoney(double value);
     void receiveMoney(double value);
@@ -37,6 +38,8 @@ public:
     int getLocation() const;
     bool getRollState() const;
     void setRollState(bool state);
+    void buyImprove(AcademicBuilding &ab);
+    void sellImprove(AcademicBuilding &ab);
 };
 
 #endif

@@ -11,11 +11,13 @@ class AcademicBuilding : public Property {
   MonopolyBlock *mb;
   double calculateRent() const override;
  public:
-  AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock *mb);
+  AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb);
   int getImproveNum() const;
+  double getImproveCost() const;
   void addImprove() const;
   void removeImprove() const;
-  void checkMonopoly() const;
+  bool isMonopolized() const;
+  std::string getBlockName() const;
 };
 
 #endif //WATOPOLY__ACADEMICBUILDING_H_

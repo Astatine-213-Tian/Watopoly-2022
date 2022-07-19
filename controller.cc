@@ -137,9 +137,19 @@ void Controller::play() {
                 continue;
             }
             if (option == "buy") {
-                g->buyImprove(*ab);
+                try {
+                    g->buyImprove(*ab);
+                } catch (exception &e) {
+                    cout << e.what() << endl;
+                    continue;
+                }
             } else if (option == "sell") {
-                g->sellImprove(*ab);
+                try {
+                    g->sellImprove(*ab);
+                } catch (exception &e) {
+                    cout << e.what() << endl;
+                    continue;
+                }
             }
         } else if (cmd == "mortgage") {
             string name;

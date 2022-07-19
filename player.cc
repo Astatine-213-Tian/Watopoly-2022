@@ -1,5 +1,7 @@
 #include <vector>
 #include "player.h"
+#include "academicBuilding.h"
+#include "error.h"
 
 using namespace std;
 
@@ -54,3 +56,32 @@ int Player::getLocation() const{ return curLocation; }
 bool Player::getRollState() const{ return canRoll; }
 
 void Player::setRollState(bool state) { canRoll = state; }
+
+bool Player::payMoney(double value) {
+    // TODO payMoney
+    return false;
+}
+
+
+void Player::buyImprove(AcademicBuilding &ab) {
+    if (ab.getOwner() != this) {
+        throw NotOwner{name, ab.getName()};
+    } else if (!ab.isMonopolized()) {
+        throw NotMonopolized{ab.getBlockName()};
+    } else if (ab.getImproveNum() >= 5) {
+        throw MaxImprove{ab.getBlockName()};
+    }
+    payMoney(ab.getImproveCost());
+    ab.addImprove();
+}
+
+
+void Player::sellImprove(AcademicBuilding &ab) {
+    if (ab.getOwner() != this) {
+        throw NotOwner{name, ab.getName()};
+    } else if (ab.getImproveNum() <= 0) {
+        throw ZeroImprove{ab.getBlockName()};
+    }
+    ab.removeImprove();
+    receiveMoney(ab.getImproveCost() / 2);
+}

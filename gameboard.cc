@@ -226,11 +226,11 @@ void GameBoard::trade(Player &player, Property &property, double value) {
 }
 
 void GameBoard::buyImprove(AcademicBuilding &ab) {
-    // TODO curPlayer->buyImprove(ab) - checkIsMonopolized
+    curPlayer->buyImprove(ab);
 }
 
 void GameBoard::sellImprove(AcademicBuilding &ab) {
-    // TODO curPlayer->sellImprove(ab)
+    curPlayer->sellImprove(ab);
 }
 
 void GameBoard::mortgage(Property &p) {
