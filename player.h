@@ -29,12 +29,13 @@ public:
     void removeProperty(Property &p);
     bool hasProperty(Property &p) const;
     void setToTimsLine();
-    void removeFromTimesLine();
-    int getrollTimes() const;
+    void removeFromTimsLine();
+    int getRollTimes() const;
     void addRollTimes();
     void initRollTimes();
     int getLocation() const;
     void advanceCurLocation();
+    void setRollState(bool state);
 };
 
 #endif
