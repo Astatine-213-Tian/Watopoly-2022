@@ -3,12 +3,13 @@
 #include "property.h"
 #include "player.h"
 
-Property::Property(std::string name, float cost): Cell{std::move(name)}, cost{cost}, owner{nullptr} {}
+Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr} {}
 
 Player *Property::getOwner() const { return owner; }
+
 void Property::setOwner(Player *p) { owner = p; }
 
-float Property::getCost() const { return cost; }
+double Property::getCost() const { return cost; }
 
 void Property::passBy(Player &p) { }
 
@@ -31,11 +32,12 @@ void Property::landOn(Player &p) {
             }
         }
         if (!buy) return;
+        p.payMoney(cost);
+        p.addProperty(*this);
+        owner = &p;
     }
 
-    float rent = calculateRent(p);
-    if (p.payMoney(rent)) {
-        owner = &p;
-        owner->receiveMoney(rent);
-    }
+    double rent = calculateRent();
+    p.payMoney(rent);
+    owner->receiveMoney(rent);
 }

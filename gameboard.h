@@ -22,9 +22,9 @@ public:
 	Player *getCurPlayer();
 	Player *getPlayer(std::string name);
 	Property *getProperty(std::string name);
-	void trade(Player &player, float value, Property &property);
+	void trade(Player &player, double value, Property &property);
 	void trade(Player &player, Property &p1, Property &p2);
-	void trade(Player &player, Property &property, float value);
+	void trade(Player &player, Property &property, double value);
 	void buyImprove(Property &p);
 	void sellImprove(Property &p);
 	void mortgage(Property &p);

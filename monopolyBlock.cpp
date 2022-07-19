@@ -2,30 +2,23 @@
 #include "monopolyBlock.h"
 #include "academicBuilding.h"
 
-MonopolyBlock::MonopolyBlock(std::string name): name{std::move(name)}, buildings{}, numImprove{0} {}
+MonopolyBlock::MonopolyBlock(std::string name, double improveCost): name{std::move(name)}, buildings{}, improveCost{improveCost}, numImprove{0} {}
 
-void MonopolyBlock::addNewBuilding(AcademicBuilding &a) {
-    buildings.emplace_back(&a);
-}
+void MonopolyBlock::addNewBuilding(AcademicBuilding &a) { buildings.emplace_back(&a);}
 
-int MonopolyBlock::getImprove() const {
-    return numImprove;
-}
+double MonopolyBlock::getImproveCost() const { return improveCost; }
 
-void MonopolyBlock::addImprove() {
-    ++numImprove;
-}
+int MonopolyBlock::getImproveNum() const { return numImprove; }
 
-void MonopolyBlock::removeImprove() {
-    --numImprove;
-}
+void MonopolyBlock::addImprove() { ++numImprove; }
+
+void MonopolyBlock::removeImprove() { --numImprove;}
 
 bool MonopolyBlock::isMonopolizedBy(Player &p) const {
     for (auto b: buildings) {
-        if (b->getOwner() != &p) {
-            return false;
-        }
+        if (b->getOwner() != &p) return false;
     }
-
     return true;
 }
+
+std::string MonopolyBlock::getName() const { return name; }

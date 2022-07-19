@@ -8,15 +8,15 @@ class Player;
 
 class Property : Cell {
  protected:
-  float cost;
+  double cost;
   Player *owner;
+  virtual double calculateRent() const = 0;
 
  public:
-  Property(std::string name, float cost);
-  float getCost() const;
+  Property(std::string name, double cost);
+  double getCost() const;
   Player *getOwner() const;
   void setOwner(Player *p);
-  virtual float calculateRent(Player &p) const = 0;
   void passBy(Player &p) override;
   void landOn(Player &p) override;
 };

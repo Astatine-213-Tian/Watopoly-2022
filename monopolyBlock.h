@@ -10,13 +10,16 @@ class Player;
 class MonopolyBlock {
   std::string name;
   std::vector<AcademicBuilding*> buildings;
+  double improveCost;
   int numImprove;
 
  public:
-  explicit MonopolyBlock(std::string name);
+  MonopolyBlock(std::string name, double improveCost);
   void addNewBuilding(AcademicBuilding &a);
   bool isMonopolizedBy(Player &p) const;
-  int getImprove() const;
+  std::string getName() const;
+  double getImproveCost() const;
+  int getImproveNum() const;
   void addImprove();
   void removeImprove();
 };

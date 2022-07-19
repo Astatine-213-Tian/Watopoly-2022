@@ -1,31 +1,43 @@
 #include <utility>
 #include "academicBuilding.h"
 #include "monopolyBlock.h"
+#include "error.h"
+#include "player.h"
 
-AcademicBuilding::AcademicBuilding(std::string name, float cost, std::vector<float> tuition, MonopolyBlock &mb) :
+AcademicBuilding::AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb) :
     Property{std::move(name), cost}, tuition{std::move(tuition)}, mb{&mb} {
     mb.addNewBuilding(*this);
 }
 
-float AcademicBuilding::calculateRent(Player &p) const {
-    int improve = mb->getImprove();
+double AcademicBuilding::calculateRent() const {
+    int improve = mb->getImproveNum();
     return tuition[improve];
 }
 
-int AcademicBuilding::getImprove() const {
-    return mb->getImprove();
+int AcademicBuilding::getImproveNum() const {
+    return mb->getImproveNum();
 }
 
-bool AcademicBuilding::addImprove(Player &p) {
-    if (&p != owner || !mb->isMonopolizedBy(p) || mb->getImprove() >= 5) return false;
+void AcademicBuilding::addImprove(Player &p) {
+    if (&p != owner) {
+        throw NotOwner{};
+    } else if (!mb->isMonopolizedBy(p)) {
+        throw NotMonopolized{};
+    } else if (mb->getImproveNum() >= 5) {
+        throw MaxImprove{};
+    }
+    p.payMoney(mb->getImproveCost());
     mb->addImprove();
-    return true;
 }
 
-bool AcademicBuilding::removeImprove(Player &p) {
-    if (&p != owner || mb->getImprove() <= 0) return false;
+void AcademicBuilding::sellImprove(Player &p) {
+    if (&p != owner) {
+        throw NotOwner{};
+    } else if (mb->getImproveNum() <= 0) {
+        throw ZeroImprove{};
+    }
     mb->removeImprove();
-    return true;
+    p.receiveMoney(mb->getImproveCost() / 2);
 }
 
 

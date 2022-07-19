@@ -22,7 +22,7 @@ Property *GameBoard::getProperty(string name) {
 	return nullptr;
 }
 
-void GameBoard::trade(Player &player, int value, Property &property) {
+void GameBoard::trade(Player &player, double value, Property &property) {
     if (curPlayer->payMoney(value) && property.getOwner() == &player) {
         player.receiveMoney(value);
         curPlayer->addProperty(property);
@@ -45,7 +45,7 @@ void GameBoard::trade(Player &player, Property &p1, Property &p2) {
     }
 }
 
-void GameBoard::trade(Player &player, Property &property, int value) {
+void GameBoard::trade(Player &player, Property &property, double value) {
     if (property.getOwner() == curPlayer && player.payMoney(value)){
         curPlayer->receiveMoney(value);
         curPlayer->removeProperty(property);

@@ -4,17 +4,17 @@
 #include <vector>
 #include "property.h"
 
+
 class MonopolyBlock;
 class AcademicBuilding : public Property {
-  float improveCost;
-  std::vector<float> tuition;
+  std::vector<double> tuition;
   MonopolyBlock *mb;
+  double calculateRent() const override;
  public:
-  AcademicBuilding(std::string name, float cost, std::vector<float> tuition, MonopolyBlock &mb);
-  float calculateRent(Player &p) const override;
-  int getImprove() const;
-  bool addImprove(Player &p);
-  bool removeImprove(Player &p);
+  AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb);
+  int getImproveNum() const;
+  void addImprove(Player &p);
+  void sellImprove(Player &p);
 };
 
 #endif //WATOPOLY__ACADEMICBUILDING_H_
