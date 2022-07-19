@@ -1,7 +1,7 @@
 #include <utility>
 #include "gym.h"
 #include "player.h"
-#include "Dice.h"
+#include "dice.h"
 
 Gym::Gym(std::string name): Property{std::move(name), 150} {}
 
