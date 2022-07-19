@@ -17,9 +17,17 @@ void Controller::play() {
 
     while (cin >> cmd) {
         if (cmd == "roll") {
-            g->roll();
+            if (!g->getCurPlayer()->getRollState()) {
+                cout << "You cannot roll in this turn." << endl;
+            } else {
+                g->roll();
+            }
         } else if (cmd == "next") {
-            g->next();
+            if (!g->getCurPlayer()->getRollState()) {
+                g->next();
+            } else {
+                cout << "You may roll another time before finishing your turn." << endl;
+            }
         } else if (cmd == "trade") {
             string name;
             string give;
