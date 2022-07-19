@@ -10,6 +10,8 @@
 
 using namespace std;
 
+bool GameBoard::checkInTimsLine() { return curPlayer->inTims(); }
+
 void GameBoard::roll() {
     int diceSum = 0;
     Dice d;
@@ -24,11 +26,12 @@ void GameBoard::roll() {
             curPlayer->initRollTimes();
             //send to Tims
         } else {
-            for (int i = 0; i < diceSum - 1; i++) {
-                curPlayer->advanceCurLocation();
-                cells[curPlayer->getLocation()]->passBy(*curPlayer);
+            for (int i = 1; i < diceSum; i++) {
+                int cur = curPlayer->getLocation();
+                int dest = (cur + i >= size) ? cur + i - size : cur + i;
+                cells[dest]->passBy(*curPlayer);
+                curPlayer->move(dest);
             }
-            curPlayer->advanceCurLocation();
             cells[curPlayer->getLocation()]->landOn(*curPlayer);
 
             if (roll1 == roll2) {
@@ -161,3 +164,14 @@ void GameBoard::allAssets() {
     }
 }
 
+void GameBoard::auction(int cellNum) {
+
+}
+
+bool GameBoard::isWin() {
+    return (players.size() == 1);
+}
+
+void GameBoard::bankrupt() {
+
+}
