@@ -8,9 +8,7 @@ using namespace std;
 void TimsLine::passBy(Player &p) {}
 
 void TimsLine::landOn(Player &p) {
-    unordered_map<Player *, int> iterator it;
-    it = queue.find(&p);
-    if (it == unordered_map::end) {
+    if (queue.find(&p) == queue.end()) {
         queue[&p] = 1;
     }
     

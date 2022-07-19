@@ -3,12 +3,62 @@
 #include <memory>
 #include "gameboard.h"
 #include "player.h"
-#include "cell.h"
 #include "property.h"
-#include "error.h"
 #include "academicBuilding.h"
+#include "cell.h"
+#include "dice.h"
+#include "error.h"
 
 using namespace std;
+
+bool GameBoard::checkInTimsLine() { return curPlayer->inTims(); }
+
+void GameBoard::roll() {
+    int diceSum = 0;
+    Dice d;
+    int roll1 = d.roll();
+    int roll2 = d.roll();
+    diceSum = roll1 + roll2;
+    curPlayer->setRollState(false);
+    curPlayer->addRollTimes();
+
+    if (!checkInTimsLine()) {
+        if (curPlayer->getRollTimes() == 3) {
+            curPlayer->initRollTimes();
+            //send to Tims
+        } else {
+            for (int i = 1; i < diceSum; i++) {
+                int cur = curPlayer->getLocation();
+                int dest = (cur + i >= size) ? cur + i - size : cur + i;
+                cells[dest]->passBy(*curPlayer);
+                curPlayer->move(dest);
+            }
+            cells[curPlayer->getLocation()]->landOn(*curPlayer);
+
+            if (roll1 == roll2) {
+                curPlayer->setRollState(true);
+                cout << "Lucky! You may roll again." << endl;
+            } else {
+                curPlayer->initRollTimes();
+            }
+        }
+    } else {
+        if (roll1 == roll2) {
+            cout << "Congrats for getting out of the line!" << endl;
+            curPlayer->removeFromTimsLine();
+            // roll again once getting out of Tims line??
+        }
+    }
+}
+
+void GameBoard::next() {
+    curPlayer->setRollState(true);
+    if (curPlayer == *players.end()) {
+        curPlayer = *players.begin();
+    } else {
+        curPlayer++;
+    }
+}
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
 
@@ -124,7 +174,7 @@ void GameBoard::mortgage(Property &p) {
 
 void GameBoard::unmortgage(Property &p) {
     if (p.getMortgage() && p.getOwner() == curPlayer) {
-        if (curPlayer->payMoney(p.getCash() * 0.6)) {
+        if (curPlayer->payMoney(p.getCost() * 0.6)) {
             p.setMortgage(false);
         } else {
             // bankrupt
@@ -149,3 +199,14 @@ void GameBoard::allAssets() {
     }
 }
 
+void GameBoard::auction(int cellNum) {
+
+}
+
+bool GameBoard::isWin() {
+    return (players.size() == 1);
+}
+
+void GameBoard::bankrupt() {
+
+}

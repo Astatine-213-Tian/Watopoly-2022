@@ -12,10 +12,13 @@ class Dice;
 
 class GameBoard {
     std::vector<Cell *> cells;
+	const int size;
     std::vector<Player *> players;
+	const int numPlayers;
     Player *curPlayer;
     Dice *dice1;
     Dice *dice2;
+	int curPlayerIndex;
 	bool checkInTimsLine();
 	// map, roll
 
@@ -23,7 +26,7 @@ public:
     void init();
 	void roll(); // save dice val, check dice, check num double
     void roll(int d1, int d2);
-	void next(); // check can next, 
+	void next(); // check can next,
 	Player *getCurPlayer();
 	Player *getPlayer(const std::string& name);
 	Property *getProperty(const std::string& name);

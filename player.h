@@ -10,8 +10,10 @@ class Player {
     std::vector<Property *> properties;
     double cash;
     int numCup;
+    int curLocation;
     bool isInTimsLine;
     int rollTimes;
+    bool canRoll;
 
 public:
     Player(std::string name);
@@ -19,17 +21,22 @@ public:
     std::vector<Property *> getProperties() const;
     double getCash() const;
     int getNumCup() const;
+    void move(const int index);
     void useCup();
     bool payMoney(double value);
     void receiveMoney(double value);
     void addProperty(Property &p);
     void removeProperty(Property &p);
     bool hasProperty(Property &p) const;
+    bool inTims() const;
     void setToTimsLine();
-    void removeFromTimesLine();
-    int getrollTimes() const;
+    void removeFromTimsLine();
+    int getRollTimes() const;
     void addRollTimes();
     void initRollTimes();
+    int getLocation() const;
+    bool getRollState() const;
+    void setRollState(bool state);
 };
 
 #endif
