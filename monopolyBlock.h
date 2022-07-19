@@ -15,8 +15,8 @@ class MonopolyBlock {
 
  public:
   MonopolyBlock(std::string name, double improveCost);
-  void addNewBuilding(AcademicBuilding &a);
-  bool isMonopolizedBy(Player &p) const;
+  void addNewBuilding(AcademicBuilding *a);
+  bool isMonopolizedBy(Player *p) const;
   std::string getName() const;
   double getImproveCost() const;
   int getImproveNum() const;
