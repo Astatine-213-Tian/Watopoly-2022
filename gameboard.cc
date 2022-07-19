@@ -1,5 +1,6 @@
 #include <iostream>
 #include <exception>
+#include <memory>
 #include "gameboard.h"
 #include "player.h"
 
@@ -9,22 +10,19 @@ Player *GameBoard::getCurPlayer() { return curPlayer; }
 
 Player *GameBoard::getPlayer(string name) {
 	for (auto i : players) {
-		if (i->name == name) return i;
+		if (i->getName() == name) return i;
 	}
 	return nullptr;
 }
 
 Property *GameBoard::getProperty(string name) {
-    Cell* c;
 	for (auto i : cells) {
-		if (i->name == name) c = i; break;
+		if (i->getName() == name) return i;
 	}
-    if (!c) return nullptr;
-    Property *p = dynamic_cast<Property*>(c);
 	return nullptr;
 }
 
-void GameBoard::trade(Player &player, float value, Property &property) {
+void GameBoard::trade(Player &player, int value, Property &property) {
     if (curPlayer->payMoney(value) && property.getOwner() == &player) {
         player.receiveMoney(value);
         curPlayer->addProperty(property);
@@ -47,7 +45,7 @@ void GameBoard::trade(Player &player, Property &p1, Property &p2) {
     }
 }
 
-void GameBoard::trade(Player &player, Property &property, float value) {
+void GameBoard::trade(Player &player, Property &property, int value) {
     if (property.getOwner() == curPlayer && player.payMoney(value)){
         curPlayer->receiveMoney(value);
         curPlayer->removeProperty(property);
@@ -60,21 +58,21 @@ void GameBoard::trade(Player &player, Property &property, float value) {
 }
 
 void GameBoard::buyImprove(Property &p) {
-    Academic *ab = dynamic_cast<Academic *>(&p);
-    if (!ab) {
-        cout << "You cannot improve a non-academic building." << endl;
-        return;
+	try {
+        Academic ab = p;
+        ab.addImprove();
+    } catch (bad_cast &bc) {
+        cout << "This is not an academic building." << endl;
     }
-    ab.addImprove();
 }
 
 void GameBoard::sellImprove(Property &p) {
-    Academic *ab = dynamic_cast<Academic *>(&p);
-    if (!ab) {
-        cout << "You cannot improve a non-academic building." << endl;
-        return;
+    try {
+        Academic ab = p;
+        ab.sellImprove();
+    } catch (bad_cast &bc) {
+        cout << "This is not an academic building." << endl;
     }
-    ab.setllImprove();
 }
 
 void GameBoard::mortgage(Property &p) {
@@ -88,7 +86,7 @@ void GameBoard::mortgage(Property &p) {
 
 void GameBoard::unmortgage(Property &p) {
     if (p.getMortgage() && p.getOwner() == curPlayer) {
-        if (curPlayer->payMoney(p.getCost * 0.6)) {
+        if (curPlayer->payMoney(p.getCash() * 0.6)) {
             p.setMortgage(false);
         } else {
             // bankrupt
@@ -99,11 +97,11 @@ void GameBoard::unmortgage(Property &p) {
 }
 
 void GameBoard::assets(Player &p) {
-    cout << "Player " << p.name << endl;
+    cout << "Player " << p.getName() << endl;
     cout << "Current Saving: $" << p.getCash() << endl;
     cout << "Properties: " << endl;
     for (auto i : p.getProperties()) {
-        cout << i->name << endl;
+        cout << i->getName() << endl;
     }
 }
 
