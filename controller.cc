@@ -11,9 +11,10 @@ using namespace std;
 class Property;
 class AcademicBuilding;
 
-Controller::Controller() {}
+Controller::Controller() : g{make_unique<GameBoard>()} {
+    g->init();
+}
 
-Controller::~Controller() { delete g; }
 
 bool Controller::askPlayer(Player *p) {
     cout << "Player " << p->getName() << ", do you accept this trade? (y/n)" << endl;
@@ -76,7 +77,12 @@ void Controller::play() {
                     continue;
                 }
                 if (askPlayer(toWhom)) {
-                    g->trade(*toWhom, giveMoney, *receiveProperty);
+                    try {
+                        g->trade(*toWhom, giveMoney, *receiveProperty);
+                    } catch (exception &e) {
+                        cout << e.what() << endl;
+                        continue;
+                    }
                 } else {
                     cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
@@ -89,7 +95,12 @@ void Controller::play() {
                     continue;
                 }
                 if (askPlayer(toWhom)) {
-                    g->trade(*toWhom, *giveProperty, receiveMoney);
+                    try {
+                        g->trade(*toWhom, *giveProperty, receiveMoney);
+                    } catch (exception &e) {
+                        cout << e.what() << endl;
+                        continue;
+                    }
                 } else {
                     cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
@@ -104,7 +115,12 @@ void Controller::play() {
                     continue;
                 }
                 if (askPlayer(toWhom)) {
-                    g->trade(*toWhom, *giveProperty, *receiveProperty);
+                    try {
+                        g->trade(*toWhom, *giveProperty, *receiveProperty);
+                    } catch (exception &e) {
+                        cout << e.what() << endl;
+                        continue;
+                    }
                 } else {
                     cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
