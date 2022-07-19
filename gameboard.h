@@ -10,6 +10,7 @@ class Player;
 
 class GameBoard {
     std::vector<Cell *> cells;
+	const int size;
     std::vector<Player *> players;
 	const int numPlayers;
     Player *curPlayer;
