@@ -6,7 +6,7 @@
 
 class Player;
 
-class Property : Cell {
+class Property : public Cell {
  protected:
   double cost;
   Player *owner;
