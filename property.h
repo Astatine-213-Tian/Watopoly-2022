@@ -7,8 +7,10 @@
 class Player;
 
 class Property : Cell {
+ protected:
   float cost;
   Player *owner;
+
  public:
   Property(std::string name, float cost);
   float getCost() const;

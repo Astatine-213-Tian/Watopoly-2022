@@ -6,13 +6,14 @@
 class Player;
 
 class Cell{
-    std::string name;
+ protected:
+  std::string name;
 
-public:
-    Cell(std::string name);
-    virtual ~Cell();
-    virtual void passBy(Player &p) = 0;
-    virtual void landOn(Player &p) = 0;
+ public:
+  Cell(std::string name);
+  virtual ~Cell();
+  virtual void passBy(Player &p) = 0;
+  virtual void landOn(Player &p) = 0;
 };
 
 #endif
