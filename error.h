@@ -39,16 +39,19 @@ class ZeroImprove: public Error {
 };
 
 class NotAcademicBuilding: public Error {
+  std::string invalidName;
  public:
   explicit NotAcademicBuilding(const std::string &name);
 };
 
 class NotProperty: public Error {
+  std::string invalidName;
  public:
   explicit NotProperty(const std::string &name);
 };
 
 class NotPlayer: public Error {
+  std::string invalidName;
  public:
   explicit NotPlayer(const std::string &name);
 };
