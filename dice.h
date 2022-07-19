@@ -6,6 +6,9 @@ class Dice {
   std::vector<int> v = { 1, 2, 3, 4, 5, 6 };
   int lastValue;
  public:
+  Dice();
+  int getLastValue();
+  void setValue(int value);
   int roll();
 };
 
