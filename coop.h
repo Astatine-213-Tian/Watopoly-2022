@@ -1,7 +1,7 @@
 #ifndef _COOP_H_
 #define _COOP_H_
 
-#include "NonProperty.h"
+#include "nonProperty.h"
 class Player;
 
 class Coop: public NonProperty {

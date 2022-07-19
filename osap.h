@@ -1,7 +1,7 @@
 #ifndef _OSAP_H_
 #define _OSAP_H_
 
-#include "NonProperty.h"
+#include "nonProperty.h"
 class Player;
 
 class OSAP: public NonProperty {

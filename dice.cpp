@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
-#include "Dice.h"
+#include "dice.h"
 
 int Dice::roll() {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();

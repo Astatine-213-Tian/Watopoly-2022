@@ -2,7 +2,7 @@
 #define _TIMSLINE_H_
 
 #include <unordered_map>
-#include "NonProperty.h"
+#include "nonProperty.h"
 
 class Player;
 

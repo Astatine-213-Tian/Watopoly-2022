@@ -1,7 +1,7 @@
 #ifndef _GEESE_H_
 #define _GEESE_H_
 
-#include "NonProperty.h"
+#include "nonProperty.h"
 class Player;
 
 class Geese: public NonProperty {
