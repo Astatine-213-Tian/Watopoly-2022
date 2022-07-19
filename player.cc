@@ -3,14 +3,14 @@
 
 using namespace std;
 
-Player::Player(string name): name{name}, cash{0} {}
+Player::Player(string name): name{name}, cash{0}, numCup{0}, isInTimsLine{false}, rollTimes{0} {}
 
-string Player::getName() { return name; }
+string Player::getName() const{ return name; }
 
-vector<Property *> Player::getProperties() { return properties; }
+vector<Property *> Player::getProperties() const{ return properties; }
 
-float Player::getCash() { return cash; }
+double Player::getCash() const{ return cash; }
 
-int Player::getNumCup() { return numCup; }
+int Player::getNumCup() const{ return numCup; }
 
 void Player::useCup() { numCup --;}

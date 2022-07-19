@@ -8,23 +8,23 @@ class Property;
 class Player {
     std::string name;
     std::vector<Property *> properties;
-    float cash;
+    double cash;
     int numCup;
     bool isInTimsLine;
     int rollTimes;
 
 public:
     Player(std::string name);
-    std::string getName();
-    std::vector<Property *> getProperties();
-    float getCash();
-    int getNumCup();
+    std::string getName() const;
+    std::vector<Property *> getProperties() const;
+    double getCash() const;
+    int getNumCup() const;
     void useCup();
-    bool payMoney(float value);
-    void receiveMoney(float value);
+    bool payMoney(double value);
+    void receiveMoney(double value);
     void addProperty(Property &p);
     void removeProperty(Property &p);
-    bool hasProperty(Property &p);
+    bool hasProperty(Property &p) const;
     void setToTimsLine();
     void removeFromTimesLine();
     int getrollTimes() const;
