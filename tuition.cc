@@ -4,6 +4,8 @@
 
 using namespace std;
 
+Tuition::Tuition() : NonProperty{"tuition"} {}
+
 void Tuition::passBy(Player &p) {}
 
 void Tuition::landOn(Player &p) {
@@ -12,9 +14,12 @@ void Tuition::landOn(Player &p) {
     cout << "Enter 1 to pay $300. \nEnter 2 to pay 10\% of your total asset." << endl;
     cin >> ans;
     if (ans == 1) {
-        if(!p.payMoney(300)) // bankrupt
+        if(!p.payMoney(300)) {
+            // bankrupt
+        }
     } else if (ans == 2) {
-        float total = p.calculateAssetsValue();
-        if(!p.payMoney(total * 0.1)) // bankrupt
+        // TODO calculate total asset
+//        float total = p.calculateAssetsValue();
+//        if(!p.payMoney(total * 0.1)) // bankrupt
     }
 }

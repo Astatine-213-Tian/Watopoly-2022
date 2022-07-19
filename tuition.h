@@ -5,9 +5,10 @@
 class Player;
 
 class Tuition: public NonProperty {
-public:
-    void passBy(Player &p) override;
-    void landOn(Player &p) override;
+ public:
+  Tuition();
+  void passBy(Player &p) override;
+  void landOn(Player &p) override;
 };
 
 #endif

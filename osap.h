@@ -5,10 +5,11 @@
 class Player;
 
 class OSAP: public NonProperty {
-    const int value = 200;
-public:
-    void passBy(Player &p) override;
-    void landOn(Player &p) override;
+  const int value = 200;
+ public:
+  OSAP();
+  void passBy(Player &p) override;
+  void landOn(Player &p) override;
 };
 
 #endif
