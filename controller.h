@@ -4,6 +4,7 @@
 #include <string>
 
 class GameBoard;
+class Player;
 class Controller {
     GameBoard *g;
 
@@ -11,6 +12,7 @@ class Controller {
     Controller();
     ~Controller();
     void init();
+    bool askPlayer(Player *p);
     void play();
     void save(std::string filename);
     void load();
