@@ -75,13 +75,26 @@ void GameBoard::init() {
 
 bool GameBoard::checkInTimsLine() { return curPlayer->inTims(); }
 
+void GameBoard::forward(const int diceSum) {
+    for (int i = 1; i < diceSum; i++) {
+        int cur = curPlayer->getLocation();
+        int dest = (cur + i >= cells.size()) ? cur + i - cells.size() : cur + i;
+        cells[dest]->passBy(*curPlayer);
+        curPlayer->move(dest);
+    }
+    try {
+        cells[curPlayer->getLocation()]->landOn(*curPlayer);
+    } catch (sendToTims &) {
+        // send to tims
+    }
+}
+
 void GameBoard::roll() {
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     int diceSum = roll1 + roll2;
     curPlayer->setRollState(false);
     curPlayer->addRollTimes();
-
     int size = (int) cells.size();
 
     if (!checkInTimsLine()) {
@@ -89,17 +102,7 @@ void GameBoard::roll() {
             curPlayer->initRollTimes();
             //TODO Send to Tims
         } else {
-            for (int i = 1; i < diceSum; i++) {
-                int cur = curPlayer->getLocation();
-                int dest = (cur + i >= size) ? cur + i - size : cur + i;
-                cells[dest]->passBy(*curPlayer);
-                curPlayer->move(dest);
-            }
-            try {
-                cells[curPlayer->getLocation()]->landOn(*curPlayer);
-            } catch (sendToTims &) {
-                // send to tims
-            }
+            forward(diceSum);
 
             if (roll1 == roll2) {
                 curPlayer->setRollState(true);
@@ -112,7 +115,8 @@ void GameBoard::roll() {
         if (roll1 == roll2) {
             cout << "Congrats for getting out of the line!" << endl;
             curPlayer->removeFromTimsLine();
-            // roll again once getting out of Tims line??
+            curPlayer->initRollTimes();
+            forward(diceSum);
         }
     }
 }
