@@ -24,3 +24,5 @@ NotAcademicBuilding::NotAcademicBuilding(const string& name) : Error{name + " is
 NotProperty::NotProperty(const std::string &name) : Error{name + " is not a Property"} {}
 
 NotPlayer::NotPlayer(const std::string &name) : Error{name + " is not a Player"} {}
+
+InvalidRoll::InvalidRoll() : Error{"You cannot roll anymore"} {}

@@ -56,4 +56,9 @@ class NotPlayer: public Error {
   explicit NotPlayer(const std::string &name);
 };
 
+class InvalidRoll: public Error {
+ public:
+  InvalidRoll()
+};
+
 #endif //WATOPOLY__ERROR_H_
