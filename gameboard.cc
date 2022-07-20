@@ -78,13 +78,28 @@ void GameBoard::addPlayer(const std::string &name, char displayChar, int positio
 }
 
 
+void GameBoard::forward(const int diceSum) {
+    for (int i = 1; i < diceSum; i++) {
+        int cur = curPlayer->getLocation();
+        int dest = (cur + i >= cells.size()) ? cur + i - cells.size() : cur + i;
+        cells[dest]->passBy(*curPlayer);
+        curPlayer->move(dest);
+    }
+    try {
+        cells[curPlayer->getLocation()]->landOn(*curPlayer);
+    } catch (sendToTims &) {
+        // send to tims
+    }
+}
+
 void GameBoard::roll() {
-    if (dice1->getValue() != dice2->getValue()) throw InvalidRoll{};
+    if (!curPlayer->getRollState()) throw InvalidRoll{};
 
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     int diceSum = roll1 + roll2;
     curPlayer->addRollTimes();
+    curPlayer->setRollState(false);
     int size = (int) cells.size();
 
     // TODO intims check before roll
@@ -94,21 +109,10 @@ void GameBoard::roll() {
             curPlayer->move(10);
             next();
         } else {
-            for (int i = 1; i < diceSum; i++) {
-                int cur = curPlayer->getLocation();
-                int dest = (cur + i >= size) ? cur + i - size : cur + i;
-                cells[dest]->passBy(*curPlayer);
-                curPlayer->move(dest);
-            }
-
-            cells[curPlayer->getLocation()]->landOn(*curPlayer);
-            if (curPlayer->shouldMoveToTims()) {
-                curPlayer->move(10);
-                curPlayer->setToTimsLine();
-                curPlayer->completeMoveToTims();
-            }
+            forward(diceSum);
 
             if (roll1 == roll2) {
+                curPlayer->setRollState(true);
                 cout << "Lucky! You may roll again." << endl;
             } else {
                 curPlayer->initRollTimes();
@@ -119,13 +123,13 @@ void GameBoard::roll() {
             cout << "Congrats for getting out of the line!" << endl;
             curPlayer->removeFromTimsLine();
             curPlayer->initRollTimes();
+            forward(diceSum);
         }
     }
 }
 
 void GameBoard::next() {
-    dice1->init();
-    dice2->init();
+    curPlayer->setRollState(true);
     size_t numPlayer = players.size();
     if (curPlayer == players[numPlayer - 1].get()) {
         curPlayer = players[0].get();
