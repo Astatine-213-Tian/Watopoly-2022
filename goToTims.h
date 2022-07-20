@@ -5,7 +5,6 @@
 class Player;
 
 class GoToTims: public NonProperty {
-  const int timsIndex;
  public:
   GoToTims();
   void passBy(Player &p) override;
