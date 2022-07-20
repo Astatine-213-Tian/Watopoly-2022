@@ -3,13 +3,17 @@
 #include "property.h"
 #include "player.h"
 
-Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr} {}
+Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, isMortgaged{false}, owner{nullptr} {}
 
 Player *Property::getOwner() const { return owner; }
 
 void Property::setOwner(Player *p) { owner = p; }
 
 double Property::getCost() const { return cost; }
+
+void Property::setMortgage() { isMortgaged = true; }
+
+void Property::setUnMortgage() { isMortgaged = false; }
 
 void Property::passBy(Player &p) { }
 

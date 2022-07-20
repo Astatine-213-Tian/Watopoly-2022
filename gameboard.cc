@@ -143,12 +143,10 @@ Player *GameBoard::getPlayer(const string& name) const{
 Property *GameBoard::getProperty(const string& name) const{
     for (auto &i : cells) {
         if (i->getName() == name) {
-            try {
-                return &dynamic_cast<Property&>(*i);
-            } catch (bad_cast &) {
-                break;
-            }
-        };
+            auto *p = dynamic_cast<Property*>(i.get());
+            if (p) return p;
+            else break;
+        }
     }
     throw NotProperty{name};
 }
@@ -156,12 +154,10 @@ Property *GameBoard::getProperty(const string& name) const{
 AcademicBuilding *GameBoard::getAcademicBuilding(const std::string &name) const{
     for (auto &i : cells) {
         if (i->getName() == name) {
-            try {
-                return &dynamic_cast<AcademicBuilding&>(*i);
-            } catch (bad_cast &) {
-                break;
-            }
-        };
+            auto *ab = dynamic_cast<AcademicBuilding*>(i.get());
+            if (ab) return ab;
+            else break;
+        }
     }
     throw NotAcademicBuilding{name};
 }
@@ -172,23 +168,10 @@ void GameBoard::trade(Player &player, double value, Property &property) {
         throw NotOwner{player.getName(), property.getName()};
     }
     property.setOwner(curPlayer);
-    
+
     //check bankrupt
     curPlayer->payMoney(value);
-
-    // curPlayer->addProperty(property);
-    // player.removeProperty(property);
-    // player.receiveMoney(value);
-    
-//    if (curPlayer->payMoney(value) && property.getOwner() == &player) {
-//        player.receiveMoney(value);
-//        curPlayer->addProperty(property);
-//        player.removeProperty(property);
-//    } else if (!(player.hasProperty(property))) {
-//        cout << "Invalid trade." << endl;
-//    } else {
-//        // bankrupt
-//    }
+    player.receiveMoney(value);
 }
 
 void GameBoard::trade(Player &player, Property &p1, Property &p2) {
@@ -200,20 +183,6 @@ void GameBoard::trade(Player &player, Property &p1, Property &p2) {
     }
     p1.setOwner(&player);
     p2.setOwner(curPlayer);
-
-    // curPlayer->removeProperty(p1);
-    // curPlayer->addProperty(p2);
-    // player.addProperty(p1);
-    // player.removeProperty(p2);
-    
-//    if (p1.getOwner() == curPlayer && p2.getOwner() == &player) {
-//        curPlayer->removeProperty(p1);
-//	    curPlayer->addProperty(p2);
-//	    player.addProperty(p1);
-//	    player.removeProperty(p2);
-//    } else {
-//        cout << "Invalid trade." << endl;
-//    }
 }
 
 void GameBoard::trade(Player &player, Property &property, double value) {
@@ -221,23 +190,9 @@ void GameBoard::trade(Player &player, Property &property, double value) {
     if (property.getOwner() != curPlayer) {
         throw NotOwner{curPlayer->getName(), property.getName()};
     }
-    // player.addProperty(property);
-    // curPlayer->receiveMoney(value);
-    // curPlayer->removeProperty(property);
-    property.setOwner(&player);
-
-    //check bankrupt
     player.payMoney(value);
-
-//    if (property.getOwner() == curPlayer && player.payMoney(value)){
-//        curPlayer->receiveMoney(value);
-//        curPlayer->removeProperty(property);
-//        player.addProperty(property);
-//    } else if (!(curPlayer->hasProperty(property))) {
-//        cout << "Invalid trade." << endl;
-//    } else {
-//        // bankrupt
-//    }
+    curPlayer->receiveMoney(value);
+    property.setOwner(&player);
 }
 
 void GameBoard::buyImprove(AcademicBuilding &ab) {
@@ -274,12 +229,9 @@ void GameBoard::assets(Player &p) {
     cout << "Current Saving: $" << p.getCash() << endl;
     cout << "Properties: " << endl;
     for (auto &i : cells) {
-        try {
-            if (dynamic_cast<Property &> (*i).getOwner() == &p) {
-                cout << i->getName() << endl;
-            }
-        } catch (bad_cast &) {
-            continue;
+        auto *property = dynamic_cast<Property *>(i.get());
+        if (property->getOwner() == &p) {
+            cout << i->getName() << endl;
         }
     }
 }

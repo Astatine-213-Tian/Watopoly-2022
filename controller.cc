@@ -16,7 +16,7 @@ Controller::Controller() : g{make_unique<GameBoard>()} {
 }
 
 
-bool Controller::askPlayer(Player *p) {
+bool Controller::askPlayerTradeResponse(Player *p) {
     cout << "Player " << p->getName() << ", do you accept this trade? (y/n)" << endl;
     string answer;
 
@@ -25,6 +25,7 @@ bool Controller::askPlayer(Player *p) {
         if (answer == "Y" || answer == "y" || answer == "Yes" || answer == "yes") {
             return true;
         } else if (answer == "N" || answer == "n" || answer == "No" || answer == "no") {
+            cout << "Player " << p->getName() << " does not accept this trade." << endl;
             return false;
         }
         cout << "Please input y/n as your response: " << endl;
@@ -76,15 +77,12 @@ void Controller::play() {
                     cout << e.what() << endl;
                     continue;
                 }
-                if (askPlayer(toWhom)) {
+                if (askPlayerTradeResponse(toWhom)) {
                     try {
                         g->trade(*toWhom, giveMoney, *receiveProperty);
                     } catch (exception &e) {
                         cout << e.what() << endl;
-                        continue;
                     }
-                } else {
-                    cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
             } else if (ssReceive >> receiveMoney) {
                 Property *giveProperty;
@@ -94,15 +92,12 @@ void Controller::play() {
                     cout << e.what() << endl;
                     continue;
                 }
-                if (askPlayer(toWhom)) {
+                if (askPlayerTradeResponse(toWhom)) {
                     try {
                         g->trade(*toWhom, *giveProperty, receiveMoney);
                     } catch (exception &e) {
                         cout << e.what() << endl;
-                        continue;
                     }
-                } else {
-                    cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
             } else {
                 Property *giveProperty;
@@ -114,15 +109,12 @@ void Controller::play() {
                     cout << e.what() << endl;
                     continue;
                 }
-                if (askPlayer(toWhom)) {
+                if (askPlayerTradeResponse(toWhom)) {
                     try {
                         g->trade(*toWhom, *giveProperty, *receiveProperty);
                     } catch (exception &e) {
                         cout << e.what() << endl;
-                        continue;
                     }
-                } else {
-                    cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
             }
         } else if (cmd == "improve") {
@@ -141,14 +133,12 @@ void Controller::play() {
                     g->buyImprove(*ab);
                 } catch (exception &e) {
                     cout << e.what() << endl;
-                    continue;
                 }
             } else if (option == "sell") {
                 try {
                     g->sellImprove(*ab);
                 } catch (exception &e) {
                     cout << e.what() << endl;
-                    continue;
                 }
             }
         } else if (cmd == "mortgage") {
