@@ -12,7 +12,7 @@ class Controller {
 
  public:
   Controller();
-  bool askPlayer(Player *p);
+  bool askPlayerTradeResponse(Player *p);
   void play();
   void save(std::string filename);
   void load();
