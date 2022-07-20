@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <fstream>
 #include "controller.h"
 #include "gameboard.h"
 #include "player.h"
@@ -176,6 +177,29 @@ void Controller::play() {
     }
 }
 
-void Controller::save(string filename) {}
+void Controller::save(string filename) {
 
-void Controller::load() {}
+}
+
+void Controller::load(const string& filename) {
+    string line;
+    ifstream iFile(filename);
+    if (iFile.is_open()) {
+        getline(iFile, line);
+        int numPlayers = stoi(line);
+        for (int i = 0; i < numPlayers; ++i) {
+            getline(iFile, line);
+            istringstream ss(line);
+            string name;
+            char displayChar;
+            int timsCups;
+            double money;
+            int position;
+            ss >> name >> displayChar >> timsCups >> money >> position;
+            g->addPlayer(name, displayChar, position, timsCups, money);
+        }
+        while (getline(iFile, line)) {
+            // TODO how to set info for property?
+        }
+    }
+}
