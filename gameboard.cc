@@ -19,7 +19,7 @@
 
 using namespace std;
 
-GameBoard::GameBoard() : curPlayer{nullptr} {}
+GameBoard::GameBoard() : curPlayer{nullptr}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()} {}
 
 void GameBoard::init() {
     MonopolyBlock Art1 = MonopolyBlock{"Art1", 50};
@@ -73,21 +73,26 @@ void GameBoard::init() {
     cells.emplace_back(make_unique<AcademicBuilding>("DC", 400, vector<double>{50, 200, 600, 1400, 1700, 2000}, Math));
 }
 
-bool GameBoard::checkInTimsLine() { return curPlayer->inTims(); }
+void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money) {
+    players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position));
+}
+
 
 void GameBoard::roll() {
+    if (dice1->getValue() != dice2->getValue()) throw InvalidRoll{};
+
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     int diceSum = roll1 + roll2;
-    curPlayer->setRollState(false);
     curPlayer->addRollTimes();
-
     int size = (int) cells.size();
 
-    if (!checkInTimsLine()) {
-        if (curPlayer->getRollTimes() == 3) {
+    // TODO intims check before roll
+    if (!curPlayer->inTims()) {
+        if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
             curPlayer->initRollTimes();
-            //TODO Send to Tims
+            curPlayer->move(10);
+            next();
         } else {
             for (int i = 1; i < diceSum; i++) {
                 int cur = curPlayer->getLocation();
@@ -95,14 +100,15 @@ void GameBoard::roll() {
                 cells[dest]->passBy(*curPlayer);
                 curPlayer->move(dest);
             }
-            try {
-                cells[curPlayer->getLocation()]->landOn(*curPlayer);
-            } catch (sendToTims &) {
-                // send to tims
+
+            cells[curPlayer->getLocation()]->landOn(*curPlayer);
+            if (curPlayer->shouldMoveToTims()) {
+                curPlayer->move(10);
+                curPlayer->setToTimsLine();
+                curPlayer->completeMoveToTims();
             }
 
             if (roll1 == roll2) {
-                curPlayer->setRollState(true);
                 cout << "Lucky! You may roll again." << endl;
             } else {
                 curPlayer->initRollTimes();
@@ -112,13 +118,14 @@ void GameBoard::roll() {
         if (roll1 == roll2) {
             cout << "Congrats for getting out of the line!" << endl;
             curPlayer->removeFromTimsLine();
-            // roll again once getting out of Tims line??
+            curPlayer->initRollTimes();
         }
     }
 }
 
 void GameBoard::next() {
-    curPlayer->setRollState(true);
+    dice1->init();
+    dice2->init();
     size_t numPlayer = players.size();
     if (curPlayer == players[numPlayer - 1].get()) {
         curPlayer = players[0].get();

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Player::Player(string name): name{name}, cash{0}, numCup{0}, isInTimsLine{false}, rollTimes{0} {}
+Player::Player(std::string name, char displayChar, int timCups, double cash, int position): name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position}, isInTimsLine{false}, rollTimes{0}, canRoll{true} {}
 
 string Player::getName() const{ return name; }
 
@@ -23,7 +23,7 @@ void Player::receiveMoney(double value) { cash += value; }
 
 // void Player::addProperty(Property &p) { properties.emplace_back(&p); }
 
-// void Player::removeProperty(Property &p) { 
+// void Player::removeProperty(Property &p) {
 //     for (vector<Property *>::iterator it = properties.begin(); it != properties.end(); it++) {
 //         if (*it == &p) {
 //             properties.erase(it);
@@ -32,7 +32,7 @@ void Player::receiveMoney(double value) { cash += value; }
 //     }
 // }
 
-// bool Player::hasProperty(Property &p) const{ 
+// bool Player::hasProperty(Property &p) const{
 //     for (auto i : properties) {
 //         if (i == &p) { return true; }
 //     }
@@ -44,6 +44,12 @@ bool Player::inTims() const{ return isInTimsLine; }
 void Player::setToTimsLine() { isInTimsLine = true; }
 
 void Player::removeFromTimsLine() { isInTimsLine = false; }
+
+void Player::setMoveToTims() { moveToTims = true; }
+
+bool Player::shouldMoveToTims() const { return moveToTims; }
+
+void Player::completeMoveToTims() { moveToTims = true; }
 
 int Player::getRollTimes() const{ return rollTimes; }
 

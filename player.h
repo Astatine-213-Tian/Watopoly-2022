@@ -8,16 +8,18 @@ class AcademicBuilding;
 
 class Player {
     std::string name;
+    char displayChar;
     //std::vector<Property *> properties;
     double cash;
     int numCup;
     int curLocation;
     bool isInTimsLine;
+    bool moveToTims;
     int rollTimes;
     bool canRoll;
 
 public:
-    Player(std::string name);
+    Player(std::string name, char displayChar, int timCups, double cash, int position);
     std::string getName() const;
     //std::vector<Property *> getProperties() const;
     double getCash() const;
@@ -26,11 +28,11 @@ public:
     void useCup();
     bool payMoney(double value);
     void receiveMoney(double value);
-    // void addProperty(Property &p);
-    // void removeProperty(Property &p);
-    // bool hasProperty(Property &p) const;
     bool inTims() const;
     void setToTimsLine();
+    void setMoveToTims();
+    bool shouldMoveToTims() const;
+    void completeMoveToTims();
     void removeFromTimsLine();
     int getRollTimes() const;
     void addRollTimes();

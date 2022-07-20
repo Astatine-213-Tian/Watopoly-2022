@@ -22,6 +22,7 @@ class GameBoard {
  public:
   GameBoard();
   void init();
+  void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500);
   void roll(); // save dice val, check dice, check num double
   void roll(int d1, int d2);
   void next(); // check can next,
