@@ -3,16 +3,18 @@
 #include <chrono>
 #include "dice.h"
 
-Dice::Dice() : lastValue{0} {}
+Dice::Dice() : value{0} {}
 
-int Dice::getLastValue() { return lastValue; }
+int Dice::getValue() { return value; }
 
 int Dice::roll() {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine rng{seed};
     std::shuffle( v.begin(), v.end(), rng );
-    lastValue = v[0];
-    return lastValue;
+    value = v[0];
+    return value;
 }
 
-void Dice::setValue(int v) { lastValue = v; }
+void Dice::setValue(int v) { value = v; }
+
+void Dice::init() { value = 0; }

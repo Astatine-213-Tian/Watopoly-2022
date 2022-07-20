@@ -4,10 +4,11 @@
 
 class Dice {
   std::vector<int> v = { 1, 2, 3, 4, 5, 6 };
-  int lastValue;
+  int value;
  public:
   Dice();
-  int getLastValue();
+  void init();
+  int getValue();
   void setValue(int value);
   int roll();
 };
