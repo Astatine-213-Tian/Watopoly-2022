@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <fstream>
 #include "controller.h"
 #include "gameboard.h"
 #include "player.h"
@@ -26,7 +25,6 @@ bool Controller::askPlayerTradeResponse(Player *p) {
         if (answer == "Y" || answer == "y" || answer == "Yes" || answer == "yes") {
             return true;
         } else if (answer == "N" || answer == "n" || answer == "No" || answer == "no") {
-            cout << "Player " << p->getName() << " does not accept this trade." << endl;
             return false;
         }
         cout << "Please input y/n as your response: " << endl;
@@ -35,8 +33,10 @@ bool Controller::askPlayerTradeResponse(Player *p) {
 
 void Controller::play() {
     string cmd;
-
+    
+    cout << "Please enter a command:" << endl;
     while (cin >> cmd) {
+
         if (cmd == "roll") {
             if (!g->getCurPlayer()->getRollState()) {
                 cout << "You cannot roll in this turn." << endl;
@@ -83,7 +83,10 @@ void Controller::play() {
                         g->trade(*toWhom, giveMoney, *receiveProperty);
                     } catch (exception &e) {
                         cout << e.what() << endl;
+                        continue;
                     }
+                } else {
+                    cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
             } else if (ssReceive >> receiveMoney) {
                 Property *giveProperty;
@@ -98,7 +101,10 @@ void Controller::play() {
                         g->trade(*toWhom, *giveProperty, receiveMoney);
                     } catch (exception &e) {
                         cout << e.what() << endl;
+                        continue;
                     }
+                } else {
+                    cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
             } else {
                 Property *giveProperty;
@@ -115,7 +121,10 @@ void Controller::play() {
                         g->trade(*toWhom, *giveProperty, *receiveProperty);
                     } catch (exception &e) {
                         cout << e.what() << endl;
+                        continue;
                     }
+                } else {
+                    cout << "Player " << toWhom->getName() << " does not accept this trade." << endl;
                 }
             }
         } else if (cmd == "improve") {
@@ -134,12 +143,14 @@ void Controller::play() {
                     g->buyImprove(*ab);
                 } catch (exception &e) {
                     cout << e.what() << endl;
+                    continue;
                 }
             } else if (option == "sell") {
                 try {
                     g->sellImprove(*ab);
                 } catch (exception &e) {
                     cout << e.what() << endl;
+                    continue;
                 }
             }
         } else if (cmd == "mortgage") {
@@ -177,29 +188,6 @@ void Controller::play() {
     }
 }
 
-void Controller::save(string filename) {
+void Controller::save(string& filename) {}
 
-}
-
-void Controller::load(const string& filename) {
-    string line;
-    ifstream iFile(filename);
-    if (iFile.is_open()) {
-        getline(iFile, line);
-        int numPlayers = stoi(line);
-        for (int i = 0; i < numPlayers; ++i) {
-            getline(iFile, line);
-            istringstream ss(line);
-            string name;
-            char displayChar;
-            int timsCups;
-            double money;
-            int position;
-            ss >> name >> displayChar >> timsCups >> money >> position;
-            g->addPlayer(name, displayChar, position, timsCups, money);
-        }
-        while (getline(iFile, line)) {
-            // TODO how to set info for property?
-        }
-    }
-}
+void Controller::load(const string& filename) {}
