@@ -37,7 +37,6 @@ void Property::landOn(Player &p) {
         }
         if (!buy) return;
         p.payMoney(cost);
-        p.addProperty(*this);
         owner = &p;
     }
 
