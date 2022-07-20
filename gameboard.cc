@@ -15,6 +15,7 @@
 #include "gym.h"
 #include "goToTims.h"
 #include "coop.h"
+#include "action.h"
 
 using namespace std;
 
@@ -94,7 +95,11 @@ void GameBoard::roll() {
                 cells[dest]->passBy(*curPlayer);
                 curPlayer->move(dest);
             }
-            cells[curPlayer->getLocation()]->landOn(*curPlayer);
+            try {
+                cells[curPlayer->getLocation()]->landOn(*curPlayer);
+            } catch (sendToTims &) {
+                // send to tims
+            }
 
             if (roll1 == roll2) {
                 curPlayer->setRollState(true);
@@ -158,8 +163,10 @@ void GameBoard::trade(Player &player, double value, Property &property) {
     if (property.getOwner() != &player) {
         throw NotOwner{player.getName(), property.getName()};
     }
-    curPlayer->payMoney(value);
     property.setOwner(curPlayer);
+
+    //check bankrupt
+    curPlayer->payMoney(value);
     player.receiveMoney(value);
 }
 
@@ -217,9 +224,12 @@ void GameBoard::assets(Player &p) {
     cout << "Player " << p.getName() << endl;
     cout << "Current Saving: $" << p.getCash() << endl;
     cout << "Properties: " << endl;
-//    for (auto i : ()) {
-//        cout << i->getName() << endl;
-//    }
+    for (auto &i : cells) {
+        auto *property = dynamic_cast<Property *>(i.get());
+        if (property->getOwner() == &p) {
+            cout << i->getName() << endl;
+        }
+    }
 }
 
 void GameBoard::allAssets() {
