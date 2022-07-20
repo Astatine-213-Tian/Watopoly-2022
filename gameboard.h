@@ -18,6 +18,7 @@ class GameBoard {
   std::unique_ptr<Dice> dice2;
 
   bool checkInTimsLine();
+  void forward(const int diceSum);
 
  public:
   GameBoard();

@@ -58,7 +58,7 @@ class NotPlayer: public Error {
 
 class InvalidRoll: public Error {
  public:
-  InvalidRoll()
+  InvalidRoll();
 };
 
 #endif //WATOPOLY__ERROR_H_
