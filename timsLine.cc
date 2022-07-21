@@ -9,7 +9,7 @@ TimsLine::TimsLine() : NonProperty{"DC Tims Line"} {}
 
 void TimsLine::passBy(Player &p) {}
 
-void TimsLine::landOn(Player &p) {
+void TimsLine::landOnAction(Player &p) {
     if (queue.find(&p) == queue.end()) {
         queue[&p] = 1;
     }

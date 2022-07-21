@@ -8,7 +8,7 @@ class Tuition: public NonProperty {
  public:
   Tuition();
   void passBy(Player &p) override;
-  void landOn(Player &p) override;
+  void landOnAction(Player &p) override;
 };
 
 #endif

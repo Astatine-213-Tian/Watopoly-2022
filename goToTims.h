@@ -8,7 +8,7 @@ class GoToTims: public NonProperty {
  public:
   GoToTims();
   void passBy(Player &p) override;
-  void landOn(Player &p) override;
+  void landOnAction(Player &p) override;
 };
 
 #endif

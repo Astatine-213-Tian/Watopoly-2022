@@ -12,7 +12,7 @@ class TimsLine: public NonProperty {
 public:
     TimsLine();
     void passBy(Player &p) override;
-    void landOn(Player &p) override;
+    void landOnAction(Player &p) override;
     void addPlayerToLine(Player &p);
     int getPlayerRound(Player &p);
 };
