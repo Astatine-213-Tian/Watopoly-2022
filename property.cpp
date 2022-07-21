@@ -3,25 +3,26 @@
 #include "property.h"
 #include "player.h"
 
-Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, isMortgaged{false}, isMortgageChargePaid{false}, owner{nullptr} {}
-
-Player *Property::getOwner() const { return owner; }
+Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, isMortgaged{false}, isMortgageInterestPaid{false} {}
 
 void Property::setOwner(Player *p) { owner = p; }
 
 double Property::getCost() const { return cost; }
 
-void Property::setMortgage() { isMortgaged = true;}
+void Property::setMortgage() {
+    isMortgaged = true;
+    isMortgageInterestPaid = false;
+}
 
 void Property::setUnMortgage() {
     isMortgaged = false;
-    isMortgageChargePaid = false;
+    isMortgageInterestPaid = false;
 }
 
-void Property::setAdditionChargePaid() { isMortgageChargePaid = true; }
+void Property::setMortgageInterestPaid() { isMortgageInterestPaid = true; }
 
 double Property::getUnMortgageCost() const {
-    if (isMortgageChargePaid) {
+    if (isMortgageInterestPaid) {
         return cost * 0.5;
     } else {
         return cost * 0.6;
@@ -39,7 +40,7 @@ void Property::landOn(Player &p) {
         std::string ans;
         while (std::cin >> ans) {
             if (ans == "Y" || ans == "y" || ans == "Yes" || ans == "yes") {
-                p.payMoney(cost);
+                p.forcePay(cost);
                 owner = &p;
                 return;
             } else if (ans == "N" || ans == "n" || ans == "No" || ans == "no") {
@@ -53,11 +54,20 @@ void Property::landOn(Player &p) {
     if (isMortgaged) return;
 
     double rent = calculateRent();
-    p.payMoney(rent);
-    owner->receiveMoney(rent);
+    p.forcePay(rent, owner);
 }
 
 
 bool Property::getMortgageStatus() const {
     return isMortgaged;
 }
+
+double Property::getAllPossibleReturn() const {
+    return cost / 2;
+}
+
+double Property::getValue() const {
+    if (isMortgaged) return 0;
+    else return getAllPossibleReturn();
+}
+

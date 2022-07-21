@@ -8,13 +8,16 @@ class Player;
 class Cell{
  protected:
   std::string name;
+  Player *owner;
 
  public:
   Cell(std::string name);
   virtual ~Cell();
   virtual void passBy(Player &p) = 0;
   virtual void landOn(Player &p) = 0;
-  std::string getName();
+  std::string getName() const;
+  Player *getOwner() const;
+  virtual double getValue() const = 0;
 };
 
 #endif

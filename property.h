@@ -9,23 +9,23 @@ class Player;
 class Property : public Cell {
  protected:
   double cost;
-  Player *owner;
   bool isMortgaged;
-  bool isMortgageChargePaid;
+  bool isMortgageInterestPaid;
   virtual double calculateRent() const = 0;
+  virtual double getAllPossibleReturn () const;
 
  public:
   Property(std::string name, double cost);
   double getCost() const;
-  Player *getOwner() const;
   double getUnMortgageCost() const;
   void setMortgage();
   void setUnMortgage();
-  void setAdditionChargePaid();
+  void setMortgageInterestPaid();
   bool getMortgageStatus() const;
   void setOwner(Player *p);
   void passBy(Player &p) override;
   void landOn(Player &p) override;
+  double getValue() const override;
 };
 
 #endif //WATOPOLY__PROPERTY_H_
