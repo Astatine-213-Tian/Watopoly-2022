@@ -18,7 +18,7 @@ void Property::setUnMortgage() {
     isMortgageChargePaid = false;
 }
 
-void Property::setAdditionCharPaid() { isMortgageChargePaid = true; }
+void Property::setAdditionChargePaid() { isMortgageChargePaid = true; }
 
 double Property::getUnMortgageCost() const {
     if (isMortgageChargePaid) {

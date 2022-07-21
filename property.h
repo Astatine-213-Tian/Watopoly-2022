@@ -21,7 +21,7 @@ class Property : public Cell {
   double getUnMortgageCost() const;
   void setMortgage();
   void setUnMortgage();
-  void setAdditionCharPaid();
+  void setAdditionChargePaid();
   bool getMortgageStatus() const;
   void setOwner(Player *p);
   void passBy(Player &p) override;
