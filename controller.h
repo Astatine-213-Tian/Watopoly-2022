@@ -14,7 +14,7 @@ class Controller {
   Controller();
   bool askPlayerTradeResponse(Player *p);
   void play();
-  void save(std::string filename);
+  void save(std::string& filename);
   void load(const std::string& filename);
 };
 
