@@ -9,10 +9,12 @@ class Player;
 class Property : public Cell {
  protected:
   double cost;
+  Player *owner;
   bool isMortgaged;
   bool isMortgageInterestPaid;
+  int numImprove;
   virtual double calculateRent() const = 0;
-  virtual double getAllPossibleReturn () const;
+  virtual double getValueWhenUnMortgage() const;
 
  public:
   Property(std::string name, double cost);
@@ -22,10 +24,19 @@ class Property : public Cell {
   void setUnMortgage();
   void setMortgageInterestPaid();
   bool getMortgageStatus() const;
+  Player *getOwner() const;
   void setOwner(Player *p);
+
+  virtual int getImproveNum() const;
+  virtual double getImproveCost() const;
+  virtual void addImprove() const;
+  virtual void removeImprove() const;
+  virtual void initImprove(int improveNum) const;
+
   void passBy(Player &p) override;
-  void landOn(Player &p) override;
-  double getValue() const override;
+  void landOnAction(Player &p) override;
+  double getTradableValue() const;
+
 };
 
 #endif //WATOPOLY__PROPERTY_H_
