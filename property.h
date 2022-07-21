@@ -11,14 +11,18 @@ class Property : public Cell {
   double cost;
   Player *owner;
   bool isMortgaged;
+  bool isMortgageChargePaid;
   virtual double calculateRent() const = 0;
 
  public:
   Property(std::string name, double cost);
   double getCost() const;
   Player *getOwner() const;
+  double getUnMortgageCost() const;
   void setMortgage();
   void setUnMortgage();
+  void setAdditionCharPaid();
+  bool getMortgageStatus() const;
   void setOwner(Player *p);
   void passBy(Player &p) override;
   void landOn(Player &p) override;
