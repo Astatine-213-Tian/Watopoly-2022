@@ -1,10 +1,11 @@
 #include "player.h"
-#include "academicBuilding.h"
 #include "error.h"
 
 using namespace std;
 
-Player::Player(std::string name, char displayChar, int timCups, double cash, int position): name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position}, isInTimsLine{false}, rollTimes{0}, canRoll{true} {}
+Player::Player(std::string name, char displayChar, int timCups, double cash, int position):
+    name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position},
+    isInTimsLine{false}, rollTimes{0}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
 
 string Player::getName() const{ return name; }
 
@@ -20,9 +21,13 @@ void Player::sentToTimsLine(int timsIndex) {
     isInTimsLine = true;
 }
 
+void Player::addCups(int num) {
+    numCup += num;
+}
+
 void Player::useCup() {
     if (numCup <= 0) throw NotEnoughCup{};
-    numCup --;
+    numCup--;
 }
 
 void Player::receiveMoney(double value) { cash += value; }
@@ -47,4 +52,42 @@ bool Player::getRollState() const{ return canRoll; }
 
 void Player::setRollState(bool state) { canRoll = state; }
 
-void Player::payMoney(double value) { cash -= value; }
+void Player::pay(double value, Player *receiver) {
+    if (cash < value) {
+        throw NotEnoughCash{name};
+    }
+    cash -= value;
+    receiver->receiveMoney(value);
+}
+
+void Player::forcePay(double value, Player *receiver) {
+    if (cash < value) {
+        debtAmount = value;
+        creditor = receiver;
+        throw NotEnoughCash{name};
+    }
+    cash -= value;
+    receiver->receiveMoney(value);
+}
+
+double Player::getDebtAmount() const {
+    return debtAmount;
+}
+
+Player* Player::getCreditor() const {
+    return creditor;
+}
+
+void Player::payDebt() {
+    pay(debtAmount, creditor);
+    debtAmount = 0;
+    creditor = nullptr;
+}
+
+int Player::getGym() const { return numGym; }
+
+int Player::getRes() const { return numRes; }
+
+void Player::addGym() { ++numGym; }
+
+void Player::addRes() { ++numRes; }

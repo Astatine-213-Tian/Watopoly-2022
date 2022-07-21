@@ -25,11 +25,9 @@ void TimsLine::landOn(Player &p) {
             //roll
             break;
         case 'P':
-            if (p.payMoney(50)) {
+            p.forcePay(50) {
                 queue.erase(&p);
-            } else {
-                //bankrupt
-            } 
+            }
             break;
         case 'C':
             if (p.getNumCup() > 0) {
@@ -46,22 +44,16 @@ void TimsLine::landOn(Player &p) {
         cout << "This is your third round in the line." << endl;
         if (p.getNumCup() == 0) {
             cout << "Please pay $50 to get out of the line." << endl;
-            if (p.payMoney(50)) {
-                queue.erase(&p);
-            } else {
-                //bankrupt
-            }
+            p.forcePay(50);
+            queue.erase(&p);
         } else {
             char ans;
             cout << "What do you choose to get out of this line?" << endl;
             cout << "Enter P for paying $50. \nEnter C for using one Roll Up the Rim Cup." << endl;
             cin >> ans;
             if (ans == 'P') {
-                if (p.payMoney(50)) {
-                    queue.erase(&p);
-                } else {
-                    // bankrupt
-                } 
+                p.forcePay(50);
+                queue.erase(&p);
             } else if (ans == 'C') {
                 p.useCup();
                 queue.erase(&p);

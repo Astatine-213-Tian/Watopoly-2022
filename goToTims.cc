@@ -6,5 +6,5 @@ GoToTims::GoToTims() : NonProperty{"GO TO TIMS"} {}
 void GoToTims::passBy(Player &p) {}
 
 void GoToTims::landOn(Player &p) {
-    p.setMoveToTims();
+    p.setShouldMoveToTims();
 }

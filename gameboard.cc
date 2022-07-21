@@ -94,7 +94,7 @@ void GameBoard::forward(int diceSum) {
 }
 
 void GameBoard::roll() {
-//    if (!curPlayer->getRollState()) throw InvalidRoll{};
+//    if (!curPlayer->getRollState()) throw InvalidCmd{};
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     curPlayer->addRollTimes();
@@ -122,7 +122,10 @@ void GameBoard::roll() {
 }
 
 void GameBoard::next() {
-    size_t numPlayer = players.size();
+    if (curPlayer->getRollState()) {
+        throw InvalidCmd{};
+    }
+    int numPlayer = static_cast<int>(players.size());
     if (curPlayer == players[numPlayer - 1].get()) {
         curPlayer = players[0].get();
     } else {
@@ -191,13 +194,12 @@ bool askPlayerTradeResponse(Player *p) {
 }
 
 
-void NoImprovementCheck(Property *property) {
+void GameBoard::noImprovementCheck(Property *property) {
     auto *ab = dynamic_cast<AcademicBuilding *>(property);
     if (ab && ab->getImproveNum() != 0) {
         throw BuildingStillWithImprove{property->getName() };
     }
 }
-
 
 void GameBoard::trade(const std::string &name, const std::string &give, const std::string &receive) {
     Player *toWhom = getPlayer(name);
@@ -211,21 +213,21 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
             throw TradeMoneyWithMoney{};
         }
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
-        NoImprovementCheck(receiveProperty);
+        noImprovementCheck(receiveProperty);
         if (askPlayerTradeResponse(toWhom)) {
             trade(*toWhom, giveMoney, *receiveProperty);
         }
     } else if (ssReceive >> receiveMoney) {
         Property *giveProperty = getPlayerProperty(give, curPlayer);
-        NoImprovementCheck(giveProperty);
+        noImprovementCheck(giveProperty);
         if (askPlayerTradeResponse(toWhom)) {
             trade(*toWhom, *giveProperty, receiveMoney);
         }
     } else {
         Property *giveProperty = getPlayerProperty(give, curPlayer);
-        NoImprovementCheck(giveProperty);
+        noImprovementCheck(giveProperty);
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
-        NoImprovementCheck(receiveProperty);
+        noImprovementCheck(receiveProperty);
         if (askPlayerTradeResponse(toWhom)) {
             trade(*toWhom, *giveProperty, *receiveProperty);
         }
@@ -233,21 +235,19 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
 }
 
 
-void GameBoard::trade(Player &player, double value, Property &property) {
+void GameBoard::trade(Player &toWhom, double value, Property &property) {
+    curPlayer->pay(value, &toWhom);
     property.setOwner(curPlayer);
-    curPlayer->payMoney(value);
-    player.receiveMoney(value);
 }
 
-void GameBoard::trade(Player &player, Property &p1, Property &p2) {
-    p1.setOwner(&player);
+void GameBoard::trade(Player &toWhom, Property &p1, Property &p2) {
+    p1.setOwner(&toWhom);
     p2.setOwner(curPlayer);
 }
 
-void GameBoard::trade(Player &player, Property &property, double value) {
-    player.payMoney(value);
-    curPlayer->receiveMoney(value);
-    property.setOwner(&player);
+void GameBoard::trade(Player &toWhom, Property &property, double value) {
+    toWhom.pay(value, curPlayer);
+    property.setOwner(&toWhom);
 }
 
 void GameBoard::buyImprove(const string &name) {
@@ -257,10 +257,9 @@ void GameBoard::buyImprove(const string &name) {
     } else if (ab->getImproveNum() >= 5) {
         throw MaxImprove{ab->getBlockName()};
     }
-    curPlayer->payMoney(ab->getImproveCost());
+    curPlayer->forcePay(ab->getImproveCost());
     ab->addImprove();
 }
-
 
 void GameBoard::sellImprove(const string &name) {
     AcademicBuilding *ab = getPlayerAcademicBuilding(name, curPlayer);
@@ -277,7 +276,7 @@ void GameBoard::mortgage(const string &name) {
     if (p->getMortgageStatus()) {
         throw PropertyStillMortgage{p->getName()};
     }
-    NoImprovementCheck(p);
+    noImprovementCheck(p);
     p->setMortgage();
     curPlayer->receiveMoney(p->getCost() / 2);
 }
@@ -287,7 +286,7 @@ void GameBoard::unmortgage(const string &name) {
     if (!p->getMortgageStatus()) {
         throw PropertyStillUnMortage{p->getName()};
     }
-    curPlayer->payMoney(p->getUnMortgageCost());
+    curPlayer->forcePay(p->getUnMortgageCost());
     p->setUnMortgage();
 }
 
@@ -317,6 +316,21 @@ bool GameBoard::isWin() {
     return (players.size() == 1);
 }
 
-void GameBoard::bankrupt() {
+void GameBoard::payDebt() {
+    curPlayer->payDebt();
+}
 
+bool GameBoard::needDealWithDebt() {
+    return curPlayer->getDebtAmount() != 0;
+}
+
+void GameBoard::bankrupt() {
+    double totalAssets = 0;
+    for (auto &i: cells) {
+        if (i->getOwner() == curPlayer) totalAssets+= i->getValue();
+    }
+    if (totalAssets >= curPlayer->getDebtAmount()) {
+        throw InvalidCmd{};
+    }
+    // TODO bankrupt staff
 }

@@ -33,79 +33,127 @@ Controller::Controller() : g{make_unique<GameBoard>()} {
 //    }
 //}
 
+
+void Controller::roll() {
+    // TODO better method?
+    if (!g->getCurPlayer()->getRollState()) {
+        cout << "You cannot roll anymore in this term." << endl;
+    } else if (g->getCurPlayer()->inTimsLine()) {
+        cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
+             << "1 - roll (you will get out if you roll double)" << endl
+             << "2 - use Roll Up the Rim cup (if you have)" << endl
+             << "3 - pay 50" << endl;
+        int option;
+        while (!(cin >> option) || option <= 3 || option > 3) {
+            cout << "Invalid input. Please choose a number between 1 and 3: ";
+        }
+        if (option == 1) {
+            g->roll();
+        } else if (option == 2) {
+            g->getCurPlayer()->useCup();
+        } else {
+            g->getCurPlayer()->forcePay(50);
+        }
+    } else {
+        g->roll();
+    }
+}
+
+void Controller::improve() {
+    string name;
+    string option;
+    cin >> name >> option;
+    if (option == "buy") {
+        try {
+            g->buyImprove(name);
+        } catch (exception &e) {
+            cout << e.what() << endl;
+        }
+    } else if (option == "sell") {
+        try {
+            g->sellImprove(name);
+        } catch (exception &e) {
+            cout << e.what() << endl;
+        }
+    }
+}
+
+void Controller::trade() {
+    string name;
+    string give;
+    string receive;
+    cin >> name >> give >> receive;
+    try {
+        g->trade(name, give, receive);
+    } catch (exception &e) {
+        cout << e.what() << endl;
+    }
+}
+
+
+void Controller::unmortgage() {
+    string name;
+    try {
+        g->unmortgage(name);
+    } catch (exception &e) {
+        cout << e.what() << endl;
+    }
+}
+
+void Controller::next() {
+    try {
+        g->next();
+    } catch (exception &e) {
+        cout << "Able to go next. You need to roll another time before finishing your turn." << endl;
+    }
+}
+
+void Controller::mortgage() {
+    string name;
+    try {
+        g->mortgage(name);
+    } catch (exception &e) {
+        cout << e.what() << endl;
+    }
+}
+
+void Controller::payDebt() {
+    try {
+        g->payDebt();
+    } catch (exception &e) {
+        cout << e.what() << endl;
+    }
+}
+
+void Controller::bankrupt() {
+    try {
+        g->bankrupt();
+    } catch (exception &e) {
+        cout << "Not able to bankrupt" << endl;
+    }
+}
+
+
 void Controller::play() {
     string cmd;
-
     cout << "Please enter a command:" << endl;
     while (cin >> cmd) {
         if (cmd == "roll") {
-            if (!g->getCurPlayer()->getRollState()) {
-                cout << "You cannot roll anymore in this term." << endl;
-            } else if (g->getCurPlayer()->inTimsLine()) {
-                cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
-                     << "1 - roll (you will get out if you roll double)" << endl
-                     << "2 - use Roll Up the Rim cup (if you have)" << endl
-                     << "3 - pay 50" << endl;
-                int option;
-                while (!(cin >> option) || option <= 3 || option > 3) {
-                    cout << "Invalid input. Please choose a number between 1 and 3: ";
-                }
-                if (option == 1) {
-                    g->roll();
-                } else if (option == 2) {
-                    g->getCurPlayer()->useCup();
-                } else {
-                    g->getCurPlayer()->payMoney(50);
-                }
-            } else {
-                g->roll();
-            }
+            if (g->needDealWithDebt()) cout << "You need to pay your debt first." << endl;
+            else roll();
         } else if (cmd == "next") {
-            if (!g->getCurPlayer()->getRollState()) {
-                g->next();
-            } else {
-                cout << "You need to roll another time before finishing your turn." << endl;
-            }
+            if (g->needDealWithDebt()) cout << "You need to pay your debt first." << endl;
+            else next();
         } else if (cmd == "trade") {
-            string name;
-            string give;
-            string receive;
-
-            cin >> name >> give >> receive;
-            g->trade(name, give, receive);
+            trade();
         } else if (cmd == "improve") {
-            string name;
-            string option;
-            cin >> name >> option;
-            if (option == "buy") {
-                try {
-                    g->buyImprove(name);
-                } catch (exception &e) {
-                    cout << e.what() << endl;
-                }
-            } else if (option == "sell") {
-                try {
-                    g->sellImprove(name);
-                } catch (exception &e) {
-                    cout << e.what() << endl;
-                }
-            }
+            improve();
         } else if (cmd == "mortgage") {
-            string name;
-            try {
-                g->mortgage(name);
-            } catch (exception &e) {
-                cout << e.what() << endl;
-            }
+            mortgage();
         } else if (cmd == "unmortgage") {
-            string name;
-            try {
-                g->unmortgage(name);
-            } catch (exception &e) {
-                cout << e.what() << endl;
-            }
+            unmortgage();
         } else if (cmd == "bankrupt") {
-            g->bankrupt();
+            bankrupt();
         } else if (cmd == "asset") {
             g->assets(*(g->getCurPlayer()));
         } else if (cmd == "all") {
@@ -113,15 +161,20 @@ void Controller::play() {
         } else if (cmd == "save") {
             string filename;
             save(filename);
-        } else {
+        } else if (cmd == "pay" && g->needDealWithDebt()) {
+            payDebt();
+        }else {
             cout << "Invalid command." << endl;
+        }
+        if (g->needDealWithDebt()) {
+            cout << "You currently has debt, do you want to pay the bill or continue raising money?;" << endl
+                 << "Input pay or other available command: " << endl;
         }
     }
 }
 
 void Controller::save(string& filename) {}
 
-}
 
 void Controller::load(const string& filename) {
     string line;

@@ -56,11 +56,6 @@ class NotPlayer: public Error {
   explicit NotPlayer(const std::string &name);
 };
 
-class InvalidRoll: public Error {
- public:
-  InvalidRoll();
-};
-
 class PropertyStillMortgage: public Error {
   std::string propertyName;
  public:
@@ -89,10 +84,12 @@ class NotEnoughCup: public Error {
   NotEnoughCup();
 };
 
-class BankruptRisk: public Error {
+class NotEnoughCash: public Error {
  public:
-  BankruptRisk();
+  explicit NotEnoughCash(const std::string &playerName);
 };
+
+class InvalidCmd : public std::exception {};
 
 
 #endif //WATOPOLY__ERROR_H_

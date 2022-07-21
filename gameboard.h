@@ -19,7 +19,13 @@ class GameBoard {
   const int timsLineLocation = 10;
 
   void forward(int diceSum);
-  int getTotalRollCups();
+  Property *getPlayerProperty(const std::string &name, Player *player) const;
+  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
+  Player *getPlayer(const std::string &name) const;
+  void trade(Player &toWhom, double value, Property &property);
+  void trade(Player &toWhom, Property &p1, Property &p2);
+  void trade(Player &toWhom, Property &property, double value);
+  static void noImprovementCheck(Property *p) ;
 
  public:
   GameBoard();
@@ -29,22 +35,18 @@ class GameBoard {
   void roll(int d1, int d2);
   void next(); // check can next,
   Player *getCurPlayer();
-  Player *getPlayer(const std::string &name) const;
-  Property *getPlayerProperty(const std::string &name, Player *player) const;
-  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
   void trade(const std::string &name, const std::string &give, const std::string &receive);
-  void trade(Player &player, double value, Property &property);
-  void trade(Player &player, Property &p1, Property &p2);
-  void trade(Player &player, Property &property, double value);
   void buyImprove(const std::string &name);
   void sellImprove(const std::string &name);
   void mortgage(const std::string &name);
   void unmortgage(const std::string &name);
+  void payDebt();
   void assets(Player &p);
   void allAssets();
   void auction(int cellNum);
   bool isWin();
   void bankrupt();
+  bool needDealWithDebt();
 };
 
 #endif

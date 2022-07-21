@@ -14,12 +14,10 @@ void Tuition::landOn(Player &p) {
     cout << "Enter 1 to pay $300. \nEnter 2 to pay 10\% of your total asset." << endl;
     cin >> ans;
     if (ans == 1) {
-        if(!p.payMoney(300)) {
-            // bankrupt
-        }
+        p.forcePay(300);
     } else if (ans == 2) {
         // TODO calculate total asset
 //        float total = p.calculateAssetsValue();
-//        if(!p.payMoney(total * 0.1)) // bankrupt
+//        if(!p.forcePay(total * 0.1)) // bankrupt
     }
 }

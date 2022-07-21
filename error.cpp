@@ -25,8 +25,6 @@ NotProperty::NotProperty(const string &name) : Error{name + " is not a Property"
 
 NotPlayer::NotPlayer(const string &name) : Error{name + " is not a Player"} {}
 
-InvalidRoll::InvalidRoll() : Error{"You cannot roll anymore"} {}
-
 PropertyStillMortgage::PropertyStillMortgage(const string &name) : Error{name + " is mortgaged."}, propertyName{name} {}
 
 PropertyStillUnMortage::PropertyStillUnMortage(const string &name) : Error{name + " is not mortgaged."}, propertyName{name} {}
@@ -35,7 +33,7 @@ TradeMoneyWithMoney::TradeMoneyWithMoney() : Error{"You're trying to trade money
 
 NotEnoughCup::NotEnoughCup() : Error{"You don't have enough cup to use!"} {}
 
-BankruptRisk::BankruptRisk() : Error{"You have the risk of bankrupt."} {}
-
 BuildingStillWithImprove::BuildingStillWithImprove(const string &name) :
     Error{name + " still have improvements. All improvements need to be sold before further action"}, propertyName{name} {}
+
+NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName + " don't have enough cash to complete the trade."} {}
