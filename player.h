@@ -14,25 +14,24 @@ class Player {
     int numCup;
     int curLocation;
     bool isInTimsLine;
-    bool moveToTims;
+    bool shouldMoveToTims;
     int rollTimes;
     bool canRoll;
 
 public:
     Player(std::string name, char displayChar, int timCups, double cash, int position);
     std::string getName() const;
-    //std::vector<Property *> getProperties() const;
     double getCash() const;
     int getNumCup() const;
     void move(int index);
+    void sentToTimsLine(int timsIndex);
     void useCup();
-    bool payMoney(double value);
+    void payMoney(double value);
     void receiveMoney(double value);
-    bool inTims() const;
+    bool inTimsLine() const;
     void setToTimsLine();
-    void setMoveToTims();
-    bool shouldMoveToTims() const;
-    void completeMoveToTims();
+    void setShouldMoveToTims();
+    bool getShouldMoveToTims() const;
     void removeFromTimsLine();
     int getRollTimes() const;
     void addRollTimes();
@@ -40,8 +39,8 @@ public:
     int getLocation() const;
     bool getRollState() const;
     void setRollState(bool state);
-    void buyImprove(AcademicBuilding &ab);
-    void sellImprove(AcademicBuilding &ab);
+    void mortgage(Property *p);
+    void unmortgage(Property *p);
 };
 
 #endif

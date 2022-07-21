@@ -39,7 +39,23 @@ void Controller::play() {
     while (cin >> cmd) {
         if (cmd == "roll") {
             if (!g->getCurPlayer()->getRollState()) {
-                cout << "You cannot roll in this turn." << endl;
+                cout << "You cannot roll anymore in this term." << endl;
+            } else if (g->getCurPlayer()->inTimsLine()) {
+                cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
+                     << "1 - roll (you will get out if you roll double)" << endl
+                     << "2 - use Roll Up the Rim cup (if you have)" << endl
+                     << "3 - pay 50" << endl;
+                int option;
+                while (!(cin >> option) || option <= 3 || option > 3) {
+                    cout << "Invalid input. Please choose a number between 1 and 3: ";
+                }
+                if (option == 1) {
+                    g->roll();
+                } else if (option == 2) {
+                    g->getCurPlayer()->useCup();
+                } else {
+                    g->getCurPlayer()->payMoney(50);
+                }
             } else {
                 g->roll();
             }
@@ -47,121 +63,109 @@ void Controller::play() {
             if (!g->getCurPlayer()->getRollState()) {
                 g->next();
             } else {
-                cout << "You may roll another time before finishing your turn." << endl;
+                cout << "You need to roll another time before finishing your turn." << endl;
             }
         } else if (cmd == "trade") {
             string name;
             string give;
             string receive;
-            istringstream ssGive(give);
-            istringstream ssReceive(receive);
-            int giveMoney;
-            int receiveMoney;
-            Player *toWhom;
+//            istringstream ssGive(give);
+//            istringstream ssReceive(receive);
+//            int giveMoney;
+//            int receiveMoney;
+//            Player *toWhom;
 
             cin >> name >> give >> receive;
-            try {
-                toWhom = g->getPlayer(name);
-            } catch (exception &e) {
-                cout << e.what() << endl;
-                continue;
-            }
-            if (ssGive >> giveMoney) {
-                if (ssReceive >> receiveMoney) {
-                    cout << "You cannot trade money with money!" << endl;
-                    continue;
-                }
-                Property *receiveProperty;
-                try {
-                    receiveProperty = g->getProperty(receive);
-                } catch (exception &e) {
-                    cout << e.what() << endl;
-                    continue;
-                }
-                if (askPlayerTradeResponse(toWhom)) {
-                    try {
-                        g->trade(*toWhom, giveMoney, *receiveProperty);
-                    } catch (exception &e) {
-                        cout << e.what() << endl;
-                    }
-                }
-            } else if (ssReceive >> receiveMoney) {
-                Property *giveProperty;
-                try {
-                    giveProperty = g->getProperty(give);
-                } catch (exception &e) {
-                    cout << e.what() << endl;
-                    continue;
-                }
-                if (askPlayerTradeResponse(toWhom)) {
-                    try {
-                        g->trade(*toWhom, *giveProperty, receiveMoney);
-                    } catch (exception &e) {
-                        cout << e.what() << endl;
-                    }
-                }
-            } else {
-                Property *giveProperty;
-                Property *receiveProperty;
-                try {
-                    giveProperty = g->getProperty(give);
-                    receiveProperty = g->getProperty(receive);
-                } catch (exception &e) {
-                    cout << e.what() << endl;
-                    continue;
-                }
-                if (askPlayerTradeResponse(toWhom)) {
-                    try {
-                        g->trade(*toWhom, *giveProperty, *receiveProperty);
-                    } catch (exception &e) {
-                        cout << e.what() << endl;
-                    }
-                }
-            }
+            g->trade(name, give, receive);
+//            try {
+//                toWhom = g->getPlayer(name);
+//            } catch (exception &e) {
+//                cout << e.what() << endl;
+//                continue;
+//            }
+//            if (ssGive >> giveMoney) {
+//                if (ssReceive >> receiveMoney) {
+//                    cout << "You cannot trade money with money!" << endl;
+//                    continue;
+//                }
+//                Property *receiveProperty;
+//                try {
+//                    receiveProperty = g->getPlayerProperty(receive);
+//                } catch (exception &e) {
+//                    cout << e.what() << endl;
+//                    continue;
+//                }
+//                if (askPlayerTradeResponse(toWhom)) {
+//                    try {
+//                        g->trade(*toWhom, giveMoney, *receiveProperty);
+//                    } catch (exception &e) {
+//                        cout << e.what() << endl;
+//                    }
+//                }
+//            } else if (ssReceive >> receiveMoney) {
+//                Property *giveProperty;
+//                try {
+//                    giveProperty = g->getPlayerProperty(give);
+//                } catch (exception &e) {
+//                    cout << e.what() << endl;
+//                    continue;
+//                }
+//                if (askPlayerTradeResponse(toWhom)) {
+//                    try {
+//                        g->trade(*toWhom, *giveProperty, receiveMoney);
+//                    } catch (exception &e) {
+//                        cout << e.what() << endl;
+//                    }
+//                }
+//            } else {
+//                Property *giveProperty;
+//                Property *receiveProperty;
+//                try {
+//                    giveProperty = g->getPlayerProperty(give);
+//                    receiveProperty = g->getPlayerProperty(receive);
+//                } catch (exception &e) {
+//                    cout << e.what() << endl;
+//                    continue;
+//                }
+//                if (askPlayerTradeResponse(toWhom)) {
+//                    try {
+//                        g->trade(*toWhom, *giveProperty, *receiveProperty);
+//                    } catch (exception &e) {
+//                        cout << e.what() << endl;
+//                    }
+//                }
+//            }
         } else if (cmd == "improve") {
             string name;
             string option;
             cin >> name >> option;
-            AcademicBuilding *ab;
-            try {
-                 ab = g->getAcademicBuilding(name);
-            } catch (exception &e) {
-                cout << e.what() << endl;
-                continue;
-            }
             if (option == "buy") {
                 try {
-                    g->buyImprove(*ab);
+                    g->buyImprove(name);
                 } catch (exception &e) {
                     cout << e.what() << endl;
                 }
             } else if (option == "sell") {
                 try {
-                    g->sellImprove(*ab);
+                    g->sellImprove(name);
                 } catch (exception &e) {
                     cout << e.what() << endl;
                 }
             }
         } else if (cmd == "mortgage") {
             string name;
-            Property *p;
             try {
-                p = g->getProperty(name);
+                g->mortgage(name);
             } catch (exception &e) {
                 cout << e.what() << endl;
-                continue;
             }
-            g->mortgage(*p);
         } else if (cmd == "unmortgage") {
             string name;
-            Property *p;
             try {
-                p = g->getProperty(name);
+                g->unmortgage(name);
             } catch (exception &e) {
                 cout << e.what() << endl;
-                continue;
             }
-            g->unmortgage(*p);
         } else if (cmd == "bankrupt") {
             g->bankrupt();
         } else if (cmd == "asset") {

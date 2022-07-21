@@ -1,6 +1,7 @@
 #include <iostream>
 #include <exception>
 #include <memory>
+#include <sstream>
 #include "gameboard.h"
 #include "property.h"
 #include "academicBuilding.h"
@@ -77,158 +78,217 @@ void GameBoard::addPlayer(const std::string &name, char displayChar, int positio
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position));
 }
 
-
-void GameBoard::forward(const int diceSum) {
+void GameBoard::forward(int diceSum) {
+    int size = static_cast<int>(cells.size());
     for (int i = 1; i < diceSum; i++) {
         int cur = curPlayer->getLocation();
-        int dest = (cur + i >= cells.size()) ? cur + i - cells.size() : cur + i;
+        int dest = (cur + i >= size) ? cur + i - size : cur + i;
         cells[dest]->passBy(*curPlayer);
         curPlayer->move(dest);
     }
-    try {
-        cells[curPlayer->getLocation()]->landOn(*curPlayer);
-    } catch (sendToTims &) {
-        // send to tims
+    cells[curPlayer->getLocation()]->landOn(*curPlayer);
+    if (curPlayer->getShouldMoveToTims()) {
+        curPlayer->sentToTimsLine(timsLineLocation);
+        curPlayer->setRollState(false);
     }
 }
 
 void GameBoard::roll() {
-    if (!curPlayer->getRollState()) throw InvalidRoll{};
-
+//    if (!curPlayer->getRollState()) throw InvalidRoll{};
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
-    int diceSum = roll1 + roll2;
     curPlayer->addRollTimes();
-    curPlayer->setRollState(false);
-    int size = (int) cells.size();
 
-    // TODO intims check before roll
-    if (!curPlayer->inTims()) {
-        if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
-            curPlayer->initRollTimes();
-            curPlayer->move(10);
-            next();
-        } else {
-            forward(diceSum);
-
-            if (roll1 == roll2) {
-                curPlayer->setRollState(true);
-                cout << "Lucky! You may roll again." << endl;
-            } else {
-                curPlayer->initRollTimes();
-            }
+    if (curPlayer->inTimsLine()) {
+        if (roll1 == roll2) {
+            curPlayer->removeFromTimsLine();
+            curPlayer->setRollState(false);
+        } else if (curPlayer->getRollTimes() == 2) {
+            curPlayer->setRollState(false);
         }
     } else {
-        if (roll1 == roll2) {
-            cout << "Congrats for getting out of the line!" << endl;
-            curPlayer->removeFromTimsLine();
-            curPlayer->initRollTimes();
-            forward(diceSum);
+        if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
+            curPlayer->sentToTimsLine(timsLineLocation);
+            curPlayer->setRollState(false);
+        } else {
+            forward(roll1 + roll2);
+            if (roll1 == roll2) {
+                curPlayer->setRollState(true);
+            } else {
+                curPlayer->setRollState(false);
+            }
         }
     }
 }
 
 void GameBoard::next() {
-    curPlayer->setRollState(true);
     size_t numPlayer = players.size();
     if (curPlayer == players[numPlayer - 1].get()) {
         curPlayer = players[0].get();
     } else {
         curPlayer++;
     }
+    curPlayer->initRollTimes();
+    curPlayer->setRollState(true);
 }
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
 
 Player *GameBoard::getPlayer(const string& name) const{
-    for (auto &i : players) {
-        if (i->getName() == name) return i.get();
+    for (auto &cell : players) {
+        if (cell->getName() == name) return cell.get();
     }
     throw NotPlayer{name};
 }
 
-Property *GameBoard::getProperty(const string& name) const{
-    for (auto &i : cells) {
-        if (i->getName() == name) {
-            auto *p = dynamic_cast<Property*>(i.get());
-            if (p) return p;
-            else break;
+Property *GameBoard::getPlayerProperty(const string& name, Player *player) const {
+    for (auto &cell : cells) {
+        if (cell->getName() == name) {
+            auto *property = dynamic_cast<Property*>(cell.get());
+            if (property) {
+                if (property->getOwner() == player) {
+                    return property;
+                } else {
+                    throw NotOwner{player->getName(), property->getName()};
+                }
+            } else break;
         }
     }
     throw NotProperty{name};
 }
 
-AcademicBuilding *GameBoard::getAcademicBuilding(const std::string &name) const{
-    for (auto &i : cells) {
-        if (i->getName() == name) {
-            auto *ab = dynamic_cast<AcademicBuilding*>(i.get());
-            if (ab) return ab;
-            else break;
+AcademicBuilding *GameBoard::getPlayerAcademicBuilding(const std::string &name, Player *player) const {
+    for (auto &cell : cells) {
+        if (cell->getName() == name) {
+            auto *ab = dynamic_cast<AcademicBuilding*>(cell.get());
+            if (ab) {
+                if (ab->getOwner() == player) {
+                    return ab;
+                } else {
+                    throw NotOwner{player->getName(), ab->getName()};
+                }
+            } else break;
         }
     }
     throw NotAcademicBuilding{name};
 }
 
-void GameBoard::trade(Player &player, double value, Property &property) {
-    // TODO encapsulate in player?
-    if (property.getOwner() != &player) {
-        throw NotOwner{player.getName(), property.getName()};
-    }
-    property.setOwner(curPlayer);
+// TODO where should I put this
+bool askPlayerTradeResponse(Player *p) {
+    cout << "Player " << p->getName() << ", do you accept this trade? (y/n)" << endl;
+    string answer;
 
-    //check bankrupt
+    while (true) {
+        cin >> answer;
+        if (answer == "Y" || answer == "y" || answer == "Yes" || answer == "yes") {
+            return true;
+        } else if (answer == "N" || answer == "n" || answer == "No" || answer == "no") {
+            cout << "Player " << p->getName() << " does not accept this trade." << endl;
+            return false;
+        }
+        cout << "Please input y/n as your response: " << endl;
+    }
+}
+
+
+void NoImprovementCheck(Property *property) {
+    auto *ab = dynamic_cast<AcademicBuilding *>(property);
+    if (ab && ab->getImproveNum() != 0) {
+        throw BuildingStillWithImprove{property->getName() };
+    }
+}
+
+
+void GameBoard::trade(const std::string &name, const std::string &give, const std::string &receive) {
+    Player *toWhom = getPlayer(name);
+    istringstream ssGive(give);
+    istringstream ssReceive(receive);
+    int giveMoney;
+    int receiveMoney;
+
+    if (ssGive >> giveMoney) {
+        if (ssReceive >> receiveMoney) {
+            throw TradeMoneyWithMoney{};
+        }
+        Property *receiveProperty = getPlayerProperty(receive, toWhom);
+        NoImprovementCheck(receiveProperty);
+        if (askPlayerTradeResponse(toWhom)) {
+            trade(*toWhom, giveMoney, *receiveProperty);
+        }
+    } else if (ssReceive >> receiveMoney) {
+        Property *giveProperty = getPlayerProperty(give, curPlayer);
+        NoImprovementCheck(giveProperty);
+        if (askPlayerTradeResponse(toWhom)) {
+            trade(*toWhom, *giveProperty, receiveMoney);
+        }
+    } else {
+        Property *giveProperty = getPlayerProperty(give, curPlayer);
+        NoImprovementCheck(giveProperty);
+        Property *receiveProperty = getPlayerProperty(receive, toWhom);
+        NoImprovementCheck(receiveProperty);
+        if (askPlayerTradeResponse(toWhom)) {
+            trade(*toWhom, *giveProperty, *receiveProperty);
+        }
+    }
+}
+
+
+void GameBoard::trade(Player &player, double value, Property &property) {
+    property.setOwner(curPlayer);
     curPlayer->payMoney(value);
     player.receiveMoney(value);
 }
 
 void GameBoard::trade(Player &player, Property &p1, Property &p2) {
-    // TODO encapsulate in player?
-    if (p1.getOwner() != curPlayer) {
-        throw NotOwner{curPlayer->getName(), p1.getName()};
-    } else if (p2.getOwner() != &player) {
-        throw NotOwner{player.getName(), p2.getName()};
-    }
     p1.setOwner(&player);
     p2.setOwner(curPlayer);
 }
 
 void GameBoard::trade(Player &player, Property &property, double value) {
-    // TODO encapsulate in player?
-    if (property.getOwner() != curPlayer) {
-        throw NotOwner{curPlayer->getName(), property.getName()};
-    }
     player.payMoney(value);
     curPlayer->receiveMoney(value);
     property.setOwner(&player);
 }
 
-void GameBoard::buyImprove(AcademicBuilding &ab) {
-    curPlayer->buyImprove(ab);
-}
-
-void GameBoard::sellImprove(AcademicBuilding &ab) {
-    curPlayer->sellImprove(ab);
-}
-
-void GameBoard::mortgage(Property &p) {
-    if (p.getOwner() == curPlayer) {
-        // p.setMortgage(true);
-        curPlayer->receiveMoney(p.getCost() / 2);
-    } else {
-        cout << "You cannot mortgage property that you do not possess." << endl;
+void GameBoard::buyImprove(const string &name) {
+    AcademicBuilding *ab = getPlayerAcademicBuilding(name, curPlayer);
+    if (!ab->isMonopolized()) {
+        throw NotMonopolized{ab->getBlockName()};
+    } else if (ab->getImproveNum() >= 5) {
+        throw MaxImprove{ab->getBlockName()};
     }
+    curPlayer->payMoney(ab->getImproveCost());
+    ab->addImprove();
 }
 
-void GameBoard::unmortgage(Property &p) {
-//    if (p.getMortgage() && p.getOwner() == curPlayer) {
-//        if (curPlayer->payMoney(p.getCost() * 0.6)) {
-//            p.setMortgage(false);
-//        } else {
-//            // bankrupt
-//        }
-//    } else {
-//        cout << "This property is not mortgaged or you are not eligible for unmortgaging." << endl;
-//    }
+
+void GameBoard::sellImprove(const string &name) {
+    AcademicBuilding *ab = getPlayerAcademicBuilding(name, curPlayer);
+    if (ab->getImproveNum() <= 0) {
+        throw ZeroImprove{ab->getBlockName()};
+    }
+    ab->removeImprove();
+    curPlayer->receiveMoney(ab->getImproveCost() / 2);
+}
+
+
+void GameBoard::mortgage(const string &name) {
+    Property *p = getPlayerProperty(name, curPlayer);
+    if (p->getMortgageStatus()) {
+        throw PropertyStillMortgage{p->getName()};
+    }
+    NoImprovementCheck(p);
+    p->setMortgage();
+    curPlayer->receiveMoney(p->getCost() / 2);
+}
+
+void GameBoard::unmortgage(const string &name) {
+    Property *p = getPlayerProperty(name, curPlayer);
+    if (!p->getMortgageStatus()) {
+        throw PropertyStillUnMortage{p->getName()};
+    }
+    curPlayer->payMoney(p->getUnMortgageCost());
+    p->setUnMortgage();
 }
 
 void GameBoard::assets(Player &p) {

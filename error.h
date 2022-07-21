@@ -7,7 +7,7 @@
 class Error : public std::exception {
   std::string msg;
  public:
-  explicit Error(std::string msg);
+  explicit Error(const std::string &msg);
   const char * what() const noexcept override;
 };
 
@@ -16,26 +16,26 @@ class NotOwner : public Error {
   std::string playerName;
   std::string propertyName;
  public:
-  NotOwner(std::string playerName, std::string propertyName);
+  NotOwner(const std::string &playerName, const std::string &propertyName);
 };
 
 class NotMonopolized: public Error {
   std::string blockName;
  public:
-  explicit NotMonopolized(std::string blockName);
+  explicit NotMonopolized(const std::string &blockName);
 };
 
 class MaxImprove: public Error {
   std::string blockName;
  public:
-  explicit MaxImprove(std::string blockName);
+  explicit MaxImprove(const std::string &blockName);
 };
 
 
 class ZeroImprove: public Error {
   std::string blockName;
  public:
-  explicit ZeroImprove(std::string blockName);
+  explicit ZeroImprove(const std::string &blockName);
 };
 
 class NotAcademicBuilding: public Error {
@@ -58,7 +58,41 @@ class NotPlayer: public Error {
 
 class InvalidRoll: public Error {
  public:
-  InvalidRoll()
+  InvalidRoll();
 };
+
+class PropertyStillMortgage: public Error {
+  std::string propertyName;
+ public:
+  explicit PropertyStillMortgage(const std::string &name);
+};
+
+class PropertyStillUnMortage: public Error {
+  std::string propertyName;
+ public:
+  explicit PropertyStillUnMortage(const std::string &name);
+};
+
+class BuildingStillWithImprove: public Error {
+  std::string propertyName;
+ public:
+  explicit BuildingStillWithImprove(const std::string &name);
+};
+
+class TradeMoneyWithMoney: public Error {
+ public:
+  TradeMoneyWithMoney();
+};
+
+class NotEnoughCup: public Error {
+ public:
+  NotEnoughCup();
+};
+
+class BankruptRisk: public Error {
+ public:
+  BankruptRisk();
+};
+
 
 #endif //WATOPOLY__ERROR_H_

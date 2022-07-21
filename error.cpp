@@ -3,26 +3,39 @@
 #include "error.h"
 using namespace std;
 
-Error::Error(std::string msg) : msg{move(msg)} {}
+Error::Error(const string &msg) : msg{"Error" + msg} {}
 const char *Error::what() const noexcept { return msg.c_str(); }
 
-NotOwner::NotOwner(string playerName, string propertyName) :
-    Error{"Player " + playerName + " does not own " + propertyName}, playerName{move(playerName)}, propertyName{move(propertyName)} {}
+NotOwner::NotOwner(const string &playerName, const string &propertyName) :
+    Error{"Player " + playerName + " does not own " + propertyName}, playerName{playerName}, propertyName{propertyName} {}
 
 
-NotMonopolized::NotMonopolized(string blockName) :
-    Error{blockName + " is not monopolized "}, blockName{move(blockName)} {}
+NotMonopolized::NotMonopolized(const string &blockName) :
+    Error{blockName + " is not monopolized "}, blockName{blockName} {}
 
-MaxImprove::MaxImprove(std::string blockName) :
-    Error{blockName + " has reached maximal improvement number"}, blockName{std::move(blockName)} {}
+MaxImprove::MaxImprove(const string &blockName) :
+    Error{blockName + " has reached maximal improvement number"}, blockName{blockName} {}
 
-ZeroImprove::ZeroImprove(std::string blockName) :
-    Error{blockName + " has no improvement to be removed"}, blockName{std::move(blockName)} {}
+ZeroImprove::ZeroImprove(const string &blockName) :
+    Error{blockName + " has no improvement to be removed"}, blockName{blockName} {}
 
-NotAcademicBuilding::NotAcademicBuilding(const string& name) : Error{name + " is not an Academic Building"} {}
+NotAcademicBuilding::NotAcademicBuilding(const string &name) : Error{name + " is not an Academic Building"} {}
 
-NotProperty::NotProperty(const std::string &name) : Error{name + " is not a Property"} {}
+NotProperty::NotProperty(const string &name) : Error{name + " is not a Property"} {}
 
-NotPlayer::NotPlayer(const std::string &name) : Error{name + " is not a Player"} {}
+NotPlayer::NotPlayer(const string &name) : Error{name + " is not a Player"} {}
 
 InvalidRoll::InvalidRoll() : Error{"You cannot roll anymore"} {}
+
+PropertyStillMortgage::PropertyStillMortgage(const string &name) : Error{name + " is mortgaged."}, propertyName{name} {}
+
+PropertyStillUnMortage::PropertyStillUnMortage(const string &name) : Error{name + " is not mortgaged."}, propertyName{name} {}
+
+TradeMoneyWithMoney::TradeMoneyWithMoney() : Error{"You're trying to trade money with money."} {}
+
+NotEnoughCup::NotEnoughCup() : Error{"You don't have enough cup to use!"} {}
+
+BankruptRisk::BankruptRisk() : Error{"You have the risk of bankrupt."} {}
+
+BuildingStillWithImprove::BuildingStillWithImprove(const string &name) :
+    Error{name + " still have improvements. All improvements need to be sold before further action"}, propertyName{name} {}

@@ -16,8 +16,10 @@ class GameBoard {
   Player *curPlayer;
   std::unique_ptr<Dice> dice1;
   std::unique_ptr<Dice> dice2;
+  const int timsLineLocation = 10;
 
-  bool checkInTimsLine();
+  void forward(int diceSum);
+  int getTotalRollCups();
 
  public:
   GameBoard();
@@ -27,16 +29,17 @@ class GameBoard {
   void roll(int d1, int d2);
   void next(); // check can next,
   Player *getCurPlayer();
-  Player *getPlayer(const std::string& name) const;
-  Property *getProperty(const std::string& name) const;
-  AcademicBuilding *getAcademicBuilding(const std::string& name) const;
+  Player *getPlayer(const std::string &name) const;
+  Property *getPlayerProperty(const std::string &name, Player *player) const;
+  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
+  void trade(const std::string &name, const std::string &give, const std::string &receive);
   void trade(Player &player, double value, Property &property);
   void trade(Player &player, Property &p1, Property &p2);
   void trade(Player &player, Property &property, double value);
-  void buyImprove(AcademicBuilding &ab);
-  void sellImprove(AcademicBuilding &ab);
-  void mortgage(Property &p);
-  void unmortgage(Property &p);
+  void buyImprove(const std::string &name);
+  void sellImprove(const std::string &name);
+  void mortgage(const std::string &name);
+  void unmortgage(const std::string &name);
   void assets(Player &p);
   void allAssets();
   void auction(int cellNum);
