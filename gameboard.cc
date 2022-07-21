@@ -16,7 +16,6 @@
 #include "gym.h"
 #include "goToTims.h"
 #include "coop.h"
-#include "action.h"
 
 using namespace std;
 
@@ -32,63 +31,96 @@ void GameBoard::init() {
     MonopolyBlock Sci2 = MonopolyBlock{"Sci2", 200};
     MonopolyBlock Math = MonopolyBlock{"Math", 200};
 
-    cells.emplace_back(make_unique<OSAP>());
-    cells.emplace_back(make_unique<AcademicBuilding>(AcademicBuilding{"AL", 40, vector<double>{2, 10, 30, 90, 160, 250}, Art1}));
-//    cells.emplace_back(make_unique<SLC>())
-    cells.emplace_back(make_unique<AcademicBuilding>(AcademicBuilding{"ML", 60, vector<double>{4, 20, 60, 180, 320, 450}, Art1}));
-    cells.emplace_back(make_unique<Tuition>(Tuition{}));
-    cells.emplace_back(make_unique<Residence>("MKV"));
-    cells.emplace_back(make_unique<AcademicBuilding>("ECH", 100, vector<double>{6, 30, 90, 270, 400, 550}, Art2));
-//    cells.emplace_back(make_unique<NHL>())
-    cells.emplace_back(make_unique<AcademicBuilding>("PAS", 100, vector<double>{6, 30, 90, 270, 400, 550}, Art2));
-    cells.emplace_back(make_unique<AcademicBuilding>("HH", 120, vector<double>{8, 40, 10, 300, 450, 600}, Art2));
-    cells.emplace_back(make_unique<TimsLine>());
-    cells.emplace_back(make_unique<AcademicBuilding>("RCH", 140, vector<double>{10, 50, 150, 450, 625, 750}, Eng));
-    cells.emplace_back(make_unique<Gym>("PAC"));
-    cells.emplace_back(make_unique<AcademicBuilding>("DWE", 140, vector<double>{10, 50, 150, 450, 625, 750}, Eng));
-    cells.emplace_back(make_unique<AcademicBuilding>("CPH", 160, vector<double>{12, 60, 180, 500, 700, 900}, Eng));
-    cells.emplace_back(make_unique<Residence>("UWP"));
-    cells.emplace_back(make_unique<AcademicBuilding>("LHI", 180, vector<double>{14, 70, 200, 550, 750, 950}, Health));
-    //    cells.emplace_back(make_unique<SLC>())
-    cells.emplace_back(make_unique<AcademicBuilding>("BMH", 180, vector<double>{14, 70, 200, 550, 750, 950}, Health));
-    cells.emplace_back(make_unique<AcademicBuilding>("OPT", 200, vector<double>{16, 80, 220, 600, 800, 1000}, Health));
-    cells.emplace_back(make_unique<Geese>());
-    cells.emplace_back(make_unique<AcademicBuilding>("EV1", 220, vector<double>{18, 90, 250, 700, 875, 1050}, Env));
-    //    cells.emplace_back(make_unique<NHL>())
-    cells.emplace_back(make_unique<AcademicBuilding>("EV2", 220, vector<double>{18, 90, 250, 700, 875, 1050}, Env));
-    cells.emplace_back(make_unique<AcademicBuilding>("EV3", 240, vector<double>{20, 100, 300, 750, 925, 1100}, Env));
-    cells.emplace_back(make_unique<Residence>("V1"));
-    cells.emplace_back(make_unique<AcademicBuilding>("PHYS", 260, vector<double>{22, 110, 330, 800, 975, 1150}, Sci1));
-    cells.emplace_back(make_unique<AcademicBuilding>("B1", 260, vector<double>{22, 110, 330, 800, 975, 1150}, Sci1));
-    cells.emplace_back(make_unique<Gym>("CIF"));
-    cells.emplace_back(make_unique<AcademicBuilding>("B2", 280, vector<double>{24, 120, 360, 850, 1025, 1200}, Sci1));
-    cells.emplace_back(make_unique<GoToTims>());
-    cells.emplace_back(make_unique<AcademicBuilding>("EIT", 300, vector<double>{26, 130, 390, 900, 1100, 1275}, Sci2));
-    cells.emplace_back(make_unique<AcademicBuilding>("ESC", 300, vector<double>{26, 130, 390, 900, 1100, 1275}, Sci2));
-    //    cells.emplace_back(make_unique<SLC>())
-    cells.emplace_back(make_unique<AcademicBuilding>("C2", 320, vector<double>{28, 150, 450, 1000, 1200, 1400}, Sci2));
-    cells.emplace_back(make_unique<Residence>("REV"));
-    //    cells.emplace_back(make_unique<NHL>())
-    cells.emplace_back(make_unique<AcademicBuilding>("MC", 350, vector<double>{35, 175, 500, 1100, 1300, 1500}, Math));
-    cells.emplace_back(make_unique<Coop>());
-    cells.emplace_back(make_unique<AcademicBuilding>("DC", 400, vector<double>{50, 200, 600, 1400, 1700, 2000}, Math));
+    cells.emplace_back(make_shared<OSAP>());
+    properties.emplace_back(make_shared<AcademicBuilding>(AcademicBuilding{"AL", 40, vector<double>{2, 10, 30, 90, 160, 250}, Art1}));
+    cells.emplace_back(properties[properties.size() - 1]);
+    //    cells.emplace_back(make_shared<SLC>())
+    properties.emplace_back(make_shared<AcademicBuilding>(AcademicBuilding{"ML", 60, vector<double>{4, 20, 60, 180, 320, 450}, Art1}));
+    cells.emplace_back(properties[properties.size() - 1]);
+    cells.emplace_back(make_shared<Tuition>(Tuition{}));
+    properties.emplace_back(make_shared<Residence>("MKV"));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("ECH", 100, vector<double>{6, 30, 90, 270, 400, 550}, Art2));
+    cells.emplace_back(properties[properties.size() - 1]);
+    //    cells.emplace_back(make_shared<NHL>())
+    properties.emplace_back(make_shared<AcademicBuilding>("PAS", 100, vector<double>{6, 30, 90, 270, 400, 550}, Art2));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("HH", 120, vector<double>{8, 40, 10, 300, 450, 600}, Art2));
+    cells.emplace_back(properties[properties.size() - 1]);
+    cells.emplace_back(make_shared<TimsLine>());
+    properties.emplace_back(make_shared<AcademicBuilding>("RCH", 140, vector<double>{10, 50, 150, 450, 625, 750}, Eng));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<Gym>("PAC"));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("DWE", 140, vector<double>{10, 50, 150, 450, 625, 750}, Eng));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("CPH", 160, vector<double>{12, 60, 180, 500, 700, 900}, Eng));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<Residence>("UWP"));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("LHI", 180, vector<double>{14, 70, 200, 550, 750, 950}, Health));
+    cells.emplace_back(properties[properties.size() - 1]);
+    //    cells.emplace_back(make_shared<SLC>())
+    properties.emplace_back(make_shared<AcademicBuilding>("BMH", 180, vector<double>{14, 70, 200, 550, 750, 950}, Health));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("OPT", 200, vector<double>{16, 80, 220, 600, 800, 1000}, Health));
+    cells.emplace_back(properties[properties.size() - 1]);
+    cells.emplace_back(make_shared<Geese>());
+    properties.emplace_back(make_shared<AcademicBuilding>("EV1", 220, vector<double>{18, 90, 250, 700, 875, 1050}, Env));
+    cells.emplace_back(properties[properties.size() - 1]);
+    //    cells.emplace_back(make_shared<NHL>())
+    properties.emplace_back(make_shared<AcademicBuilding>("EV2", 220, vector<double>{18, 90, 250, 700, 875, 1050}, Env));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("EV3", 240, vector<double>{20, 100, 300, 750, 925, 1100}, Env));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<Residence>("V1"));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("PHYS", 260, vector<double>{22, 110, 330, 800, 975, 1150}, Sci1));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("B1", 260, vector<double>{22, 110, 330, 800, 975, 1150}, Sci1));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<Gym>("CIF"));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("B2", 280, vector<double>{24, 120, 360, 850, 1025, 1200}, Sci1));
+    cells.emplace_back(properties[properties.size() - 1]);
+    cells.emplace_back(make_shared<GoToTims>());
+    properties.emplace_back(make_shared<AcademicBuilding>("EIT", 300, vector<double>{26, 130, 390, 900, 1100, 1275}, Sci2));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<AcademicBuilding>("ESC", 300, vector<double>{26, 130, 390, 900, 1100, 1275}, Sci2));
+    cells.emplace_back(properties[properties.size() - 1]);
+    //    cells.emplace_back(make_shared<SLC>())
+    properties.emplace_back(make_shared<AcademicBuilding>("C2", 320, vector<double>{28, 150, 450, 1000, 1200, 1400}, Sci2));
+    cells.emplace_back(properties[properties.size() - 1]);
+    properties.emplace_back(make_shared<Residence>("REV"));
+    cells.emplace_back(properties[properties.size() - 1]);
+    //    cells.emplace_back(make_shared<NHL>())
+    properties.emplace_back(make_shared<AcademicBuilding>("MC", 350, vector<double>{35, 175, 500, 1100, 1300, 1500}, Math));
+    cells.emplace_back(properties[properties.size() - 1]);
+    cells.emplace_back(make_shared<Coop>());
+    properties.emplace_back(make_shared<AcademicBuilding>("DC", 400, vector<double>{50, 200, 600, 1400, 1700, 2000}, Math));
+    cells.emplace_back(properties[properties.size() - 1]);
 }
 
-void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money) {
-    players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position));
+void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
+    players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
 }
 
-void GameBoard::forward(int diceSum) {
+void GameBoard::move(int distance) {
+    cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
     int size = static_cast<int>(cells.size());
-    for (int i = 1; i < diceSum; i++) {
+    // TODO negative
+    int dest;
+    for (int i = 1; i < distance; i++) {
         int cur = curPlayer->getLocation();
-        int dest = (cur + i >= size) ? cur + i - size : cur + i;
+        dest = (cur + i >= size) ? cur + i - size : cur + i;
         cells[dest]->passBy(*curPlayer);
-        curPlayer->move(dest);
     }
+    curPlayer->setLocation(dest);
     cells[curPlayer->getLocation()]->landOn(*curPlayer);
     if (curPlayer->getShouldMoveToTims()) {
-        curPlayer->sentToTimsLine(timsLineLocation);
+        cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
+        curPlayer->sentToTimsLine(timsLineIndex);
+        cells[curPlayer->getLocation()]->landOn(*curPlayer);
         curPlayer->setRollState(false);
     }
 }
@@ -108,10 +140,10 @@ void GameBoard::roll() {
         }
     } else {
         if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
-            curPlayer->sentToTimsLine(timsLineLocation);
+            curPlayer->sentToTimsLine(timsLineIndex);
             curPlayer->setRollState(false);
         } else {
-            forward(roll1 + roll2);
+            move(roll1 + roll2);
             if (roll1 == roll2) {
                 curPlayer->setRollState(true);
             } else {
@@ -145,36 +177,33 @@ Player *GameBoard::getPlayer(const string& name) const{
 }
 
 Property *GameBoard::getPlayerProperty(const string& name, Player *player) const {
-    for (auto &cell : cells) {
-        if (cell->getName() == name) {
-            auto *property = dynamic_cast<Property*>(cell.get());
-            if (property) {
-                if (property->getOwner() == player) {
-                    return property;
-                } else {
-                    throw NotOwner{player->getName(), property->getName()};
-                }
-            } else break;
+    for (auto &property : properties) {
+        if (property->getName() == name) {
+            if (property->getOwner() == player) {
+                return property.get();
+            } else {
+                throw NotOwner{player->getName(), property->getName()};
+            }
         }
     }
     throw NotProperty{name};
 }
 
-AcademicBuilding *GameBoard::getPlayerAcademicBuilding(const std::string &name, Player *player) const {
-    for (auto &cell : cells) {
-        if (cell->getName() == name) {
-            auto *ab = dynamic_cast<AcademicBuilding*>(cell.get());
-            if (ab) {
-                if (ab->getOwner() == player) {
-                    return ab;
-                } else {
-                    throw NotOwner{player->getName(), ab->getName()};
-                }
-            } else break;
-        }
-    }
-    throw NotAcademicBuilding{name};
-}
+//AcademicBuilding *GameBoard::getPlayerAcademicBuilding(const std::string &name, Player *player) const {
+//    for (auto &cell : cells) {
+//        if (cell->getName() == name) {
+//            auto *ab = dynamic_cast<AcademicBuilding*>(cell.get());
+//            if (ab) {
+//                if (ab->getOwner() == player) {
+//                    return ab;
+//                } else {
+//                    throw NotOwner{player->getName(), ab->getName()};
+//                }
+//            } else break;
+//        }
+//    }
+//    throw NotAcademicBuilding{name};
+//}
 
 // TODO where should I put this
 bool askPlayerTradeResponse(Player *p) {
@@ -205,8 +234,8 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
     Player *toWhom = getPlayer(name);
     istringstream ssGive(give);
     istringstream ssReceive(receive);
-    int giveMoney;
-    int receiveMoney;
+    double giveMoney;
+    double receiveMoney;
 
     if (ssGive >> giveMoney) {
         if (ssReceive >> receiveMoney) {
@@ -251,23 +280,15 @@ void GameBoard::trade(Player &toWhom, Property &property, double value) {
 }
 
 void GameBoard::buyImprove(const string &name) {
-    AcademicBuilding *ab = getPlayerAcademicBuilding(name, curPlayer);
-    if (!ab->isMonopolized()) {
-        throw NotMonopolized{ab->getBlockName()};
-    } else if (ab->getImproveNum() >= 5) {
-        throw MaxImprove{ab->getBlockName()};
-    }
-    curPlayer->forcePay(ab->getImproveCost());
-    ab->addImprove();
+    Property *p = getPlayerProperty(name, curPlayer);
+    curPlayer->forcePay(p->getImproveCost());
+    p->addImprove();
 }
 
 void GameBoard::sellImprove(const string &name) {
-    AcademicBuilding *ab = getPlayerAcademicBuilding(name, curPlayer);
-    if (ab->getImproveNum() <= 0) {
-        throw ZeroImprove{ab->getBlockName()};
-    }
-    ab->removeImprove();
-    curPlayer->receiveMoney(ab->getImproveCost() / 2);
+    Property *p = getPlayerProperty(name, curPlayer);
+    p->removeImprove();
+    curPlayer->receiveMoney(p->getImproveCost() / 2);
 }
 
 
@@ -292,8 +313,8 @@ void GameBoard::unmortgage(const string &name) {
 
 double GameBoard::assetsValue() {
     double value = 0;
-    for (auto &i: cells) {
-        if (i->getOwner() == curPlayer) value+= i->getValue();
+    for (auto &i: properties) {
+        if (i->getOwner() == curPlayer) value+= i->getTradableValue();
     }
     return value;
 }
@@ -302,7 +323,7 @@ void GameBoard::assets(Player &p) {
     cout << "Player " << p.getName() << endl;
     cout << "Current Saving: $" << p.getCash() << endl;
     cout << "Properties: " << endl;
-    for (auto &i : cells) {
+    for (auto &i : properties) {
         if (i->getOwner() == &p) {
             cout << i->getName() << endl;
         }

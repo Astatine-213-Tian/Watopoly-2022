@@ -2,6 +2,7 @@
 #include "academicBuilding.h"
 #include "monopolyBlock.h"
 #include "player.h"
+#include "error.h"
 
 AcademicBuilding::AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb) :
     Property{std::move(name), cost}, tuition{std::move(tuition)}, mb{&mb} {
@@ -21,25 +22,32 @@ int AcademicBuilding::getImproveNum() const {
 }
 
 void AcademicBuilding::addImprove() const{
+    if (!mb->isMonopolized()) throw NotMonopolized{mb->getName()};
+    if (mb->getImproveNum() >= 5) throw MaxImprove{mb->getName()};
     mb->addImprove();
 }
 
 void AcademicBuilding::removeImprove() const{
+    if (mb->getImproveNum() <= 0) throw ZeroImprove{mb->getName()};
     mb->removeImprove();
 }
 
-bool AcademicBuilding::isMonopolized() const {
-    return mb->isMonopolized();
+void AcademicBuilding::initImprove(int num) const {
+    mb->initImproveNum(num);
 }
 
-std::string AcademicBuilding::getBlockName() const {
-    return mb->getName();
-}
+//bool AcademicBuilding::isMonopolized() const {
+//    return mb->isMonopolized();
+//}
+//
+//std::string AcademicBuilding::getBlockName() const {
+//    return mb->getName();
+//}
 
 double AcademicBuilding::getImproveCost() const {
     return mb->getImproveCost();
 }
 
-double AcademicBuilding::getAllPossibleReturn() const {
+double AcademicBuilding::getValueWhenUnMortgage() const {
     return cost / 2 + getImproveCost() / 2 * getImproveNum();
 }

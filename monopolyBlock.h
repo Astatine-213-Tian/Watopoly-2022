@@ -22,6 +22,7 @@ class MonopolyBlock {
   int getImproveNum() const;
   void addImprove();
   void removeImprove();
+  void initImproveNum(int num);
 };
 
 #endif //WATOPOLY__MONOPOLYBLOCK_H_

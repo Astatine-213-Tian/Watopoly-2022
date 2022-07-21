@@ -12,15 +12,17 @@ class AcademicBuilding;
 
 class GameBoard {
   std::vector<std::unique_ptr<Player>> players;
-  std::vector<std::unique_ptr<Cell>> cells;
+  std::vector<std::shared_ptr<Cell>> cells;
+  std::vector<std::shared_ptr<Property>> properties;
   Player *curPlayer;
   std::unique_ptr<Dice> dice1;
   std::unique_ptr<Dice> dice2;
-  const int timsLineLocation = 10;
+  const int timsLineIndex = 10;
+  const int osapIndex = 0;
 
-  void forward(int diceSum);
+  void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
-  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
+//  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
   Player *getPlayer(const std::string &name) const;
   void trade(Player &toWhom, double value, Property &property);
   void trade(Player &toWhom, Property &p1, Property &p2);
@@ -31,7 +33,7 @@ class GameBoard {
  public:
   GameBoard();
   void init();
-  void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500);
+  void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
   void roll(); // save dice val, check dice, check num double
   void roll(int d1, int d2);
   void next(); // check can next,

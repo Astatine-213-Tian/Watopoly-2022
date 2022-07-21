@@ -1,7 +1,6 @@
 #include <utility>
 #include "monopolyBlock.h"
 #include "academicBuilding.h"
-#include "error.h"
 
 MonopolyBlock::MonopolyBlock(std::string name, double improveCost): name{std::move(name)}, buildings{}, improveCost{improveCost}, numImprove{0} {}
 
@@ -22,6 +21,10 @@ bool MonopolyBlock::isMonopolized() const {
         if (b->getOwner() != monopoly) return false;
     }
     return true;
+}
+
+void MonopolyBlock::initImproveNum(int num) {
+    numImprove = num;
 }
 
 std::string MonopolyBlock::getName() const { return name; }
