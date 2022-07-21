@@ -6,7 +6,6 @@
 class NonProperty: public Cell {
  public:
   explicit NonProperty(const std::string&);
-  virtual double getValue() const override;
 };
 
 #endif
