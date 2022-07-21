@@ -290,16 +290,24 @@ void GameBoard::unmortgage(const string &name) {
     p->setUnMortgage();
 }
 
+double GameBoard::assetsValue() {
+    double value = 0;
+    for (auto &i: cells) {
+        if (i->getOwner() == curPlayer) value+= i->getValue();
+    }
+    return value;
+}
+
 void GameBoard::assets(Player &p) {
     cout << "Player " << p.getName() << endl;
     cout << "Current Saving: $" << p.getCash() << endl;
     cout << "Properties: " << endl;
     for (auto &i : cells) {
-        auto *property = dynamic_cast<Property *>(i.get());
-        if (property->getOwner() == &p) {
+        if (i->getOwner() == &p) {
             cout << i->getName() << endl;
         }
     }
+    cout << "Total assets value: " << assetsValue() << endl;
 }
 
 void GameBoard::allAssets() {
@@ -325,11 +333,7 @@ bool GameBoard::needDealWithDebt() {
 }
 
 void GameBoard::bankrupt() {
-    double totalAssets = 0;
-    for (auto &i: cells) {
-        if (i->getOwner() == curPlayer) totalAssets+= i->getValue();
-    }
-    if (totalAssets >= curPlayer->getDebtAmount()) {
+    if (assetsValue() >= curPlayer->getDebtAmount()) {
         throw InvalidCmd{};
     }
     // TODO bankrupt staff
