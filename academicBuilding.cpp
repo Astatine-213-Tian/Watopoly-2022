@@ -41,5 +41,5 @@ double AcademicBuilding::getImproveCost() const {
 }
 
 double AcademicBuilding::getAllPossibleReturn() const {
-    return cost / 2 + getImproveCost() * getImproveNum();
+    return cost / 2 + getImproveCost() / 2 * getImproveNum();
 }
