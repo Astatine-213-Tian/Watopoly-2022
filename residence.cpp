@@ -5,10 +5,7 @@
 Residence::Residence(std::string name) : Property{std::move(name), 200} {}
 
 double Residence::calculateRent() const {
-    int numRes = 0;
-    for (auto p: owner->getProperties()) {
-        if (dynamic_cast<Residence*>(p)) ++numRes;
-    }
+    int numRes = owner->getRes();
     if (numRes == 1) return 25;
     else if (numRes == 2) return 50;
     else if (numRes == 3) return 100;

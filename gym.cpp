@@ -11,12 +11,7 @@ double Gym::calculateRent() const {
     diceSum += d.roll();
     diceSum += d.roll();
     
-    int numGym = 0;
-    for (auto p: owner->getProperties()) {
-        if (dynamic_cast<Gym *>(p)) ++numGym;
-    }
-
-    if (numGym == 1) {
+    if (owner->getGym() == 1) {
         return 4.0 * diceSum;
     } else {
         return 10.0 * diceSum;
