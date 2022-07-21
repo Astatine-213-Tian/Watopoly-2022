@@ -1,19 +1,22 @@
 #include "player.h"
 #include "error.h"
+#include "gameboard.h"
 
 using namespace std;
 
-Player::Player(std::string name, char displayChar, int timCups, double cash, int position):
+Player::Player(std::string name, char displayChar, int timCups, double cash, int position, GameBoard *_g, bool inTims, int timsRound):
     name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position},
-    isInTimsLine{false}, rollTimes{0}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
+    isInTimsLine{inTims}, rollTimes{timsRound}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr}, g{_g} {}
 
 string Player::getName() const{ return name; }
+
+char Player::getDisplayChar() const { return displayChar; }
 
 double Player::getCash() const{ return cash; }
 
 int Player::getNumCup() const{ return numCup; }
 
-void Player::move(const int index) { curLocation = index; }
+void Player::setLocation(const int index) { curLocation = index; }
 
 void Player::sentToTimsLine(int timsIndex) {
     curLocation = timsIndex;

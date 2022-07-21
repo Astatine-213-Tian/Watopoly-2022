@@ -5,11 +5,11 @@
 #include <vector>
 class Property;
 class AcademicBuilding;
+class GameBoard;
 
 class Player {
   std::string name;
   char displayChar;
-  //std::vector<Property *> properties;
   double cash;
   int numCup;
   int curLocation;
@@ -21,20 +21,22 @@ class Player {
   int numRes;
   double debtAmount;
   Player *creditor;
+  GameBoard *g;
 
  public:
-  Player(std::string name, char displayChar, int timCups, double cash, int position);
+  Player(std::string name, char displayChar, int timCups, double cash, int position, GameBoard *gameBoard, bool isInTimsLine, int timsLineRound);
   std::string getName() const;
   double getCash() const;
+  char getDisplayChar() const;
   int getNumCup() const;
-  void move(int index);
+  void setLocation(int index);
   void addCups(int num);
   void useCup();
   void pay(double value, Player *receiver = nullptr); // reject if not enough cash
   void forcePay(double value, Player *receiver = nullptr); // cause debt if not enough cash
   void receiveMoney(double value);
   bool inTimsLine() const;
-  void sentToTimsLine(int timsIndex);
+  void sentToTimsLine(int index);
   void setShouldMoveToTims();
   bool getShouldMoveToTims() const;
   void removeFromTimsLine();
