@@ -16,18 +16,12 @@ void usage() {
 
 int main(int argc, char *argv[]) {
     Controller c;
+    GameBoard gb;
+    TextDisplay td;
 
-    // gamebaord g
-    // display td
-    // c.setgameboard
-    // c ctor
-    // g.setcontroller
-    // g.setobserver
-    // g + set
-    // g.init()
-    // cell - setindex
-    // init index - attach
-    // c.play()
+    gb.setObserver(td);
+    c.setGameBoard(gb);
+    gb.setController(c);
 
     if (argc == 1) c.addPlayers();
 
