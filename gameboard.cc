@@ -18,6 +18,7 @@
 #include "coop.h"
 #include "subject.h"
 #include "observer.h"
+#include "state.h"
 
 using namespace std;
 
@@ -152,12 +153,13 @@ void GameBoard::move(int distance) {
 }
 
 void GameBoard::roll() {
-//    if (!curPlayer->getRollState()) throw InvalidCmd{"roll};
+    if (!curPlayer->getRollState()) throw InvalidCmd{"roll"};
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     curPlayer->addRollTimes();
 
     if (curPlayer->inTimsLine()) {
+        throw inTims{};
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
             curPlayer->setRollState(false);
