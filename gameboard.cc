@@ -369,7 +369,7 @@ void GameBoard::bankrupt() {
     // TODO bankrupt staff
 }
 
-void GameBoard::setObserver(shared_ptr<Observer> o) { ob = make_unique<Observer>(o); }
+void GameBoard::setObserver(shared_ptr<Observer> o) { ob = o; }
 
 ostream &operator<<(ostream &out, const GameBoard &gb) {
     out << gb.ob;
