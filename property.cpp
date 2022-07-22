@@ -83,6 +83,6 @@ void Property::addImprove() { throw NotAcademicBuilding{name}; }
 
 void Property::removeImprove() { throw NotAcademicBuilding{name}; }
 
-Info Property::getInfo() {
+Info Property::getInfo() const {
     return Info{owner->getDisplayChar(), getImproveNum(), cellIndex, name, playersOnCell};
 }

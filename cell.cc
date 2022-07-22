@@ -10,6 +10,11 @@ string Cell::getName() const { return name; }
 
 void Cell::setIndex(const int idx) { cellIndex = idx; }
 
+void Cell::initLandOn(Player &p) {
+    playersOnCell.emplace_back(p.getDisplayChar());
+    notifyObservers();
+}
+
 void Cell::landOn(Player &p) {
     playersOnCell.emplace_back(p.getDisplayChar());
     landOnAction(p);

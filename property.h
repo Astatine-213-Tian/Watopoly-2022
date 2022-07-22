@@ -36,7 +36,7 @@ class Property : public Cell {
   // override from Cell
   void passBy(Player &p) override;
   void landOnAction(Player &p) override;
-  Info getInfo() override;
+  Info getInfo() const override;
 };
 
 #endif //WATOPOLY__PROPERTY_H_

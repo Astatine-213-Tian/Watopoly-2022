@@ -7,6 +7,7 @@
 #include "gameboard.h"
 #include "dice.h"
 #include "termcodes.h"
+#include "state.h"
 
 using namespace std;
 
@@ -20,11 +21,16 @@ void Controller::setGameBoard(GameBoard *gb) {
     g->init();
 }
 
+
 void Controller::roll() {
     // TODO better method?
-    if (!g->getCurPlayer()->getRollState()) {
-        cout << RED << "You cannot roll anymore in this term." << DEFAULT << endl;
-    } else if (g->getCurPlayer()->inTimsLine()) {
+
+    try {
+        g->roll();
+        cout << g;
+    } catch (exception &e) {
+        cout << RED << "You may not roll anymore in this turn." << DEFAULT << endl;
+    } catch (inTims &) {
         cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
              << "1 - roll (you will get out if you roll double)" << endl
              << "2 - use Roll Up the Rim cup (if you have)" << endl
@@ -41,10 +47,30 @@ void Controller::roll() {
         } else {
             g->getCurPlayer()->forcePay(50);
         }
-    } else {
-        g->roll();
-        cout << g;
     }
+    // if (!g->getCurPlayer()->getRollState()) {
+    //     cout << "You cannot roll anymore in this term." << endl;
+    // } else if (g->getCurPlayer()->inTimsLine()) {
+    //     cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
+    //          << "1 - roll (you will get out if you roll double)" << endl
+    //          << "2 - use Roll Up the Rim cup (if you have)" << endl
+    //          << "3 - pay 50" << endl;
+    //     int option;
+    //     while (!(cin >> option) || option <= 3 || option > 3) {
+    //         cout << "Invalid input. Please choose a number between 1 and 3: ";
+    //     }
+    //     if (option == 1) {
+    //         g->roll();
+    //         cout << g;
+    //     } else if (option == 2) {
+    //         g->getCurPlayer()->useCup();
+    //     } else {
+    //         g->getCurPlayer()->forcePay(50);
+    //     }
+    // } else {
+    //     g->roll();
+    //     cout << g;
+    // }
 }
 
 void Controller::improve() {

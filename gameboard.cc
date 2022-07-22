@@ -18,6 +18,7 @@
 #include "coop.h"
 #include "subject.h"
 #include "observer.h"
+#include "state.h"
 
 using namespace std;
 
@@ -115,7 +116,7 @@ void GameBoard::setController(Controller *c) {
 
 void GameBoard::addPlayer(const string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
-    cells[position]->notifyObservers();
+    cells[position]->initLandOn(*(players.end()->get()));
 }
 
 
@@ -133,11 +134,12 @@ void GameBoard::start() {
 void GameBoard::move(int distance) {
     cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
     int size = static_cast<int>(cells.size());
-    // TODO negative
+
     int dest;
-    for (int i = 1; i < distance; i++) {
+    for (int i = 1; i < abs(distance); i++) {
         int cur = curPlayer->getLocation();
-        dest = (cur + i >= size) ? cur + i - size : cur + i;
+        if (distance >= 0) dest = (cur + i >= size) ? cur + i - size : cur + i;
+        else dest = (cur - i < 0) ? cur - i + size : cur - i;
         cells[dest]->passBy(*curPlayer);
     }
     curPlayer->setLocation(dest);
@@ -151,12 +153,13 @@ void GameBoard::move(int distance) {
 }
 
 void GameBoard::roll() {
-//    if (!curPlayer->getRollState()) throw InvalidCmd{"roll};
+    if (!curPlayer->getRollState()) throw InvalidCmd{"roll"};
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     curPlayer->addRollTimes();
 
     if (curPlayer->inTimsLine()) {
+        throw inTims{};
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
             curPlayer->setRollState(false);
