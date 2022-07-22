@@ -24,8 +24,8 @@ class GameBoard {
   const int timsLineIndex = 10;
   const int osapIndex = 0;
 
-  std::unique_ptr<Controller> controller;
-  std::shared_ptr<Observer> ob;
+  Controller *controller;
+  Observer *ob;
 
   void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
@@ -62,7 +62,7 @@ class GameBoard {
   void bankrupt();
   bool needDealWithDebt();
 
-  void setObserver(std::shared_ptr<Observer> o);
+  void setObserver(Observer &o);
   friend std::ostream &operator<<(std::ostream &out, const GameBoard &gb);
 };
 
