@@ -2,12 +2,16 @@
 #define _CELL_H_
 
 #include <string>
-#include "vector"
+#include <vector>
+#include "subject.h"
+#include "info.h"
 
 class Player;
 
-class Cell{
+class Cell: public Subject{
  protected:
+  char owner;
+  int cellIndex;
   std::string name;
   std::vector<char> playersOnCell;
   virtual void landOnAction(Player &p) = 0;
@@ -19,6 +23,8 @@ class Cell{
   virtual void passBy(Player &p) = 0;
   void landOn(Player &p);
   std::string getName() const;
+  void setIndex(const int idx);
+  virtual Info &getInfo() = 0;
 };
 
 #endif

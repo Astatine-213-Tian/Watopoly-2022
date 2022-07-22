@@ -12,10 +12,12 @@ using namespace std;
 class Property;
 class AcademicBuilding;
 
-Controller::Controller() : g{make_unique<GameBoard>()} {
+Controller::Controller() {}
+
+void Controller::setGameBoard(GameBoard &gb) {
+    g = make_unique<GameBoard>(gb);
     g->init();
 }
-
 
 //bool Controller::askPlayerTradeResponse(Player *p) {
 //    cout << "Player " << p->getName() << ", do you accept this trade? (y/n)" << endl;
@@ -49,6 +51,7 @@ void Controller::roll() {
         }
         if (option == 1) {
             g->roll();
+            cout << g;
         } else if (option == 2) {
             g->getCurPlayer()->useCup();
         } else {
@@ -56,6 +59,7 @@ void Controller::roll() {
         }
     } else {
         g->roll();
+        cout << g;
     }
 }
 
@@ -76,6 +80,7 @@ void Controller::improve() {
             cout << e.what() << endl;
         }
     }
+    cout << g;
 }
 
 void Controller::trade() {
@@ -104,7 +109,7 @@ void Controller::next() {
     try {
         g->next();
     } catch (exception &e) {
-        cout << "Able to go next. You need to roll another time before finishing your turn." << endl;
+        cout << "Unable to go next. You need to roll another time before finishing your turn." << endl;
     }
 }
 
@@ -174,7 +179,6 @@ void Controller::play() {
 }
 
 void Controller::save(string& filename) {}
-
 
 void Controller::load(const string& filename) {
     string line;

@@ -3,6 +3,7 @@
 #include <memory>
 #include <sstream>
 #include "gameboard.h"
+#include "textdisplay.h"
 #include "property.h"
 #include "academicBuilding.h"
 #include "dice.h"
@@ -16,6 +17,8 @@
 #include "gym.h"
 #include "goToTims.h"
 #include "coop.h"
+#include "subject.h"
+#include "observer.h"
 
 using namespace std;
 
@@ -99,10 +102,21 @@ void GameBoard::init() {
     cells.emplace_back(make_shared<Coop>());
     properties.emplace_back(make_shared<AcademicBuilding>("DC", 400, vector<double>{50, 200, 600, 1400, 1700, 2000}, Math));
     cells.emplace_back(properties[properties.size() - 1]);
+
+    for (int i = 0; i < (int) cells.size(); i++) {
+        cells[i]->setIndex(i);
+        cells[i]->attach(ob);
+        cells[i]->notifyObservers();
+    }
+}
+
+void GameBoard::setController(Controller &c) {
+    controller = make_unique<Controller>(c);
 }
 
 void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
+    cells[position]->notifyObservers();
 }
 
 void GameBoard::move(int distance) {
@@ -157,6 +171,7 @@ void GameBoard::next() {
     if (curPlayer->getRollState()) {
         throw InvalidCmd{};
     }
+    cout << curPlayer->getName() << ": your turn is ended." << endl;
     int numPlayer = static_cast<int>(players.size());
     if (curPlayer == players[numPlayer - 1].get()) {
         curPlayer = players[0].get();
@@ -165,6 +180,7 @@ void GameBoard::next() {
     }
     curPlayer->initRollTimes();
     curPlayer->setRollState(true);
+    cout << curPlayer->getName() << ": it is not your turn." << endl;
 }
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
@@ -283,12 +299,14 @@ void GameBoard::buyImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
     curPlayer->forcePay(p->getImproveCost());
     p->addImprove();
+    p->notifyObservers();
 }
 
 void GameBoard::sellImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
     p->removeImprove();
     curPlayer->receiveMoney(p->getImproveCost() / 2);
+    p->notifyObservers();
 }
 
 
@@ -358,4 +376,11 @@ void GameBoard::bankrupt() {
         throw InvalidCmd{};
     }
     // TODO bankrupt staff
+}
+
+void GameBoard::setObserver(shared_ptr<Observer> o) { ob = make_unique<Observer>(o); }
+
+ostream &operator<<(ostream &out, const GameBoard &gb) {
+    out << gb.ob;
+    return out;
 }
