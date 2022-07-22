@@ -204,21 +204,6 @@ Property *GameBoard::getPlayerProperty(const string &name, Player *player) const
     return property;
 }
 
-//AcademicBuilding *GameBoard::getPlayerAcademicBuilding(const std::string &name, Player *player) const {
-//    for (auto &cell : cells) {
-//        if (cell->getName() == name) {
-//            auto *ab = dynamic_cast<AcademicBuilding*>(cell.get());
-//            if (ab) {
-//                if (ab->getOwner() == player) {
-//                    return ab;
-//                } else {
-//                    throw NotOwner{player->getName(), ab->getName()};
-//                }
-//            } else break;
-//        }
-//    }
-//    throw NotAcademicBuilding{name};
-//}
 
 // TODO where should I put this
 bool askPlayerTradeResponse(Player *p) {
@@ -297,33 +282,22 @@ void GameBoard::trade(Player &toWhom, Property &property, double value) {
 void GameBoard::buyImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
     // TODO mortgage check
-    curPlayer->pay(p->getImproveCost());
     p->addImprove();
 }
 
 void GameBoard::sellImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
     p->removeImprove();
-    curPlayer->receiveMoney(p->getImproveCost() / 2);
 }
 
 
 void GameBoard::mortgage(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    if (p->getMortgageStatus()) {
-        throw PropertyStillMortgage{p->getName()};
-    }
-    noImprovementCheck(p);
     p->setMortgage();
-    curPlayer->receiveMoney(p->getCost() / 2);
 }
 
 void GameBoard::unmortgage(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    if (!p->getMortgageStatus()) {
-        throw PropertyStillUnMortage{p->getName()};
-    }
-    curPlayer->forcePay(p->getUnMortgageCost());
     p->setUnMortgage();
 }
 

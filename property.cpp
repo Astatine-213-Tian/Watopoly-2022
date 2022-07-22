@@ -13,24 +13,22 @@ void Property::setOwner(Player *p) { owner = p; }
 double Property::getCost() const { return cost; }
 
 void Property::setMortgage() {
+    if (isMortgaged) throw PropertyStillMortgage{name};
+    if (getImproveNum() > 0) throw BuildingStillWithImprove{name};
+    owner->receiveMoney( cost / 2);
     isMortgaged = true;
     isMortgageInterestPaid = false;
 }
 
 void Property::setUnMortgage() {
+    if (!isMortgaged) throw PropertyStillUnMortage{name};
+    double payment = cost * (isMortgageInterestPaid ? 0.5 : 0.6);
+    owner->pay(payment);
     isMortgaged = false;
     isMortgageInterestPaid = false;
 }
 
 void Property::setMortgageInterestPaid() { isMortgageInterestPaid = true; }
-
-double Property::getUnMortgageCost() const {
-    if (isMortgageInterestPaid) {
-        return cost * 0.5;
-    } else {
-        return cost * 0.6;
-    }
-}
 
 void Property::passBy(Player &p) { }
 

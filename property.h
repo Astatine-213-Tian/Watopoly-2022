@@ -19,7 +19,6 @@ class Property : public Cell {
  public:
   Property(std::string name, double cost);
   double getCost() const;
-  double getUnMortgageCost() const;
   void setMortgage();
   void setUnMortgage();
   void setMortgageInterestPaid();
