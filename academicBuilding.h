@@ -17,9 +17,7 @@ class AcademicBuilding : public Property {
   double getImproveCost() const override;
   void addImprove() const override;
   void removeImprove() const override;
-  void initImprove(int improveNum) const override;
-//  bool isMonopolized() const;
-//  std::string getBlockName() const;
+  void loadImproveNum(int improveNum) const override;
 };
 
 #endif //WATOPOLY__ACADEMICBUILDING_H_

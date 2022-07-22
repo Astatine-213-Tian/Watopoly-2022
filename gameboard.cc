@@ -110,8 +110,7 @@ void GameBoard::setProperty(const std::string &name, const std::string &owner, i
     Property *property = getProperty(name);
     Player *player = getPlayer(owner);
     property->setOwner(player);
-    property->initImprove(improvements);
-    if (mortgaged) property->setMortgage();
+    property->loadInfo(improvements, mortgaged);
 }
 
 void GameBoard::start() {
@@ -297,6 +296,7 @@ void GameBoard::trade(Player &toWhom, Property &property, double value) {
 
 void GameBoard::buyImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
+    // TODO mortgage check
     curPlayer->pay(p->getImproveCost());
     p->addImprove();
 }

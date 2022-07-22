@@ -4,7 +4,7 @@
 #include "player.h"
 #include "error.h"
 
-Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false}, isMortgageInterestPaid{false}, numImprove{0} {}
+Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false}, isMortgageInterestPaid{false} {}
 
 Player *Property::getOwner() const { return owner; }
 
@@ -78,7 +78,12 @@ int Property::getImproveNum() const { return 0; }
 
 double Property::getImproveCost() const { return 0; }
 
-void Property::initImprove(int improveNum) const { }
+void Property::loadImproveNum(int improveNum) const {};
+
+void Property::loadInfo(int improveNum, bool mortgaged) {
+    isMortgaged = mortgaged;
+    loadImproveNum(improveNum);
+}
 
 void Property::addImprove() const { throw NotAcademicBuilding{name}; }
 

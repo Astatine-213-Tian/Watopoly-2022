@@ -32,17 +32,9 @@ void AcademicBuilding::removeImprove() const{
     mb->removeImprove();
 }
 
-void AcademicBuilding::initImprove(int num) const {
+void AcademicBuilding::loadImproveNum(int num) const {
     mb->initImproveNum(num);
 }
-
-//bool AcademicBuilding::isMonopolized() const {
-//    return mb->isMonopolized();
-//}
-//
-//std::string AcademicBuilding::getBlockName() const {
-//    return mb->getName();
-//}
 
 double AcademicBuilding::getImproveCost() const {
     return mb->getImproveCost();
