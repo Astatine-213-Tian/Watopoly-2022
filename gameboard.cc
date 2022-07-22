@@ -119,6 +119,18 @@ void GameBoard::addPlayer(const std::string &name, char displayChar, int positio
     cells[position]->notifyObservers();
 }
 
+
+void GameBoard::setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged) {
+    Property *property = getProperty(name);
+    Player *player = getPlayer(owner);
+    property->setOwner(player);
+    property->loadInfo(improvements, mortgaged);
+}
+
+void GameBoard::start() {
+    curPlayer = players[0].get();
+}
+
 void GameBoard::move(int distance) {
     cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
     int size = static_cast<int>(cells.size());
@@ -185,41 +197,29 @@ void GameBoard::next() {
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
 
-Player *GameBoard::getPlayer(const string& name) const{
+Player *GameBoard::getPlayer(const string &name) const{
+    if (name == "BANK") return nullptr;
     for (auto &cell : players) {
         if (cell->getName() == name) return cell.get();
     }
     throw NotPlayer{name};
 }
 
-Property *GameBoard::getPlayerProperty(const string& name, Player *player) const {
+Property *GameBoard::getProperty(const std::string &name) const {
     for (auto &property : properties) {
-        if (property->getName() == name) {
-            if (property->getOwner() == player) {
-                return property.get();
-            } else {
-                throw NotOwner{player->getName(), property->getName()};
-            }
-        }
+        if (property->getName() == name) return property.get();
     }
     throw NotProperty{name};
 }
 
-//AcademicBuilding *GameBoard::getPlayerAcademicBuilding(const std::string &name, Player *player) const {
-//    for (auto &cell : cells) {
-//        if (cell->getName() == name) {
-//            auto *ab = dynamic_cast<AcademicBuilding*>(cell.get());
-//            if (ab) {
-//                if (ab->getOwner() == player) {
-//                    return ab;
-//                } else {
-//                    throw NotOwner{player->getName(), ab->getName()};
-//                }
-//            } else break;
-//        }
-//    }
-//    throw NotAcademicBuilding{name};
-//}
+Property *GameBoard::getPlayerProperty(const string &name, Player *player) const {
+    Property *property = getProperty(name);
+    if (property->getOwner() != player) {
+        throw NotOwner{player->getName(), property->getName()};
+    }
+    return property;
+}
+
 
 // TODO where should I put this
 bool askPlayerTradeResponse(Player *p) {
@@ -297,7 +297,7 @@ void GameBoard::trade(Player &toWhom, Property &property, double value) {
 
 void GameBoard::buyImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    curPlayer->forcePay(p->getImproveCost());
+    // TODO mortgage check
     p->addImprove();
     p->notifyObservers();
 }
@@ -312,20 +312,11 @@ void GameBoard::sellImprove(const string &name) {
 
 void GameBoard::mortgage(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    if (p->getMortgageStatus()) {
-        throw PropertyStillMortgage{p->getName()};
-    }
-    noImprovementCheck(p);
     p->setMortgage();
-    curPlayer->receiveMoney(p->getCost() / 2);
 }
 
 void GameBoard::unmortgage(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    if (!p->getMortgageStatus()) {
-        throw PropertyStillUnMortage{p->getName()};
-    }
-    curPlayer->forcePay(p->getUnMortgageCost());
     p->setUnMortgage();
 }
 
@@ -346,7 +337,7 @@ void GameBoard::assets(Player &p) {
             cout << i->getName() << endl;
         }
     }
-    cout << "Total assets value: " << assetsValue() << endl;
+    cout << "Total value (mortgage + sell) " << assetsValue() << endl;
 }
 
 void GameBoard::allAssets() {

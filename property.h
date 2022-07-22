@@ -13,30 +13,31 @@ class Property : public Cell {
   Player *owner;
   bool isMortgaged;
   bool isMortgageInterestPaid;
-  int numImprove;
   virtual double calculateRent() const = 0;
   virtual double getValueWhenUnMortgage() const;
+  virtual void loadImproveNum(int improveNum) const;
 
  public:
   Property(std::string name, double cost);
   double getCost() const;
-  double getUnMortgageCost() const;
   void setMortgage();
   void setUnMortgage();
   void setMortgageInterestPaid();
   bool getMortgageStatus() const;
   Player *getOwner() const;
   void setOwner(Player *p);
+  double getTradableValue() const;
+  void loadInfo(int improveNum, bool mortgaged);
 
+  // For academic building only;
   virtual int getImproveNum() const;
   virtual double getImproveCost() const;
   virtual void addImprove() const;
   virtual void removeImprove() const;
-  virtual void initImprove(int improveNum) const;
 
+  // override from Cell
   void passBy(Player &p) override;
   void landOnAction(Player &p) override;
-  double getTradableValue() const;
 
   Info &getInfo() override;
 };

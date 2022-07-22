@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <sstream>
+#include <fstream>
 #include "controller.h"
 #include "gameboard.h"
 #include "textdisplay.h"
@@ -16,71 +16,42 @@ void usage() {
 
 int main(int argc, char *argv[]) {
     Controller c;
-    GameBoard gb;
-    shared_ptr<TextDisplay> td;
 
-    gb.setObserver(td);
-    c.setGameBoard(gb);
-    gb.setController(c);
+    // gamebaord g
+    // display td
+    // c.setgameboard
+    // c ctor
+    // g.setcontroller
+    // g.setobserver
+    // g + set
+    // g.init()
+    // cell - setindex
+    // init index - attach
+    // c.play()
 
-    string cmd;
-    string file;
+    if (argc == 1) c.addPlayers();
 
-    if (argc == 1) {
-        c.play();
-    } else if (argc == 3) {
-        istringstream issCmd{argv[1]};
-        istringstream issFile{argv[2]};
-        issCmd >> cmd;
-        issFile >> file;
-        if (cmd == "-load") {
-            c.load(file);
-            c.play();
-        } else {
-            usage();
-            return 1;
-        }
-    } else if (argc == 2) {
-        istringstream issCmd{argv[1]};
-        issCmd >> cmd;
-        if (cmd == "-testing") {
-            // TODO testing mode
-        } else {
-            usage();
-            return 1;
-        }
-    } else if (argc == 4) {
-        istringstream issCmd{argv[1]};
-        issCmd >> cmd;
-        if (cmd == "-load") {
-            issCmd = istringstream{argv[2]};
-            issCmd >> file;
-            issCmd = istringstream{argv[3]};
-            issCmd >> cmd;
-            if (cmd == "-testing") {
-                // load + test
+    for (int i = 1; i < argc; ++i) {
+        string theArg = argv[i];
+        if (theArg == "-load") {
+            if (i + 1 < argc) {
+                string filename = argv[++i];
+                ifstream f(filename);
+                if (f.good()) c.load(filename);
+                else {
+                    cerr << "File doesn't exist." << endl;
+                    return 1;
+                }
             } else {
-                usage();
-                return 1;
+                cerr << "Please provide a filename." << endl;
             }
-        } else if (cmd == "-testing") {
-            issCmd = istringstream{argv[2]};
-            issCmd >> cmd;
-            if (cmd == "-load") {
-                issCmd = istringstream{argv[3]};
-                issCmd >> file;
-                // load + test
-            } else {
-                usage();
-                return 1;
-            }
-        } else {
-            usage();
-            return 1;
+        } else if (theArg == "-testing") {
+            // TODO set testing
+        } else if (theArg == "-enhanced") {
+            // TODO set enhanced
         }
-    } else {
-        usage();
-        return 1;
     }
+
+    c.play();
     return 0;
 }

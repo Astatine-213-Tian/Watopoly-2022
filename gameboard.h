@@ -29,6 +29,7 @@ class GameBoard {
 
   void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
+  Property *getProperty(const std::string &name) const;
 //  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
   Player *getPlayer(const std::string &name) const;
   void trade(Player &toWhom, double value, Property &property);
@@ -41,6 +42,8 @@ class GameBoard {
   GameBoard();
   void init();
   void setController(Controller &c);
+  void start();
+  void setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged);
   void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
   void roll();
   void roll(int d1, int d2);
