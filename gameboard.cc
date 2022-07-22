@@ -362,6 +362,24 @@ void GameBoard::bankrupt() {
         throw InvalidCmd{};
     }
     // TODO bankrupt staff
+    Player *creditor = curPlayer->getCreditor();
+    creditor->receiveMoney(curPlayer->getCash());
+    for (auto &property: properties) {
+        if (property->getOwner() == curPlayer) {
+            if (property->getMortgageStatus()) {
+                if (creditor) {
+                    // TODO ask accept or not
+                    // if yes, use pay, setowner, setmortageinterestpaid
+                    // else auction
+                } else {
+                    // TODO auction
+                }
+            } else {
+                property->setOwner(creditor);
+            }
+        }
+    }
+    players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> p) { p.get() == this->curPlayer; }), players.end());
 }
 
 void GameBoard::setObserver(Observer *o) { ob = o; }

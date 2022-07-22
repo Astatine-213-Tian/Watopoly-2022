@@ -23,7 +23,7 @@ class Property : public Cell {
   void setMortgage();
   void setUnMortgage();
   void setMortgageInterestPaid();
-//  bool getMortgageStatus() const;
+  bool getMortgageStatus() const;
   Player *getOwner() const;
   void setOwner(Player *p);
   double getTradableValue() const;
