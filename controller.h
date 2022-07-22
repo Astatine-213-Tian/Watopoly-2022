@@ -19,7 +19,7 @@ class Controller {
   void payDebt();
   void bankrupt();
   void save(std::string& filename);
-  bool yesOrNoResponse();
+  static bool yesOrNoResponse();
 
  public:
   Controller();
