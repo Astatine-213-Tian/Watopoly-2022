@@ -109,8 +109,8 @@ void GameBoard::init() {
     }
 }
 
-void GameBoard::setController(Controller &c) {
-    controller = &c;
+void GameBoard::setController(Controller *c) {
+    controller = c;
 }
 
 void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
@@ -364,7 +364,7 @@ void GameBoard::bankrupt() {
     // TODO bankrupt staff
 }
 
-void GameBoard::setObserver(Observer &o) { ob = &o; }
+void GameBoard::setObserver(Observer *o) { ob = o; }
 
 ostream &operator<<(ostream &out, const GameBoard &gb) {
     out << gb.ob;

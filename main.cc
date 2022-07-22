@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
     GameBoard gb;
     TextDisplay td;
 
-    gb.setObserver(td);
-    c.setGameBoard(gb);
-    gb.setController(c);
+    gb.setObserver(&td);
+    gb.setController(&c);
+    c.setGameBoard(&gb);
 
     if (argc == 1) c.addPlayers();
 

@@ -8,7 +8,7 @@ class GameBoard;
 class Player;
 
 class Controller {
-  std::unique_ptr<GameBoard> g;
+  GameBoard *g = nullptr;
 //  void processUsualCmd(const std::string &cmd);
   void next();
   void roll();
@@ -22,7 +22,7 @@ class Controller {
 
  public:
   Controller();
-  void setGameBoard(GameBoard &gb);
+  void setGameBoard(GameBoard *gb);
 //  bool askPlayerTradeResponse(Player *p);
   void addPlayers();
   void play();

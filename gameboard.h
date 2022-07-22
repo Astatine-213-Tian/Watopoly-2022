@@ -12,7 +12,6 @@
 class Property;
 class AcademicBuilding;
 class Observer;
-class TextDisplay;
 
 class GameBoard {
   std::vector<std::unique_ptr<Player>> players;
@@ -24,8 +23,8 @@ class GameBoard {
   const int timsLineIndex = 10;
   const int osapIndex = 0;
 
-  Controller *controller;
-  Observer *ob;
+  Controller *controller = nullptr;
+  Observer *ob = nullptr;
 
   void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
@@ -41,7 +40,7 @@ class GameBoard {
  public:
   GameBoard();
   void init();
-  void setController(Controller &c);
+  void setController(Controller *c);
   void start();
   void setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged);
   void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
@@ -62,7 +61,7 @@ class GameBoard {
   void bankrupt();
   bool needDealWithDebt();
 
-  void setObserver(Observer &o);
+  void setObserver(Observer *o);
   friend std::ostream &operator<<(std::ostream &out, const GameBoard &gb);
 };
 

@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
-#include <random>
 #include "controller.h"
 #include "gameboard.h"
 #include "dice.h"
@@ -13,10 +12,10 @@ using namespace std;
 class Property;
 class AcademicBuilding;
 
-Controller::Controller() {}
+Controller::Controller() = default;
 
-void Controller::setGameBoard(GameBoard &gb) {
-    g = make_unique<GameBoard>(gb);
+void Controller::setGameBoard(GameBoard *gb) {
+    g = gb;
     g->init();
 }
 
@@ -180,7 +179,7 @@ void Controller::addPlayers() {
                 continue;
             }
             int randPos = 30;
-            while (randPos == 30) { d.roll(); }
+            while (randPos == 30) { randPos = d.roll(); }
             g->addPlayer(name, displayChar, randPos);
             used = true;
             cout << "Player " << name << " added to the game! Initial position is " << randPos << endl;
