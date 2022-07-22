@@ -21,18 +21,13 @@ void Property::setMortgage() {
     if (getImproveNum() > 0) throw BuildingStillWithImprove{name};
     owner->receiveMoney( cost / 2);
     isMortgaged = true;
-    isMortgageInterestPaid = false;
 }
 
 void Property::setUnMortgage() {
     if (!isMortgaged) throw PropertyStillUnMortage{name};
-    double payment = cost * (isMortgageInterestPaid ? 0.5 : 0.6);
-    owner->pay(payment);
+    owner->pay(cost * 0.6);
     isMortgaged = false;
-    isMortgageInterestPaid = false;
 }
-
-void Property::setMortgageInterestPaid() { isMortgageInterestPaid = true; }
 
 void Property::passBy(Player &p) { }
 
