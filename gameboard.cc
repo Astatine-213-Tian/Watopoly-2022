@@ -133,11 +133,12 @@ void GameBoard::start() {
 void GameBoard::move(int distance) {
     cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
     int size = static_cast<int>(cells.size());
-    // TODO negative
+
     int dest;
-    for (int i = 1; i < distance; i++) {
+    for (int i = 1; i < abs(distance); i++) {
         int cur = curPlayer->getLocation();
-        dest = (cur + i >= size) ? cur + i - size : cur + i;
+        if (distance >= 0) dest = (cur + i >= size) ? cur + i - size : cur + i;
+        else dest = (cur - i < 0) ? cur - i + size : cur - i;
         cells[dest]->passBy(*curPlayer);
     }
     curPlayer->setLocation(dest);
