@@ -36,6 +36,7 @@ class GameBoard {
   void trade(Player &toWhom, Property &property, double value);
   double assetsValue();
   static void noImprovementCheck(Property *p) ;
+  void assets(Player *p);
 
  public:
   GameBoard();
@@ -54,7 +55,7 @@ class GameBoard {
   void mortgage(const std::string &name);
   void unmortgage(const std::string &name);
   void payDebt();
-  void assets(Player &p);
+  void assets();
   void allAssets();
   void auction(int cellNum);
   bool isWin();

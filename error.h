@@ -89,7 +89,10 @@ class NotEnoughCash: public Error {
   explicit NotEnoughCash(const std::string &playerName);
 };
 
-class InvalidCmd : public std::exception {};
+class InvalidCmd : public Error {
+ public:
+  explicit InvalidCmd(const std::string &cmdName);
+};
 
 
 #endif //WATOPOLY__ERROR_H_

@@ -65,7 +65,7 @@ void Player::pay(double value, Player *receiver) {
 
 void Player::forcePay(double value, Player *receiver) {
     if (cash < value) {
-        debtAmount = value;
+        debtAmount += value;
         creditor = receiver;
         throw NotEnoughCash{name};
     }

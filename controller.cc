@@ -213,7 +213,7 @@ void Controller::play() {
         } else if (cmd == "bankrupt") {
             bankrupt();
         } else if (cmd == "asset") {
-            g->assets(*(g->getCurPlayer()));
+            g->assets();
         } else if (cmd == "all") {
             g->allAssets();
         } else if (cmd == "save") {
@@ -263,5 +263,77 @@ void Controller::load(const string& filename) {
             g->setProperty(property, owner, improvements, mortgaged);
         }
         ifs.close();
+    }
+}
+
+bool Controller::yesOrNoResponse() {
+    string res;
+    while (cin >> res) {
+        if (res == "Yes" || res == "yes" || res == "y" || res == "Y") {
+            return true;
+        } else if (res == "No" || res == "no" || res == "N" || res == "n") {
+            return false;
+        } else {
+            cout << "Invalid input, please input y/n: " << endl;
+        }
+    }
+    return false;
+}
+
+bool Controller::askTradeResponse(const string &currName, const string &toName, const string &currGive, const string &currReceive) {
+    cout << "To player " + toName + ": Do you accept this trade?" << endl <<
+     "Trade detail: give player " + currName + " " + currReceive + " in exchange for " + currGive + ")" << endl
+     << "Your response (y/n): " << endl;
+    if (yesOrNoResponse()) return true;
+    else {
+        cout << "Trade rejected." << endl;
+        return false;
+    }
+}
+
+
+pair<string, double> Controller::auction(const vector<string>& properties, const vector<string>& playersName) {
+    cout << "Auction for ";
+    for (auto &name: properties) cout << name << " ";
+    cout << "started!" << endl;
+
+    vector<pair<string, bool>> participants;
+    participants.reserve(playersName.size());
+    for (auto & name : playersName) { participants.emplace_back(name, true); }
+    pair<string, double> lastBidInfo(participants[participants.size() - 1].first, 0);
+    size_t participantLeft = participants.size();
+
+    while (true) {
+        for (auto &participant : participants) {
+            if (participantLeft <= 1) {
+                cout << "Congratulations " << lastBidInfo.first << "! You are the winning bidder. Your bid price is " << lastBidInfo.second << endl;
+                return lastBidInfo;
+            }
+            if (participant.second) {
+                cout << "Player " << participant.first << ", please enter you bid (q for quit): ";
+                string cmd;
+                while (cin >> cmd) {
+                    if (cmd == "q" || cmd == "quit" || cmd == "Q" || cmd == "Quit") {
+                        --participantLeft;
+                        participant.second = false;
+                        break;
+                    }
+                    stringstream ss{cmd};
+                    double curBid;
+                    if (ss >> curBid) {
+                        if (curBid <= lastBidInfo.second) {
+                            cout << "Invalid: your bid must be higher than " << lastBidInfo.second << endl;
+                        } else {
+                            cout << "Bid successfully. The newest bid is " << curBid << endl;
+                            lastBidInfo = make_pair(participant.first, curBid);
+                            break;
+                        }
+                    } else {
+                        cout << "Invalid input." << endl;
+                    }
+                    cout << "Please bid or enter q to quit: ";
+                }
+            }
+        }
     }
 }

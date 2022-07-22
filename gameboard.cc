@@ -151,7 +151,7 @@ void GameBoard::move(int distance) {
 }
 
 void GameBoard::roll() {
-//    if (!curPlayer->getRollState()) throw InvalidCmd{};
+//    if (!curPlayer->getRollState()) throw InvalidCmd{"roll};
     int roll1 = dice1->roll();
     int roll2 = dice2->roll();
     curPlayer->addRollTimes();
@@ -180,7 +180,7 @@ void GameBoard::roll() {
 
 void GameBoard::next() {
     if (curPlayer->getRollState()) {
-        throw InvalidCmd{};
+        throw InvalidCmd{"next"};
     }
     cout << curPlayer->getName() << ": your turn is ended." << endl;
     int numPlayer = static_cast<int>(players.size());
@@ -220,24 +220,6 @@ Property *GameBoard::getPlayerProperty(const string &name, Player *player) const
 }
 
 
-// TODO where should I put this
-bool askPlayerTradeResponse(Player *p) {
-    cout << "Player " << p->getName() << ", do you accept this trade? (y/n)" << endl;
-    string answer;
-
-    while (true) {
-        cin >> answer;
-        if (answer == "Y" || answer == "y" || answer == "Yes" || answer == "yes") {
-            return true;
-        } else if (answer == "N" || answer == "n" || answer == "No" || answer == "no") {
-            cout << "Player " << p->getName() << " does not accept this trade." << endl;
-            return false;
-        }
-        cout << "Please input y/n as your response: " << endl;
-    }
-}
-
-
 void GameBoard::noImprovementCheck(Property *property) {
     auto *ab = dynamic_cast<AcademicBuilding *>(property);
     if (ab && ab->getImproveNum() != 0) {
@@ -258,13 +240,13 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
         }
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
         noImprovementCheck(receiveProperty);
-        if (askPlayerTradeResponse(toWhom)) {
+        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), "$" + to_string(giveMoney), receiveProperty->getName())) {
             trade(*toWhom, giveMoney, *receiveProperty);
         }
     } else if (ssReceive >> receiveMoney) {
         Property *giveProperty = getPlayerProperty(give, curPlayer);
         noImprovementCheck(giveProperty);
-        if (askPlayerTradeResponse(toWhom)) {
+        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), "$" + to_string(receiveMoney))) {
             trade(*toWhom, *giveProperty, receiveMoney);
         }
     } else {
@@ -272,7 +254,7 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
         noImprovementCheck(giveProperty);
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
         noImprovementCheck(receiveProperty);
-        if (askPlayerTradeResponse(toWhom)) {
+        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), receiveProperty->getName())) {
             trade(*toWhom, *giveProperty, *receiveProperty);
         }
     }
@@ -323,12 +305,14 @@ double GameBoard::assetsValue() {
     return value;
 }
 
-void GameBoard::assets(Player &p) {
-    cout << "Player " << p.getName() << endl;
-    cout << "Current Saving: $" << p.getCash() << endl;
+void GameBoard::assets() { assets(curPlayer); }
+
+void GameBoard::assets(Player *p) {
+    cout << "Player " << p->getName() << endl;
+    cout << "Current Saving: $" << p->getCash() << endl;
     cout << "Properties: " << endl;
     for (auto &i : properties) {
-        if (i->getOwner() == &p) {
+        if (i->getOwner() == p) {
             cout << i->getName() << endl;
         }
     }
@@ -337,7 +321,7 @@ void GameBoard::assets(Player &p) {
 
 void GameBoard::allAssets() {
     for (auto &i : players) {
-        assets(*i);
+        assets(i.get());
     }
 }
 
@@ -359,27 +343,45 @@ bool GameBoard::needDealWithDebt() {
 
 void GameBoard::bankrupt() {
     if (assetsValue() >= curPlayer->getDebtAmount()) {
-        throw InvalidCmd{};
+        throw InvalidCmd{"bankrupt"};
     }
-    // TODO bankrupt staff
+
     Player *creditor = curPlayer->getCreditor();
-    creditor->receiveMoney(curPlayer->getCash());
-    for (auto &property: properties) {
-        if (property->getOwner() == curPlayer) {
-            if (property->getMortgageStatus()) {
-                if (creditor) {
-                    // TODO ask accept or not
-                    // if yes, use pay, setowner, setmortageinterestpaid
-                    // else auction
-                } else {
-                    // TODO auction
-                }
-            } else {
-                property->setOwner(creditor);
+    vector<Property *> auctionProperties;
+    if (creditor) {
+        creditor->receiveMoney(curPlayer->getCash());
+        for (auto &property: properties) {
+            if (property->getOwner() == curPlayer) {
+                // TODO ask immediately unmortgage or pay 10%
+                // if unmortgage pay, else forcepay property->getCost() * 0.1
+            }
+        }
+    } else {
+        for (auto &property: properties) {
+            if (property->getOwner() == curPlayer) {
+                auctionProperties.emplace_back(property.get());
             }
         }
     }
-    players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> p) { p.get() == this->curPlayer; }), players.end());
+    players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> p) { return p.get() == this->curPlayer; }), players.end());
+
+    if (!auctionProperties.empty()) {
+        vector<string> otherPlayersName;
+        for (auto &i: players) {
+            if (i.get() != curPlayer) otherPlayersName.emplace_back(i->getName());
+        }
+
+        vector<string> propertiesName;
+        propertiesName.reserve(auctionProperties.size());
+        for(auto &auctionProperty: auctionProperties) {
+            propertiesName.emplace_back(auctionProperty->getName());
+        }
+
+        pair<string, double> bidInfo = Controller::auction(propertiesName, otherPlayersName);
+        Player *bidWinner = getPlayer(bidInfo.first);
+        // TODO what if bankrupt here?
+        bidWinner->forcePay(bidInfo.second);
+    }
 }
 
 void GameBoard::setObserver(Observer *o) { ob = o; }
