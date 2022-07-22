@@ -19,6 +19,7 @@ class Controller {
   void payDebt();
   void bankrupt();
   void save(std::string& filename);
+  bool yesOrNoResponse();
 
  public:
   Controller();
@@ -27,6 +28,7 @@ class Controller {
   void addPlayers();
   void play();
   void load(const std::string& filename);
+  bool askTradeResponse(const std::string &curName, const std::string &toName, const std::string &curGive, const std::string &curReceive);
 };
 
 #endif
