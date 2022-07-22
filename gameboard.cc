@@ -297,7 +297,7 @@ void GameBoard::trade(Player &toWhom, Property &property, double value) {
 
 void GameBoard::buyImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    curPlayer->forcePay(p->getImproveCost());
+    curPlayer->pay(p->getImproveCost());
     p->addImprove();
 }
 
@@ -344,7 +344,7 @@ void GameBoard::assets(Player &p) {
             cout << i->getName() << endl;
         }
     }
-    cout << "Total assets value: " << assetsValue() << endl;
+    cout << "Total value (mortgage + sell) " << assetsValue() << endl;
 }
 
 void GameBoard::allAssets() {

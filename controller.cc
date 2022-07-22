@@ -104,7 +104,7 @@ void Controller::next() {
     try {
         g->next();
     } catch (exception &e) {
-        cout << "Able to go next. You need to roll another time before finishing your turn." << endl;
+        cout << "Unable to go next. You need to roll another time before finishing your turn." << endl;
     }
 }
 
@@ -171,7 +171,7 @@ void Controller::addPlayers() {
         int index;
         if (ss >> index && index >= 1 && index <= players.size()) {
             const string &name = get<1>(players[index - 1]);
-            const char &displayChar = get<0>(players[index - 1];
+            const char &displayChar = get<0>(players[index - 1]);
             bool &used = get<2>(players[index-1]);
             if (used) {
                 cout << "Player " << name << " is already in the game. Please choose another one." << endl;
