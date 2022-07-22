@@ -8,11 +8,19 @@
 class Subject;
 
 class TextDisplay: public Observer {
-    std::vector<Info> theDisplay;
+    std::vector<Info> displayInfo;
+    std::vector<std::vector<std::string> > toPrint;
+    const int cellWidth = 7;
+    const int cellHeight = 6;
+
+    void separateCellName(const std::string &cellName, std::vector<std::string> &cell);
+    void separatePlayers(const std::vector<char>& p, std::vector<std::string> &cell);
  public:
     void notify(Subject &whoFrom) override;
+    void setDisplayContents();
 
-    friend std::ostream &operator<< (std::ostream out, const TextDisplay &td);
+    void printMid(std::ostream &out, const int left, const int right) const;
+    friend std::ostream &operator<< (std::ostream &out, const TextDisplay &td);
 };
 
 #endif
