@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <sstream>
+#include <fstream>
 #include "controller.h"
 #include "gameboard.h"
 
@@ -21,17 +21,29 @@ int main(int argc, char *argv[]) {
     // init index - attach
     // c.play()
 
-    if (argc == 1) {
-        c.addPlayers();
-        c.play();
-    } else if (argc == 3) {
-        c.load(argv[2]);
-        c.play();
-    } else if (argc == 2) {
-        // TODO testing mode
-    } else {
-        cerr << "Incorrect number of command line arguments." << endl;
-        return 1;
+    if (argc == 1) c.addPlayers();
+
+    for (int i = 1; i < argc; ++i) {
+        string theArg = argv[i];
+        if (theArg == "-load") {
+            if (i + 1 < argc) {
+                string filename = argv[++i];
+                ifstream f(filename);
+                if (f.good()) c.load(filename);
+                else {
+                    cerr << "File doesn't exist." << endl;
+                    return 1;
+                }
+            } else {
+                cerr << "Please provide a filename." << endl;
+            }
+        } else if (theArg == "-testing") {
+            // TODO set testing
+        } else if (theArg == "-enhanced") {
+            // TODO set enhanced
+        }
     }
+
+    c.play();
     return 0;
 }
