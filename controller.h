@@ -5,7 +5,6 @@
 #include <memory>
 
 class GameBoard;
-class Player;
 
 class Controller {
   GameBoard *g = nullptr;

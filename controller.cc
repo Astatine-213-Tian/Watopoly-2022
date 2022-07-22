@@ -95,6 +95,7 @@ void Controller::next() {
     } catch (exception &e) {
         cout << RED << "Unable to go next. You need to roll another time before finishing your turn." << DEFAULT << endl;
     }
+    cout << GREEN << g->getCurPlayerName() << ": it is not your turn." << DEFAULT << endl;
 }
 
 void Controller::mortgage() {
@@ -215,17 +216,46 @@ void Controller::play() {
     }
 }
 
-void Controller::save(string& filename) {}
+void Controller::save(string& filename) {
+    ofstream ofs{filename};
+    auto players = g->getAllPlayersInfo();
+    auto properties = g->getAllPropertiesInfo();
+    if (ofs.is_open()) {
+        size_t numPlayers = players->size();
+        ofs << numPlayers << endl;
+        for (auto &p: *players) {
+            string name = get<0>(p);
+            char displayChar = get<1>(p);
+            int numCups = get<2>(p);
+            double cash = get<3>(p);
+            int position = get<4>(p);
+            ofs << name << displayChar << numCups << cash << position << endl;
+        }
+        size_t numProperties = properties->size();
+        for (auto &p: *properties) {
+            string name = get<0>(p);
+            string owner = get<1>(p);
+            int improvements = get<2>(p);
+            bool mortgaged = get<3>(p);
+            if (improvements == -1 && !mortgaged) {
+                improvements = 0;
+            }
+            ofs << name << owner << improvements << endl;
+        }
+    } else {
+        cout << RED << "Unable to open the file." << DEFAULT << endl;
+    }
+}
 
 void Controller::load(const string& filename) {
     string line;
-    ifstream ifs(filename);
+    ifstream ifs{filename};
     if (ifs.is_open()) {
         getline(ifs, line);
         int numPlayers = stoi(line);
         for (int i = 0; i < numPlayers; ++i) {
             getline(ifs, line);
-            istringstream ss(line);
+            istringstream ss{line};
             string name;
             char displayChar;
             int timsCups;
@@ -247,6 +277,8 @@ void Controller::load(const string& filename) {
             g->setProperty(property, owner, improvements, mortgaged);
         }
         ifs.close();
+    } else {
+        cout << RED << "Unable to load the file." << DEFAULT << endl;
     }
 }
 

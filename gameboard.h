@@ -29,7 +29,6 @@ class GameBoard {
   void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
   Property *getProperty(const std::string &name) const;
-//  AcademicBuilding *getPlayerAcademicBuilding(const std::string &name, Player *player) const;
   Player *getPlayer(const std::string &name) const;
   void trade(Player &toWhom, double value, Property &property);
   void trade(Player &toWhom, Property &p1, Property &p2);
@@ -49,6 +48,9 @@ class GameBoard {
   void roll(int d1, int d2);
   void next();
   Player *getCurPlayer();
+  std::string getCurPlayerName();
+  std::unique_ptr<std::vector<std::tuple<std::string, char, int, double, int>>> getAllPlayersInfo();
+  std::unique_ptr<std::vector<std::tuple<std::string, std::string, int, bool>>> getAllPropertiesInfo();
   void trade(const std::string &name, const std::string &give, const std::string &receive);
   void buyImprove(const std::string &name);
   void sellImprove(const std::string &name);
