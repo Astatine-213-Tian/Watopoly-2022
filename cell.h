@@ -21,6 +21,7 @@ class Cell: public Subject{
   virtual ~Cell();
   void leave(char p);
   virtual void passBy(Player &p) = 0;
+  void initLandOn(Player &p);
   void landOn(Player &p);
   std::string getName() const;
   void setIndex(const int idx);

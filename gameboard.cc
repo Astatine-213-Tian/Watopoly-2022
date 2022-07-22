@@ -116,7 +116,7 @@ void GameBoard::setController(Controller *c) {
 
 void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
-    cells[position]->notifyObservers();
+    cells[position]->initLandOn(*(players.end()->get()));
 }
 
 
