@@ -60,7 +60,7 @@ void Player::pay(double value, Player *receiver) {
         throw NotEnoughCash{name};
     }
     cash -= value;
-    receiver->receiveMoney(value);
+    if (receiver) receiver->receiveMoney(value);
 }
 
 void Player::forcePay(double value, Player *receiver) {
@@ -70,7 +70,7 @@ void Player::forcePay(double value, Player *receiver) {
         throw NotEnoughCash{name};
     }
     cash -= value;
-    receiver->receiveMoney(value);
+    if (receiver) receiver->receiveMoney(value);
 }
 
 double Player::getDebtAmount() const {

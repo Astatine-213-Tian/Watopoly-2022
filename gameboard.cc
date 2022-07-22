@@ -114,13 +114,13 @@ void GameBoard::setController(Controller *c) {
     controller = c;
 }
 
-void GameBoard::addPlayer(const std::string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
+void GameBoard::addPlayer(const string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
     cells[position]->initLandOn(*(players.end()->get()));
 }
 
 
-void GameBoard::setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged) {
+void GameBoard::setProperty(const string &name, const string &owner, int improvements, bool mortgaged) {
     Property *property = getProperty(name);
     Player *player = getPlayer(owner);
     property->setOwner(player);
@@ -185,7 +185,6 @@ void GameBoard::next() {
     if (curPlayer->getRollState()) {
         throw InvalidCmd{"next"};
     }
-    cout << curPlayer->getName() << ": your turn is ended." << endl;
     int numPlayer = static_cast<int>(players.size());
     if (curPlayer == players[numPlayer - 1].get()) {
         curPlayer = players[0].get();
@@ -194,10 +193,30 @@ void GameBoard::next() {
     }
     curPlayer->initRollTimes();
     curPlayer->setRollState(true);
-    cout << curPlayer->getName() << ": it is not your turn." << endl;
 }
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
+
+string GameBoard::getCurPlayerName() { return curPlayer->getName(); }
+
+unique_ptr<vector<tuple<string, char, int, double, int>>> GameBoard::getAllPlayersInfo() {
+    unique_ptr<vector<tuple<string, char, int, double, int>>> res;
+    res->reserve(players.size());
+    for (auto &p: players) {
+        res->emplace_back(p->getName(), p->getDisplayChar(), p->getNumCup(), p->getCash(), p->getLocation());
+    }
+    return res;
+}
+
+unique_ptr<vector<tuple<string, string, int, bool>>> GameBoard::getAllPropertiesInfo() {
+    unique_ptr<vector<tuple<string, string, int, bool>>> res;
+    res->reserve(properties.size());
+    for (auto &p: properties) {
+        string ownerName = p->getOwner() ? p->getOwner()->getName() : "BANK";
+        res->emplace_back(p->getName(), ownerName, p->getImproveNum(), p->getMortgageStatus());
+    }
+    return res;
+}
 
 Player *GameBoard::getPlayer(const string &name) const{
     if (name == "BANK") return nullptr;
@@ -207,7 +226,7 @@ Player *GameBoard::getPlayer(const string &name) const{
     throw NotPlayer{name};
 }
 
-Property *GameBoard::getProperty(const std::string &name) const {
+Property *GameBoard::getProperty(const string &name) const {
     for (auto &property : properties) {
         if (property->getName() == name) return property.get();
     }
@@ -230,7 +249,7 @@ void GameBoard::noImprovementCheck(Property *property) {
     }
 }
 
-void GameBoard::trade(const std::string &name, const std::string &give, const std::string &receive) {
+void GameBoard::trade(const string &name, const string &give, const string &receive) {
     Player *toWhom = getPlayer(name);
     istringstream ssGive(give);
     istringstream ssReceive(receive);
