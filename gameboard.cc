@@ -105,6 +105,19 @@ void GameBoard::addPlayer(const std::string &name, char displayChar, int positio
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
 }
 
+
+void GameBoard::setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged) {
+    Property *property = getProperty(name);
+    Player *player = getPlayer(owner);
+    property->setOwner(player);
+    property->initImprove(improvements);
+    if (mortgaged) property->setMortgage();
+}
+
+void GameBoard::start() {
+    curPlayer = players[0].get();
+}
+
 void GameBoard::move(int distance) {
     cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
     int size = static_cast<int>(cells.size());
@@ -169,24 +182,27 @@ void GameBoard::next() {
 
 Player *GameBoard::getCurPlayer() { return curPlayer; }
 
-Player *GameBoard::getPlayer(const string& name) const{
+Player *GameBoard::getPlayer(const string &name) const{
+    if (name == "BANK") return nullptr;
     for (auto &cell : players) {
         if (cell->getName() == name) return cell.get();
     }
     throw NotPlayer{name};
 }
 
-Property *GameBoard::getPlayerProperty(const string& name, Player *player) const {
+Property *GameBoard::getProperty(const std::string &name) const {
     for (auto &property : properties) {
-        if (property->getName() == name) {
-            if (property->getOwner() == player) {
-                return property.get();
-            } else {
-                throw NotOwner{player->getName(), property->getName()};
-            }
-        }
+        if (property->getName() == name) return property.get();
     }
     throw NotProperty{name};
+}
+
+Property *GameBoard::getPlayerProperty(const string &name, Player *player) const {
+    Property *property = getProperty(name);
+    if (property->getOwner() != player) {
+        throw NotOwner{player->getName(), property->getName()};
+    }
+    return property;
 }
 
 //AcademicBuilding *GameBoard::getPlayerAcademicBuilding(const std::string &name, Player *player) const {
