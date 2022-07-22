@@ -240,13 +240,13 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
         }
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
         noImprovementCheck(receiveProperty);
-        if (controller->askTradeResponse(curPlayer->getName(), toWhom->getName(), "$" + to_string(giveMoney), receiveProperty->getName())) {
+        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), "$" + to_string(giveMoney), receiveProperty->getName())) {
             trade(*toWhom, giveMoney, *receiveProperty);
         }
     } else if (ssReceive >> receiveMoney) {
         Property *giveProperty = getPlayerProperty(give, curPlayer);
         noImprovementCheck(giveProperty);
-        if (controller->askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), "$" + to_string(receiveMoney))) {
+        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), "$" + to_string(receiveMoney))) {
             trade(*toWhom, *giveProperty, receiveMoney);
         }
     } else {
@@ -254,7 +254,7 @@ void GameBoard::trade(const std::string &name, const std::string &give, const st
         noImprovementCheck(giveProperty);
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
         noImprovementCheck(receiveProperty);
-        if (controller->askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), receiveProperty->getName())) {
+        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), receiveProperty->getName())) {
             trade(*toWhom, *giveProperty, *receiveProperty);
         }
     }
@@ -305,12 +305,14 @@ double GameBoard::assetsValue() {
     return value;
 }
 
-void GameBoard::assets(Player &p) {
-    cout << "Player " << p.getName() << endl;
-    cout << "Current Saving: $" << p.getCash() << endl;
+void GameBoard::assets() { assets(curPlayer); }
+
+void GameBoard::assets(Player *p) {
+    cout << "Player " << p->getName() << endl;
+    cout << "Current Saving: $" << p->getCash() << endl;
     cout << "Properties: " << endl;
     for (auto &i : properties) {
-        if (i->getOwner() == &p) {
+        if (i->getOwner() == p) {
             cout << i->getName() << endl;
         }
     }
@@ -319,7 +321,7 @@ void GameBoard::assets(Player &p) {
 
 void GameBoard::allAssets() {
     for (auto &i : players) {
-        assets(*i);
+        assets(i.get());
     }
 }
 
@@ -345,6 +347,7 @@ void GameBoard::bankrupt() {
     }
 
     Player *creditor = curPlayer->getCreditor();
+    vector<Property *> auctionProperties;
     if (creditor) {
         creditor->receiveMoney(curPlayer->getCash());
         for (auto &property: properties) {
@@ -354,15 +357,31 @@ void GameBoard::bankrupt() {
             }
         }
     } else {
-        vector<Property *> auctionRequired;
         for (auto &property: properties) {
             if (property->getOwner() == curPlayer) {
-                auctionRequired.emplace_back(property.get());
+                auctionProperties.emplace_back(property.get());
             }
         }
-        // TODO auction actionRequired
     }
     players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> p) { return p.get() == this->curPlayer; }), players.end());
+
+    if (!auctionProperties.empty()) {
+        vector<string> otherPlayersName;
+        for (auto &i: players) {
+            if (i.get() != curPlayer) otherPlayersName.emplace_back(i->getName());
+        }
+
+        vector<string> propertiesName;
+        propertiesName.reserve(auctionProperties.size());
+        for(auto &auctionProperty: auctionProperties) {
+            propertiesName.emplace_back(auctionProperty->getName());
+        }
+
+        pair<string, double> bidInfo = Controller::auction(propertiesName, otherPlayersName);
+        Player *bidWinner = getPlayer(bidInfo.first);
+        // TODO what if bankrupt here?
+        bidWinner->forcePay(bidInfo.second);
+    }
 }
 
 void GameBoard::setObserver(Observer *o) { ob = o; }
