@@ -10,7 +10,7 @@ class AcademicBuilding : public Property {
   std::vector<double> tuition;
   MonopolyBlock *mb;
   double calculateRent() const override;
-  double getValueWhenUnMortgage() const override;
+  double getImproveValue() const override;
   void loadImproveNum(int improveNum) const override;
  public:
   AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb);

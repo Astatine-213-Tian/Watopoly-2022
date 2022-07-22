@@ -43,6 +43,6 @@ double AcademicBuilding::getImproveCost() const {
     return mb->getImproveCost();
 }
 
-double AcademicBuilding::getValueWhenUnMortgage() const {
-    return cost / 2 + getImproveCost() / 2 * getImproveNum();
+double AcademicBuilding::getImproveValue() const {
+    return mb->getImproveCost() / 2 * mb->getImproveNum();
 }

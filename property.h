@@ -14,7 +14,7 @@ class Property : public Cell {
   bool isMortgaged;
   bool isMortgageInterestPaid;
   virtual double calculateRent() const = 0;
-  virtual double getValueWhenUnMortgage() const;
+  virtual double getImproveValue() const;
   virtual void loadImproveNum(int improveNum) const;
 
  public:
