@@ -296,16 +296,12 @@ void GameBoard::trade(Player &toWhom, Property &property, double value) {
 
 void GameBoard::buyImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
-    // TODO mortgage check
     p->addImprove();
-    p->notifyObservers();
 }
 
 void GameBoard::sellImprove(const string &name) {
     Property *p = getPlayerProperty(name, curPlayer);
     p->removeImprove();
-    curPlayer->receiveMoney(p->getImproveCost() / 2);
-    p->notifyObservers();
 }
 
 

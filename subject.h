@@ -12,7 +12,7 @@ class Subject {
  public:
     void attach (std::shared_ptr<Observer> ob);
     void notifyObservers();
-    virtual Info &getInfo() = 0;
+    virtual Info getInfo() = 0;
     virtual ~Subject() = 0;
 };
 

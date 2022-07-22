@@ -21,27 +21,29 @@ int AcademicBuilding::getImproveNum() const {
     return mb->getImproveNum();
 }
 
-void AcademicBuilding::addImprove() const{
+void AcademicBuilding::addImprove() {
     if (isMortgaged) throw PropertyStillMortgage{name};
     if (!mb->isMonopolized()) throw NotMonopolized{mb->getName()};
     if (mb->getImproveNum() >= 5) throw MaxImprove{mb->getName()};
     owner->pay(mb->getImproveCost());
     mb->addImprove();
+    notifyObservers();
 }
 
-void AcademicBuilding::removeImprove() const{
+void AcademicBuilding::removeImprove() {
     if (mb->getImproveNum() <= 0) throw ZeroImprove{mb->getName()};
     mb->removeImprove();
     owner->receiveMoney(mb->getImproveCost() / 2);
+    notifyObservers();
 }
 
 void AcademicBuilding::loadImproveNum(int num) const {
     mb->initImproveNum(num);
 }
 
-double AcademicBuilding::getImproveCost() const {
-    return mb->getImproveCost();
-}
+//double AcademicBuilding::getImproveCost() const {
+//    return mb->getImproveCost();
+//}
 
 double AcademicBuilding::getImproveValue() const {
     return mb->getImproveCost() / 2 * mb->getImproveNum();

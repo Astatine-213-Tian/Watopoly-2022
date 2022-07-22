@@ -24,7 +24,7 @@ class Cell: public Subject{
   void landOn(Player &p);
   std::string getName() const;
   void setIndex(const int idx);
-  virtual Info &getInfo() = 0;
+  virtual Info getInfo() = 0;
 };
 
 #endif

@@ -15,9 +15,9 @@ class AcademicBuilding : public Property {
  public:
   AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb);
   int getImproveNum() const override;
-  double getImproveCost() const override;
-  void addImprove() const override;
-  void removeImprove() const override;
+//  double getImproveCost() const override;
+  void addImprove() override;
+  void removeImprove() override;
 };
 
 #endif //WATOPOLY__ACADEMICBUILDING_H_

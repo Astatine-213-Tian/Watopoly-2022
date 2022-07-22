@@ -23,7 +23,7 @@ class Property : public Cell {
   void setMortgage();
   void setUnMortgage();
   void setMortgageInterestPaid();
-  bool getMortgageStatus() const;
+//  bool getMortgageStatus() const;
   Player *getOwner() const;
   void setOwner(Player *p);
   double getTradableValue() const;
@@ -31,15 +31,14 @@ class Property : public Cell {
 
   // For academic building only;
   virtual int getImproveNum() const;
-  virtual double getImproveCost() const;
-  virtual void addImprove() const;
-  virtual void removeImprove() const;
+//  virtual double getImproveCost() const;
+  virtual void addImprove();
+  virtual void removeImprove();
 
   // override from Cell
   void passBy(Player &p) override;
   void landOnAction(Player &p) override;
-
-  Info &getInfo() override;
+  Info getInfo() override;
 };
 
 #endif //WATOPOLY__PROPERTY_H_

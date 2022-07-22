@@ -9,7 +9,10 @@ Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{c
 
 Player *Property::getOwner() const { return owner; }
 
-void Property::setOwner(Player *p) { owner = p; }
+void Property::setOwner(Player *p) {
+    owner = p;
+    notifyObservers();
+}
 
 double Property::getCost() const { return cost; }
 
@@ -60,37 +63,31 @@ void Property::landOnAction(Player &p) {
 }
 
 
-bool Property::getMortgageStatus() const { return isMortgaged;}
+//bool Property::getMortgageStatus() const { return isMortgaged;}
 
-double Property::getImproveValue() const { return 0;}
+double Property::getImproveValue() const { return 0; }
 
 double Property::getTradableValue() const {
     if (isMortgaged) return 0;
     else return cost / 2 + getImproveValue();
 }
 
-int Property::getImproveNum() const { return 0; }
+int Property::getImproveNum() const { return -1; }
 
-double Property::getImproveCost() const { return 0; }
+//double Property::getImproveCost() const { return 0; }
 
 void Property::loadImproveNum(int improveNum) const {};
 
 void Property::loadInfo(int improveNum, bool mortgaged) {
     isMortgaged = mortgaged;
     loadImproveNum(improveNum);
+    notifyObservers();
 }
 
-void Property::addImprove() const { throw NotAcademicBuilding{name}; }
+void Property::addImprove() { throw NotAcademicBuilding{name}; }
 
-void Property::removeImprove() const { throw NotAcademicBuilding{name}; }
+void Property::removeImprove() { throw NotAcademicBuilding{name}; }
 
-Info &Property::getInfo() {
-    Info i;
-    i.owner = owner->getDisplayChar();
-    i.numImprove = numImprove;
-    i.cellIndex = cellIndex;
-    i.cellName = name;
-    i.players = playersOnCell;
-
-    return i;
+Info Property::getInfo() {
+    return Info{owner->getDisplayChar(), getImproveNum(), cellIndex, name, playersOnCell};
 }
