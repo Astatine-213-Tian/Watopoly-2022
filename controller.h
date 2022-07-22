@@ -24,7 +24,6 @@ class Controller {
  public:
   Controller();
   void setGameBoard(GameBoard *gb);
-//  bool askPlayerTradeResponse(Player *p);
   void addPlayers();
   void play();
   void load(const std::string& filename);

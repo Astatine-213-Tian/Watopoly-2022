@@ -6,6 +6,7 @@
 #include "controller.h"
 #include "gameboard.h"
 #include "dice.h"
+#include "termcodes.h"
 
 using namespace std;
 
@@ -19,27 +20,10 @@ void Controller::setGameBoard(GameBoard *gb) {
     g->init();
 }
 
-//bool Controller::askPlayerTradeResponse(Player *p) {
-//    cout << "Player " << p->getName() << ", do you accept this trade? (y/n)" << endl;
-//    string answer;
-//
-//    while (true) {
-//        cin >> answer;
-//        if (answer == "Y" || answer == "y" || answer == "Yes" || answer == "yes") {
-//            return true;
-//        } else if (answer == "N" || answer == "n" || answer == "No" || answer == "no") {
-//            cout << "Player " << p->getName() << " does not accept this trade." << endl;
-//            return false;
-//        }
-//        cout << "Please input y/n as your response: " << endl;
-//    }
-//}
-
-
 void Controller::roll() {
     // TODO better method?
     if (!g->getCurPlayer()->getRollState()) {
-        cout << "You cannot roll anymore in this term." << endl;
+        cout << RED << "You cannot roll anymore in this term." << DEFAULT << endl;
     } else if (g->getCurPlayer()->inTimsLine()) {
         cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
              << "1 - roll (you will get out if you roll double)" << endl
@@ -71,13 +55,13 @@ void Controller::improve() {
         try {
             g->buyImprove(name);
         } catch (exception &e) {
-            cout << e.what() << endl;
+            cout << RED << e.what() << DEFAULT << endl;
         }
     } else if (option == "sell") {
         try {
             g->sellImprove(name);
         } catch (exception &e) {
-            cout << e.what() << endl;
+            cout << RED << e.what() << DEFAULT << endl;
         }
     }
     cout << g;
@@ -91,7 +75,7 @@ void Controller::trade() {
     try {
         g->trade(name, give, receive);
     } catch (exception &e) {
-        cout << e.what() << endl;
+        cout << RED << e.what() << DEFAULT << endl;
     }
 }
 
@@ -101,7 +85,7 @@ void Controller::unmortgage() {
     try {
         g->unmortgage(name);
     } catch (exception &e) {
-        cout << e.what() << endl;
+        cout << RED << e.what() << DEFAULT << endl;
     }
 }
 
@@ -109,7 +93,7 @@ void Controller::next() {
     try {
         g->next();
     } catch (exception &e) {
-        cout << "Unable to go next. You need to roll another time before finishing your turn." << endl;
+        cout << RED << "Unable to go next. You need to roll another time before finishing your turn." << DEFAULT << endl;
     }
 }
 
@@ -118,7 +102,7 @@ void Controller::mortgage() {
     try {
         g->mortgage(name);
     } catch (exception &e) {
-        cout << e.what() << endl;
+        cout << RED << e.what() << DEFAULT << endl;
     }
 }
 
@@ -126,7 +110,7 @@ void Controller::payDebt() {
     try {
         g->payDebt();
     } catch (exception &e) {
-        cout << e.what() << endl;
+        cout << RED << e.what() << DEFAULT << endl;
     }
 }
 
@@ -155,37 +139,37 @@ void Controller::addPlayers() {
     for (int i = 0; i < players.size(); ++i) {
         cout << i + 1 << ". " << get<1>(players[i]) << " (" << get<0>(players[i]) << ")"<< endl;
     }
-    cout << "Enter the index to add player, enter end to stop." << endl;
-    string cmd;
     Dice d(0, 39);
 
-    while (numPlayers <= 6) {
+    string cmd;
+    while (numPlayers < 6) {
+        cout << "Enter the index to add player, or end to stop: ";
         cin >> cmd;
         if (cmd == "end" || cmd == "End") {
             if (numPlayers < 2) {
-                cout << "Not enough players. Please add more." << endl;
+                cout << RED << "Not enough players. Please add more." << DEFAULT << endl;
                 continue;
             }
             break;
         }
-        stringstream ss;
+        stringstream ss{cmd};
         int index;
         if (ss >> index && index >= 1 && index <= players.size()) {
             const string &name = get<1>(players[index - 1]);
             const char &displayChar = get<0>(players[index - 1]);
             bool &used = get<2>(players[index-1]);
             if (used) {
-                cout << "Player " << name << " is already in the game. Please choose another one." << endl;
+                cout << RED << "Player " << name << " is already in the game. Please choose another one." << DEFAULT << endl;
                 continue;
             }
             int randPos = 30;
             while (randPos == 30) { randPos = d.roll(); }
             g->addPlayer(name, displayChar, randPos);
             used = true;
-            cout << "Player " << name << " added to the game! Initial position is " << randPos << endl;
+            cout << GREEN << "Player " << name << " added to the game! Initial position is " << randPos << "." << DEFAULT << endl;
             ++numPlayers;
         } else {
-            cout << "Invalid command. Please enter valid index or end." << endl;
+            cout << RED << "Invalid command. Please enter valid index or end." << DEFAULT << endl;
         }
     }
 }
@@ -225,7 +209,7 @@ void Controller::play() {
             cout << "Invalid command." << endl;
         }
         if (g->needDealWithDebt()) {
-            cout << "You currently has debt, do you want to pay the bill or continue raising money?;" << endl
+            cout << YELLOW << "You currently has debt, do you want to pay the bill or continue raising money?;" << DEFAULT << endl
                  << "Input pay or other available command: " << endl;
         }
     }
@@ -274,7 +258,7 @@ bool Controller::yesOrNoResponse() {
         } else if (res == "No" || res == "no" || res == "N" || res == "n") {
             return false;
         } else {
-            cout << "Invalid input, please input y/n: " << endl;
+            cout << RED << "Invalid input, please input y/n: " << DEFAULT << endl;
         }
     }
     return false;
@@ -284,9 +268,12 @@ bool Controller::askTradeResponse(const string &currName, const string &toName, 
     cout << "To player " + toName + ": Do you accept this trade?" << endl <<
      "Trade detail: give player " + currName + " " + currReceive + " in exchange for " + currGive + ")" << endl
      << "Your response (y/n): " << endl;
-    if (yesOrNoResponse()) return true;
+    if (yesOrNoResponse()) {
+        cout << GREEN << "Trade accepted." << DEFAULT << endl;
+        return true;
+    }
     else {
-        cout << "Trade rejected." << endl;
+        cout << RED << "Trade rejected." << DEFAULT << endl;
         return false;
     }
 }
@@ -306,7 +293,7 @@ pair<string, double> Controller::auction(const vector<string>& properties, const
     while (true) {
         for (auto &participant : participants) {
             if (participantLeft <= 1) {
-                cout << "Congratulations " << lastBidInfo.first << "! You are the winning bidder. Your bid price is " << lastBidInfo.second << endl;
+                cout << GREEN << "Congratulations " << lastBidInfo.first << "! You are the winning bidder. Your bid price is " << lastBidInfo.second << DEFAULT << endl;
                 return lastBidInfo;
             }
             if (participant.second) {
@@ -322,14 +309,14 @@ pair<string, double> Controller::auction(const vector<string>& properties, const
                     double curBid;
                     if (ss >> curBid) {
                         if (curBid <= lastBidInfo.second) {
-                            cout << "Invalid: your bid must be higher than " << lastBidInfo.second << endl;
+                            cout << RED << "Invalid: your bid must be higher than " << lastBidInfo.second << DEFAULT << endl;
                         } else {
-                            cout << "Bid successfully. The newest bid is " << curBid << endl;
+                            cout << GREEN << "Bid successfully. The newest bid is " << curBid << DEFAULT << endl;
                             lastBidInfo = make_pair(participant.first, curBid);
                             break;
                         }
                     } else {
-                        cout << "Invalid input." << endl;
+                        cout << RED << "Invalid input." << DEFAULT << endl;
                     }
                     cout << "Please bid or enter q to quit: ";
                 }
