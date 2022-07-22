@@ -6,6 +6,7 @@
 #include <random>
 #include "controller.h"
 #include "gameboard.h"
+#include "dice.h"
 
 using namespace std;
 
@@ -152,11 +153,7 @@ void Controller::addPlayers() {
     }
     cout << "Enter the index to add player, enter end to stop." << endl;
     string cmd;
-
-    // TODO use shuffle?
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int> distribution(0, 39);
+    Dice d(0, 39);
 
     while (numPlayers <= 6) {
         cin >> cmd;
@@ -178,7 +175,7 @@ void Controller::addPlayers() {
                 continue;
             }
             int randPos = 30;
-            while (randPos == 30) { randPos = distribution(gen); }
+            while (randPos == 30) { d.roll(); }
             g->addPlayer(name, displayChar, randPos);
             used = true;
             cout << "Player " << name << " added to the game! Initial position is " << randPos << endl;

@@ -3,13 +3,12 @@
 #include <vector>
 
 class Dice {
-  std::vector<int> v = { 1, 2, 3, 4, 5, 6 };
+  std::vector<int> diceNums;
   int value;
  public:
-  Dice();
-  void init();
-  int getValue();
-  void setValue(int value);
+  Dice(int min = 1, int max = 6);
+  int getValue() const;
+  void setValue(int _v);
   int roll();
 };
 

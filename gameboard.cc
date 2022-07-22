@@ -1,5 +1,4 @@
 #include <iostream>
-#include <exception>
 #include <memory>
 #include <sstream>
 #include "gameboard.h"
