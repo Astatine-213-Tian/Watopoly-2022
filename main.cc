@@ -8,10 +8,24 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     Controller c;
+
+    // gamebaord g
+    // display td
+    // c.setgameboard
+    // c ctor
+    // g.setcontroller
+    // g.setobserver
+    // g + set
+    // g.init()
+    // cell - setindex
+    // init index - attach
+    // c.play()
+
     if (argc == 1) {
+        c.addPlayers();
         c.play();
     } else if (argc == 3) {
-        c.load();
+        c.load(argv[2]);
         c.play();
     } else if (argc == 2) {
         // TODO testing mode

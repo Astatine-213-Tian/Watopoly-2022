@@ -3,9 +3,9 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <random>
 #include "controller.h"
 #include "gameboard.h"
-#include "player.h"
 
 using namespace std;
 
@@ -133,8 +133,65 @@ void Controller::bankrupt() {
     }
 }
 
+void Controller::addPlayers() {
+    int numPlayers = 0;
+    vector<tuple<char, string, bool>> players = {
+        {'G', "Goose", false},
+        {'B', "GRT Bus", false},
+        {'P', "Professor", false},
+        {'S', "Student", false},
+        {'$', "Money", false},
+        {'L', "Laptop", false},
+        {'T', "Pink tie", false},
+    };
+
+    cout << "Please start adding players!" << endl;
+    cout << "Available players are: " << endl;
+    for (int i = 0; i < players.size(); ++i) {
+        cout << i + 1 << ". " << get<1>(players[i]) << " (" << get<0>(players[i]) << ")"<< endl;
+    }
+    cout << "Enter the index to add player, enter end to stop." << endl;
+    string cmd;
+
+    // TODO use shuffle?
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> distribution(0, 39);
+
+    while (numPlayers <= 6) {
+        cin >> cmd;
+        if (cmd == "end" || cmd == "End") {
+            if (numPlayers < 2) {
+                cout << "Not enough players. Please add more." << endl;
+                continue;
+            }
+            break;
+        }
+        stringstream ss;
+        int index;
+        if (ss >> index && index >= 1 && index <= players.size()) {
+            const string &name = get<1>(players[index - 1]);
+            const char &displayChar = get<0>(players[index - 1];
+            bool &used = get<2>(players[index-1]);
+            if (used) {
+                cout << "Player " << name << " is already in the game. Please choose another one." << endl;
+                continue;
+            }
+            int randPos = 30;
+            while (randPos == 30) { randPos = distribution(gen); }
+            g->addPlayer(name, displayChar, randPos);
+            used = true;
+            cout << "Player " << name << " added to the game! Initial position is " << randPos << endl;
+            ++numPlayers;
+        } else {
+            cout << "Invalid command. Please enter valid index or end." << endl;
+        }
+    }
+}
 
 void Controller::play() {
+    cout << "Game started! Welcome to watopoly!" << endl;
+    g->start();
     string cmd;
     cout << "Please enter a command:" << endl;
     while (cin >> cmd) {
@@ -178,12 +235,12 @@ void Controller::save(string& filename) {}
 
 void Controller::load(const string& filename) {
     string line;
-    ifstream iFile(filename);
-    if (iFile.is_open()) {
-        getline(iFile, line);
+    ifstream ifs(filename);
+    if (ifs.is_open()) {
+        getline(ifs, line);
         int numPlayers = stoi(line);
         for (int i = 0; i < numPlayers; ++i) {
-            getline(iFile, line);
+            getline(ifs, line);
             istringstream ss(line);
             string name;
             char displayChar;
@@ -193,8 +250,18 @@ void Controller::load(const string& filename) {
             ss >> name >> displayChar >> timsCups >> money >> position;
             g->addPlayer(name, displayChar, position, timsCups, money);
         }
-        while (getline(iFile, line)) {
-            // TODO how to set info for property?
+        while (getline(ifs, line)) {
+            string property, owner;
+            int improvements;
+            istringstream ss(line);
+            ss >> property >> owner >> improvements;
+            bool mortgaged = false;
+            if (improvements == -1) {
+                improvements = 0;
+                mortgaged = true;
+            }
+            g->setProperty(property, owner, improvements, mortgaged);
         }
+        ifs.close();
     }
 }
