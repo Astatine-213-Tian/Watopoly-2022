@@ -2,10 +2,12 @@
 #define _NONPROPERTY_H_
 
 #include "cell.h"
+#include "info.h"
 
 class NonProperty: public Cell {
  public:
   explicit NonProperty(const std::string&);
+  Info &getInfo() override;
 };
 
 #endif

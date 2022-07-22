@@ -3,12 +3,16 @@
 
 #include <vector>
 #include <string>
+#include <memory>
+#include "controller.h"
 #include "dice.h"
 #include "cell.h"
 #include "player.h"
 
 class Property;
 class AcademicBuilding;
+class Observer;
+class TextDisplay;
 
 class GameBoard {
   std::vector<std::unique_ptr<Player>> players;
@@ -19,6 +23,9 @@ class GameBoard {
   std::unique_ptr<Dice> dice2;
   const int timsLineIndex = 10;
   const int osapIndex = 0;
+
+  std::unique_ptr<Controller> controller;
+  std::shared_ptr<Observer> ob;
 
   void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
@@ -34,12 +41,13 @@ class GameBoard {
  public:
   GameBoard();
   void init();
+  void setController(Controller &c);
   void start();
   void setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged);
   void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
-  void roll(); // save dice val, check dice, check num double
+  void roll();
   void roll(int d1, int d2);
-  void next(); // check can next,
+  void next();
   Player *getCurPlayer();
   void trade(const std::string &name, const std::string &give, const std::string &receive);
   void buyImprove(const std::string &name);
@@ -53,6 +61,9 @@ class GameBoard {
   bool isWin();
   void bankrupt();
   bool needDealWithDebt();
+
+  void setObserver(std::shared_ptr<Observer> o);
+  friend std::ostream &operator<<(std::ostream &out, const GameBoard &gb);
 };
 
 #endif

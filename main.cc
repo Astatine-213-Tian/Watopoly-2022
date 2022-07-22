@@ -3,8 +3,16 @@
 #include <fstream>
 #include "controller.h"
 #include "gameboard.h"
+#include "textdisplay.h"
 
 using namespace std;
+
+void usage() {
+    cerr << "Usage1: -load [filename]" << endl;
+    cerr << "Usage2: -testing" << endl;
+    cerr << "Usage3: -load [filename] -testing" << endl;
+    cerr << "Usage4: -testing -load [filename]" << endl;
+}
 
 int main(int argc, char *argv[]) {
     Controller c;

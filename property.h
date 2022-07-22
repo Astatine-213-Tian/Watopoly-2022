@@ -3,6 +3,7 @@
 
 #include <string>
 #include "cell.h"
+#include "info.h"
 
 class Player;
 
@@ -38,6 +39,7 @@ class Property : public Cell {
   void passBy(Player &p) override;
   void landOnAction(Player &p) override;
 
+  Info &getInfo() override;
 };
 
 #endif //WATOPOLY__PROPERTY_H_

@@ -8,13 +8,17 @@ Cell::Cell(string name): name{std::move(name)} {}
 
 string Cell::getName() const { return name; }
 
+void Cell::setIndex(const int idx) { cellIndex = idx; }
+
 void Cell::landOn(Player &p) {
     playersOnCell.emplace_back(p.getDisplayChar());
     landOnAction(p);
+    notifyObservers();
 }
 
 void Cell::leave(char p) {
     playersOnCell.erase(remove(playersOnCell.begin(), playersOnCell.end(), p), playersOnCell.end());
+    notifyObservers();
 }
 
 Cell::~Cell() = default;

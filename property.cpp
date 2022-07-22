@@ -3,6 +3,7 @@
 #include "property.h"
 #include "player.h"
 #include "error.h"
+#include "info.h"
 
 Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false}, isMortgageInterestPaid{false} {}
 
@@ -87,3 +88,13 @@ void Property::addImprove() const { throw NotAcademicBuilding{name}; }
 
 void Property::removeImprove() const { throw NotAcademicBuilding{name}; }
 
+Info &Property::getInfo() {
+    Info i;
+    i.owner = owner->getDisplayChar();
+    i.numImprove = numImprove;
+    i.cellIndex = cellIndex;
+    i.cellName = name;
+    i.players = playersOnCell;
+
+    return i;
+}
