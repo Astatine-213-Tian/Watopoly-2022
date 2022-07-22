@@ -60,17 +60,13 @@ void Property::landOnAction(Player &p) {
 }
 
 
-bool Property::getMortgageStatus() const {
-    return isMortgaged;
-}
+bool Property::getMortgageStatus() const { return isMortgaged;}
 
-double Property::getValueWhenUnMortgage() const {
-    return cost / 2;
-}
+double Property::getImproveValue() const { return 0;}
 
 double Property::getTradableValue() const {
     if (isMortgaged) return 0;
-    else return getValueWhenUnMortgage();
+    else return cost / 2 + getImproveValue();
 }
 
 int Property::getImproveNum() const { return 0; }
