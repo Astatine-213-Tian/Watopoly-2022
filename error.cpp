@@ -37,3 +37,5 @@ BuildingStillWithImprove::BuildingStillWithImprove(const string &name) :
     Error{name + " still have improvements. All improvements need to be sold before further action"}, propertyName{name} {}
 
 NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName + " don't have enough cash to complete the trade."} {}
+
+InvalidCmd::InvalidCmd(const std::string &cmdName) : Error{"You cannot use command " + cmdName + "at this stage."} {}
