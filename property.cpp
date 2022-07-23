@@ -5,7 +5,7 @@
 #include "error.h"
 #include "info.h"
 
-Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false}, isMortgageInterestPaid{false} {}
+Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false} {}
 
 Player *Property::getOwner() const { return owner; }
 
