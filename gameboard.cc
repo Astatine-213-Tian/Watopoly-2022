@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <algorithm>
 #include "gameboard.h"
 #include "textdisplay.h"
 #include "property.h"
@@ -9,6 +10,8 @@
 #include "error.h"
 #include "geese.h"
 #include "osap.h"
+#include "slc.h"
+#include "needleshall.h"
 #include "residence.h"
 #include "monopolyBlock.h"
 #include "tuition.h"
@@ -18,7 +21,7 @@
 #include "coop.h"
 #include "subject.h"
 #include "observer.h"
-#include "state.h"
+//#include "state.h"
 
 using namespace std;
 
@@ -37,7 +40,7 @@ void GameBoard::init() {
     cells.emplace_back(make_shared<OSAP>());
     properties.emplace_back(make_shared<AcademicBuilding>(AcademicBuilding{"AL", 40, vector<double>{2, 10, 30, 90, 160, 250}, Art1}));
     cells.emplace_back(properties[properties.size() - 1]);
-    //    cells.emplace_back(make_shared<SLC>())
+       cells.emplace_back(make_shared<SLC>());
     properties.emplace_back(make_shared<AcademicBuilding>(AcademicBuilding{"ML", 60, vector<double>{4, 20, 60, 180, 320, 450}, Art1}));
     cells.emplace_back(properties[properties.size() - 1]);
     cells.emplace_back(make_shared<Tuition>(Tuition{}));
@@ -45,7 +48,7 @@ void GameBoard::init() {
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<AcademicBuilding>("ECH", 100, vector<double>{6, 30, 90, 270, 400, 550}, Art2));
     cells.emplace_back(properties[properties.size() - 1]);
-    //    cells.emplace_back(make_shared<NHL>())
+       cells.emplace_back(make_shared<NH>());
     properties.emplace_back(make_shared<AcademicBuilding>("PAS", 100, vector<double>{6, 30, 90, 270, 400, 550}, Art2));
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<AcademicBuilding>("HH", 120, vector<double>{8, 40, 10, 300, 450, 600}, Art2));
@@ -63,7 +66,7 @@ void GameBoard::init() {
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<AcademicBuilding>("LHI", 180, vector<double>{14, 70, 200, 550, 750, 950}, Health));
     cells.emplace_back(properties[properties.size() - 1]);
-    //    cells.emplace_back(make_shared<SLC>())
+       cells.emplace_back(make_shared<SLC>());
     properties.emplace_back(make_shared<AcademicBuilding>("BMH", 180, vector<double>{14, 70, 200, 550, 750, 950}, Health));
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<AcademicBuilding>("OPT", 200, vector<double>{16, 80, 220, 600, 800, 1000}, Health));
@@ -71,7 +74,7 @@ void GameBoard::init() {
     cells.emplace_back(make_shared<Geese>());
     properties.emplace_back(make_shared<AcademicBuilding>("EV1", 220, vector<double>{18, 90, 250, 700, 875, 1050}, Env));
     cells.emplace_back(properties[properties.size() - 1]);
-    //    cells.emplace_back(make_shared<NHL>())
+       cells.emplace_back(make_shared<NH>());
     properties.emplace_back(make_shared<AcademicBuilding>("EV2", 220, vector<double>{18, 90, 250, 700, 875, 1050}, Env));
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<AcademicBuilding>("EV3", 240, vector<double>{20, 100, 300, 750, 925, 1100}, Env));
@@ -91,12 +94,12 @@ void GameBoard::init() {
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<AcademicBuilding>("ESC", 300, vector<double>{26, 130, 390, 900, 1100, 1275}, Sci2));
     cells.emplace_back(properties[properties.size() - 1]);
-    //    cells.emplace_back(make_shared<SLC>())
+       cells.emplace_back(make_shared<SLC>());
     properties.emplace_back(make_shared<AcademicBuilding>("C2", 320, vector<double>{28, 150, 450, 1000, 1200, 1400}, Sci2));
     cells.emplace_back(properties[properties.size() - 1]);
     properties.emplace_back(make_shared<Residence>("REV"));
     cells.emplace_back(properties[properties.size() - 1]);
-    //    cells.emplace_back(make_shared<NHL>())
+       cells.emplace_back(make_shared<NH>());
     properties.emplace_back(make_shared<AcademicBuilding>("MC", 350, vector<double>{35, 175, 500, 1100, 1300, 1500}, Math));
     cells.emplace_back(properties[properties.size() - 1]);
     cells.emplace_back(make_shared<Coop>());
@@ -158,14 +161,12 @@ void GameBoard::roll() {
     int roll2 = dice2->roll();
     curPlayer->addRollTimes();
 
-    if (curPlayer->inTimsLine()) {
-        throw inTims{};
-        if (roll1 == roll2) {
-            curPlayer->removeFromTimsLine();
-            curPlayer->setRollState(false);
-        } else if (curPlayer->getRollTimes() == 2) {
-            curPlayer->setRollState(false);
-        }
+    if (curPlayer->inTimsLine()) { throw inTims{}; }
+    if (roll1 == roll2) {
+        curPlayer->removeFromTimsLine();
+        curPlayer->setRollState(false);
+    } else if (curPlayer->getRollTimes() == 2) {
+        curPlayer->setRollState(false);
     } else {
         if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
             curPlayer->sentToTimsLine(timsLineIndex);
