@@ -25,6 +25,16 @@ void Controller::setGameBoard(GameBoard *gb) {
 void Controller::roll() {
     // TODO better method?
 
+    // if g->isTimsLine
+        // cout << "mmmmmmmm"
+        // try
+        //  g->moveOutTim(int opt) 1-roll 2-cup 3-pay
+        // catch
+    // else
+    // try
+    //  g->roll()
+    // catch
+
     try {
         g->roll();
         cout << g;
@@ -39,14 +49,14 @@ void Controller::roll() {
         while (!(cin >> option) || option <= 3 || option > 3) {
             cout << "Invalid input. Please choose a number between 1 and 3: ";
         }
-        if (option == 1) {
-            g->roll();
-            cout << g;
-        } else if (option == 2) {
-            g->getCurPlayer()->useCup();
-        } else {
-            g->getCurPlayer()->forcePay(50);
-        }
+//        if (option == 1) {
+//            g->roll();
+//            cout << g;
+//        } else if (option == 2) {
+//            g->getCurPlayer()->useCup();
+//        } else {
+//            g->getCurPlayer()->forcePay(50);
+//        }
     }
     // if (!g->getCurPlayer()->getRollState()) {
     //     cout << "You cannot roll anymore in this term." << endl;

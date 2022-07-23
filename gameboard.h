@@ -45,9 +45,9 @@ class GameBoard {
   void setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged);
   void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
   void roll();
+  bool inTimsLine();
   void roll(int d1, int d2);
   void next();
-  Player *getCurPlayer();
   std::string getCurPlayerName();
   std::unique_ptr<std::vector<std::tuple<std::string, char, int, double, int>>> getAllPlayersInfo();
   std::unique_ptr<std::vector<std::tuple<std::string, std::string, int, bool>>> getAllPropertiesInfo();

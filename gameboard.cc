@@ -2,7 +2,6 @@
 #include <memory>
 #include <sstream>
 #include "gameboard.h"
-#include "textdisplay.h"
 #include "property.h"
 #include "academicBuilding.h"
 #include "dice.h"
@@ -16,7 +15,6 @@
 #include "gym.h"
 #include "goToTims.h"
 #include "coop.h"
-#include "subject.h"
 #include "observer.h"
 #include "state.h"
 
@@ -116,7 +114,7 @@ void GameBoard::setController(Controller *c) {
 
 void GameBoard::addPlayer(const string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
     players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
-    cells[position]->initLandOn(*(players.end()->get()));
+    cells[position]->initLandOn(*players[players.size() - 1].get());
 }
 
 
@@ -152,6 +150,11 @@ void GameBoard::move(int distance) {
     }
 }
 
+// g->isTimsLine: return curPlayer->isTimsLine
+// moveoutTims(int opt) 1-roll() 2-usecup 3-pay (1/2 pay, 3 - forcePay)
+
+bool GameBoard::inTimsLine() { return curPlayer->inTimsLine(); }
+
 void GameBoard::roll() {
     if (!curPlayer->getRollState()) throw InvalidCmd{"roll"};
     int roll1 = dice1->roll();
@@ -159,7 +162,6 @@ void GameBoard::roll() {
     curPlayer->addRollTimes();
 
     if (curPlayer->inTimsLine()) {
-        throw inTims{};
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
             curPlayer->setRollState(false);
@@ -194,8 +196,6 @@ void GameBoard::next() {
     curPlayer->initRollTimes();
     curPlayer->setRollState(true);
 }
-
-Player *GameBoard::getCurPlayer() { return curPlayer; }
 
 string GameBoard::getCurPlayerName() { return curPlayer->getName(); }
 
@@ -332,6 +332,7 @@ void GameBoard::assets() { assets(curPlayer); }
 void GameBoard::assets(Player *p) {
     cout << "Player " << p->getName() << endl;
     cout << "Current Saving: $" << p->getCash() << endl;
+    cout << "Current cups: " << p->getNumCup() << endl;
     cout << "Properties: " << endl;
     for (auto &i : properties) {
         if (i->getOwner() == p) {
@@ -385,7 +386,7 @@ void GameBoard::bankrupt() {
             }
         }
     }
-    players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> p) { return p.get() == this->curPlayer; }), players.end());
+    players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> &p) { return p.get() == this->curPlayer; }), players.end());
 
     if (!auctionProperties.empty()) {
         vector<string> otherPlayersName;
