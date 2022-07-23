@@ -92,9 +92,9 @@ void TextDisplay::printMid(ostream &out, const int left, const int right) const 
     const string spaces(cellWidth, ' ');
 
     for (int i = 0; i < cellHeight; i++) {
-        out << toPrint[left][i];
+        out << toPrint[left][i] << "|";
         for (int j = 0; j < 9; j++) out << spaces;
-        out << toPrint[right][i] << "|" << endl;
+        out << spaces << " " << toPrint[right][i] << "|" << endl;
     }
 }
 
@@ -118,7 +118,7 @@ ostream &operator<< (ostream &out, const TextDisplay& td) {
     }
 
     for (int i = 0; i < td.cellHeight; i++) {
-        out << td.toPrint[11][i];
+        out << td.toPrint[11][i] << "|";
         for (int j = 0; j < 9; j++) {
             if (i != td.cellHeight - 1) {
                 out << spaces;
@@ -126,6 +126,7 @@ ostream &operator<< (ostream &out, const TextDisplay& td) {
                 out << cellBound;
             }
         }
+        (i != td.cellHeight - 1) ? (out << spaces << " ") : (out << cellBound << "_");
         out << td.toPrint[39][i] << "|" << endl;
     }
 
