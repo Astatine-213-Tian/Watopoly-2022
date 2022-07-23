@@ -15,11 +15,11 @@ void TextDisplay::separateCellName(const string &cellName, vector<string> &cell)
     string line = "|";
     int remain = cellWidth;
     while (iss >> read) {
-        if (remain == cellWidth && read.length() <= cellWidth) {
+        if (remain == cellWidth && (int)read.length() <= cellWidth) {
             line.append(read);
             remain -= read.length();
         } else if (remain < cellWidth) {
-            if (read.length() < remain) {
+            if ((int)read.length() < remain) {
                 line.append(" ");
                 line.append(read);
                 remain = remain - read.length() - 1;
@@ -59,7 +59,6 @@ void TextDisplay::separatePlayers(const vector<char>& p, vector<string> &cell) {
 void TextDisplay::setDisplayContents() {
     string line;
     string read = "";
-    int remain = cellWidth;
 
     for (int i = 0; i < (int)displayInfo.size(); i++) {
         vector<string> cell;

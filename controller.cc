@@ -163,7 +163,7 @@ void Controller::addPlayers() {
 
     cout << "Please start adding players!" << endl;
     cout << "Available players are: " << endl;
-    for (int i = 0; i < players.size(); ++i) {
+    for (int i = 0; i < (int)players.size(); ++i) {
         cout << i + 1 << ". " << get<1>(players[i]) << " (" << get<0>(players[i]) << ")"<< endl;
     }
     Dice d(0, 39);
@@ -181,7 +181,7 @@ void Controller::addPlayers() {
         }
         stringstream ss{cmd};
         int index;
-        if (ss >> index && index >= 1 && index <= players.size()) {
+        if (ss >> index && index >= 1 && index <= (int)players.size()) {
             const string &name = get<1>(players[index - 1]);
             const char &displayChar = get<0>(players[index - 1]);
             bool &used = get<2>(players[index-1]);
