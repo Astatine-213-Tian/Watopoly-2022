@@ -8,23 +8,26 @@
 #include "dice.h"
 #include "cell.h"
 #include "player.h"
+#include "monopolyBlock.h"
 
 class Property;
 class AcademicBuilding;
-class Observer;
+class TextDisplay;
 
 class GameBoard {
   std::vector<std::unique_ptr<Player>> players;
   std::vector<std::shared_ptr<Cell>> cells;
+  std::vector<std::unique_ptr<MonopolyBlock>> blocks;
   std::vector<std::shared_ptr<Property>> properties;
   Player *curPlayer;
+  int curPlayerIndex;
   std::unique_ptr<Dice> dice1;
   std::unique_ptr<Dice> dice2;
   const int timsLineIndex = 10;
   const int osapIndex = 0;
 
   Controller *controller = nullptr;
-  Observer *ob = nullptr;
+  TextDisplay *td = nullptr;
 
   void move(int distance);
   Property *getPlayerProperty(const std::string &name, Player *player) const;
@@ -64,7 +67,7 @@ class GameBoard {
   void bankrupt();
   bool needDealWithDebt();
 
-  void setObserver(Observer *o);
+  void setTextDisplay(TextDisplay *td);
   friend std::ostream &operator<<(std::ostream &out, const GameBoard &gb);
 };
 

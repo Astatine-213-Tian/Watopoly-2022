@@ -4,9 +4,9 @@
 #include "player.h"
 #include "error.h"
 
-AcademicBuilding::AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock &mb) :
-    Property{std::move(name), cost}, tuition{std::move(tuition)}, mb{&mb} {
-    mb.addNewBuilding(this);
+AcademicBuilding::AcademicBuilding(std::string name, double cost, std::vector<double> tuition, MonopolyBlock *mb) :
+    Property{std::move(name), cost}, tuition{std::move(tuition)}, mb{mb} {
+    mb->addNewBuilding(this);
 }
 
 double AcademicBuilding::calculateRent() const {

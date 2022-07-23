@@ -4,5 +4,5 @@
 NonProperty::NonProperty(const std::string&name): Cell{name} {}
 
 Info NonProperty::getInfo() const {
-    return Info{'\0', -1, cellIndex, name, playersOnCell};
+    return Info{-1, cellIndex, name, playersOnCell};
 }

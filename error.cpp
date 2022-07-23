@@ -3,12 +3,11 @@
 #include "error.h"
 using namespace std;
 
-Error::Error(const string &msg) : msg{"Error" + msg} {}
+Error::Error(const string &msg) : msg{"Error: " + msg} {}
 const char *Error::what() const noexcept { return msg.c_str(); }
 
 NotOwner::NotOwner(const string &playerName, const string &propertyName) :
     Error{"Player " + playerName + " does not own " + propertyName}, playerName{playerName}, propertyName{propertyName} {}
-
 
 NotMonopolized::NotMonopolized(const string &blockName) :
     Error{blockName + " is not monopolized "}, blockName{blockName} {}

@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     GameBoard gb;
     TextDisplay td;
 
-    gb.setObserver(&td);
+    gb.setTextDisplay(&td);
     gb.setController(&c);
     c.setGameBoard(&gb);
 

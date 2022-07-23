@@ -1,7 +1,7 @@
 #include "slc.h"
 #include "player.h"
 
-SLC::SLC(): NonProperty{"DC Tims Line"} {}
+SLC::SLC(): NonProperty{"SLC"} {}
 
 void SLC::passBy(Player &p) {}
 

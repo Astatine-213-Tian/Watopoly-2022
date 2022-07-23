@@ -5,7 +5,6 @@
 #include <string>
 
 struct Info {
-  char owner;
   int numImprove;
   int cellIndex;
   std::string cellName;

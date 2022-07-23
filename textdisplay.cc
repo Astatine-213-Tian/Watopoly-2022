@@ -1,12 +1,16 @@
 #include <sstream>
 #include "textdisplay.h"
 #include "subject.h"
+#include "termcodes.h"
 
 using namespace std;
 
+TextDisplay::TextDisplay() : displayInfo{vector<Info>(40)}, toPrint{vector<vector<string>>(40)} {}
+
 void TextDisplay::notify(Subject &whoFrom) {
     Info infoFrom = whoFrom.getInfo();
-    displayInfo.at(infoFrom.cellIndex) = infoFrom;
+    displayInfo[infoFrom.cellIndex] = infoFrom;
+    setDisplayContents(infoFrom.cellIndex);
 }
 
 void TextDisplay::separateCellName(const string &cellName, vector<string> &cell) {
@@ -27,8 +31,8 @@ void TextDisplay::separateCellName(const string &cellName, vector<string> &cell)
                 line.append(remain, ' ');
                 cell.emplace_back(line);
                 line = "|";
-                remain = cellWidth;
-                line.assign(read);
+                remain = cellWidth - read.length();
+                line.append(read);
             }
         }
     }
@@ -45,46 +49,48 @@ void TextDisplay::separatePlayers(const vector<char>& p, vector<string> &cell) {
         line += p[j];
         if (j < 3) line.append(" ");
     }
+    line.append(cellWidth - line.length() + 1, ' ');
     cell.emplace_back(line);
+
     line.assign("|");
     for (int j = 4; j < numPlayers; j++) {
         line += p[j];
         if (j < 8) line.append(" ");
     }
+    line.append(cellWidth - line.length() + 1, ' ');
     cell.emplace_back(line);
+
     line.assign("|").append(cellWidth, '_');
     cell.emplace_back(line);
 }
 
-void TextDisplay::setDisplayContents() {
+void TextDisplay::setDisplayContents(int index) {
     string line;
     string read = "";
+    vector<string> cell;
+    line = "|";
+    int numImprove = displayInfo[index].numImprove;
 
-    for (int i = 0; i < (int)displayInfo.size(); i++) {
-        vector<string> cell;
-        line = "|";
-        int numImprove = displayInfo[i].numImprove;
-        
-        if (numImprove == -1) {
-            separateCellName(displayInfo[i].cellName, cell);
-            for (int j = 0; j < 3 - (int)cell.size(); j++) {
-                line.assign("|").append(cellWidth, ' ');
-                cell.emplace_back(line);
-            }
-            separatePlayers(displayInfo[i].players, cell);
-
-        } else {
-            line.append(numImprove, 'I');
-            line.append(cellWidth - numImprove, ' ');
+    if (numImprove == -1) {
+        separateCellName(displayInfo[index].cellName, cell);
+        int size = cell.size();
+        for (int j = 0; j < 3 - size; j++) {
+            line.assign("|").append(cellWidth, ' ');
             cell.emplace_back(line);
-            line.assign("|");
-            line.append(cellWidth, '-');
-            cell.emplace_back(line);
-            separateCellName(displayInfo[i].cellName, cell);
-            separatePlayers(displayInfo[i].players, cell);
         }
-        toPrint.emplace_back(cell);
+        separatePlayers(displayInfo[index].players, cell);
+    } else {
+        line.append(numImprove, 'I');
+        line.append(cellWidth - numImprove, ' ');
+        cell.emplace_back(line);
+        line.assign("|");
+        line.append(cellWidth, '-');
+        cell.emplace_back(line);
+        separateCellName(displayInfo[index].cellName, cell);
+        separatePlayers(displayInfo[index].players, cell);
     }
+    toPrint[index] = cell;
+
 }
 
 void TextDisplay::printMid(ostream &out, const int left, const int right) const {
@@ -113,20 +119,26 @@ ostream &operator<< (ostream &out, const TextDisplay& td) {
     }
 
     for (int i = 19; i >= 12; i--) {
-        td.printMid(out, i, td.toPrint.size() - i);
+        td.printMid(out, i, 50 - i);
     }
 
     for (int i = 0; i < td.cellHeight; i++) {
+        // TODO underscore
+        if (i == td.cellHeight - 1) out << UNDERLINE;
+
         out << td.toPrint[11][i] << "|";
+
         for (int j = 0; j < 9; j++) {
             if (i != td.cellHeight - 1) {
                 out << spaces;
             } else {
-                out << cellBound;
+                out << spaces;
             }
         }
-        (i != td.cellHeight - 1) ? (out << spaces << " ") : (out << cellBound << "_");
+        (i != td.cellHeight - 1) ? (out << spaces << " " ) : (out << spaces << "_");
+
         out << td.toPrint[39][i] << "|" << endl;
+        if (i == td.cellHeight - 1) out << DEFAULT;
     }
 
     for (int i = 0; i < td.cellHeight; i++) {

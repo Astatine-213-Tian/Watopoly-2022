@@ -40,7 +40,7 @@ void Property::landOnAction(Player &p) {
         std::string ans;
         while (std::cin >> ans) {
             if (ans == "Y" || ans == "y" || ans == "Yes" || ans == "yes") {
-                p.forcePay(cost);
+                p.pay(cost);
                 owner = &p;
                 return;
             } else if (ans == "N" || ans == "n" || ans == "No" || ans == "no") {
@@ -84,5 +84,5 @@ void Property::addImprove() { throw NotAcademicBuilding{name}; }
 void Property::removeImprove() { throw NotAcademicBuilding{name}; }
 
 Info Property::getInfo() const {
-    return Info{owner->getDisplayChar(), getImproveNum(), cellIndex, name, playersOnCell};
+    return Info{ getImproveNum(), cellIndex, name, playersOnCell};
 }
