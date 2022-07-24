@@ -17,3 +17,7 @@ double Gym::calculateRent() const {
         return 10.0 * diceSum;
     }
 }
+
+void Gym::afterBoughtBy(Player &p) {
+    p.addGym();
+}

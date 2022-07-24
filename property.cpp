@@ -48,14 +48,22 @@ int Property::getImproveNum() const { return -1; }
 
 //double Property::getImproveCost() const { return 0; }
 
-void Property::loadImproveNum(int improveNum) const {}
+void Property::initImproveNum(int improveNum) const {}
 
 void Property::loadInfo(int improveNum, bool mortgaged) {
     isMortgaged = mortgaged;
-    loadImproveNum(improveNum);
+    initImproveNum(improveNum);
     notifyObservers();
 }
 
 void Property::addImprove() { throw NotAcademicBuilding{getName()}; }
 
 void Property::removeImprove() { throw NotAcademicBuilding{getName()}; }
+
+void Property::afterBoughtBy(Player &p) { }
+
+void Property::boughtBy(Player &p, double price) {
+    owner = &p;
+    afterBoughtBy(p);
+    p.forcePay(price);
+}

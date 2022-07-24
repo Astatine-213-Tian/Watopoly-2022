@@ -11,3 +11,7 @@ double Residence::calculateRent() const {
     else if (numRes == 3) return 100;
     else return 200;
 }
+
+void Residence::afterBoughtBy(Player &p) {
+    p.addRes();
+}

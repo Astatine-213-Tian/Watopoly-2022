@@ -4,6 +4,7 @@
 #include "property.h"
 class Residence : public Property {
   double calculateRent() const override;
+  void afterBoughtBy(Player &p) override;
  public:
   explicit Residence(std::string name);
 };
