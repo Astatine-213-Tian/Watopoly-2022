@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
             }
         } else if (theArg == "-testing") {
             // TODO set testing
+            c.setToTestMode();
         } else if (theArg == "-enhanced") {
             // TODO set enhanced
         }

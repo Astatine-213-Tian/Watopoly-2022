@@ -14,13 +14,14 @@ using namespace std;
 class Property;
 class AcademicBuilding;
 
-Controller::Controller() = default;
+Controller::Controller(): testMode{false} {};
 
 void Controller::setGameBoard(GameBoard *gb) {
     g = gb;
     g->init();
 }
 
+void Controller::setToTestMode() { testMode = true; }
 
 void Controller::roll() {
     // if g->isTimsLine
@@ -35,7 +36,26 @@ void Controller::roll() {
 
     // TODO tims, getdicesum
     try {
-        g->roll();
+        if (testMode) {
+            int roll1;
+            int roll2;
+            cout << GREEN << "Please enter the first roll: " << DEFAULT;
+            while (!(cin >> roll1)) {
+                cin.clear();
+                cin.ignore();
+                cout << RED << "Please enter a valid number: " << DEFAULT;
+            }
+            cout << GREEN << "Please enter the second roll: " << DEFAULT;
+            while (!(cin >> roll2)) {
+                cin.clear();
+                cin.ignore();
+                cout << RED << "Please enter a valid number: " << DEFAULT;
+            }
+
+            g->roll(true, roll1, roll2);
+        } else {
+            g->roll();
+        }
     } catch (exception &e) {
         cout << e.what() << endl;
         cout << RED << "You may not roll anymore in this turn." << DEFAULT << endl;

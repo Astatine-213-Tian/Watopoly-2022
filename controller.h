@@ -19,11 +19,13 @@ class Controller {
   void bankrupt();
   void save(std::string& filename);
   static bool yesOrNoResponse();
+  bool testMode;
 
  public:
   Controller();
   void setGameBoard(GameBoard *gb);
   void addPlayers();
+  void setToTestMode();
   void play();
   void load(const std::string& filename);
   static bool askTradeResponse(const std::string &curName, const std::string &toName, const std::string &curGive, const std::string &curReceive);
