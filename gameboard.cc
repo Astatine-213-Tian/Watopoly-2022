@@ -133,6 +133,9 @@ void GameBoard::start() {
 }
 
 void GameBoard::move(int distance) {
+    if (distance == 0) return;
+    curPlayer->setNumToMove(0);
+
     int cur = curPlayer->getLocation();
     cells[cur]->leave(curPlayer->getDisplayChar());
 
@@ -148,10 +151,10 @@ void GameBoard::move(int distance) {
     }
     curPlayer->setLocation(dest);
     
-    int final = curPlayer->getLocation();
-    auto *p = dynamic_cast<Property *>(cells[final].get());
+    // int final = curPlayer->getLocation();
+    auto *p = dynamic_cast<Property *>(cells[dest].get());
     if (p && !p->getOwner()) {
-        bool willBuy = Controller::askBuyResponse(cells[final]->getName(), p->getCost());
+        bool willBuy = Controller::askBuyResponse(cells[dest]->getName(), p->getCost());
         if (willBuy) {
             p->boughtBy(*curPlayer, p->getCost());
         } else {
@@ -159,16 +162,24 @@ void GameBoard::move(int distance) {
             for (auto &i: players) {
                 allPlayersName.emplace_back(i->getName());
             }
-            pair<string, double> bidInfo = Controller::auction(vector<string>{cells[final]->getName()}, allPlayersName);
+            pair<string, double> bidInfo = Controller::auction(vector<string>{cells[dest]->getName()}, allPlayersName);
             Player *bidWinner = getPlayer(bidInfo.first);
             // TODO what if bankrupt here?
             p->boughtBy(*bidWinner, bidInfo.second);
         }
     }
 
-    cells[final]->landOn(*curPlayer);
+    cells[dest]->landOn(*curPlayer);
+    
+    move(curPlayer->getNumToMove());
+    if (curPlayer->getGoToOSAP()) {
+        curPlayer->setGoToOSAP(false);
+        cells[dest]->leave(curPlayer->getDisplayChar());
+        curPlayer->setLocation(osapIndex);
+        cells[osapIndex]->landOn(*curPlayer);
+    }
     if (curPlayer->getShouldMoveToTims()) {
-        cells[final]->leave(curPlayer->getDisplayChar());
+        cells[dest]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
         curPlayer->setRollState(false);
@@ -199,6 +210,7 @@ void GameBoard::roll(bool testMode, int d1, int d2) {
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
             curPlayer->setRollState(false);
+            move(roll1 + roll2);
         } else if (curPlayer->getRollTimes() == 2) {
             curPlayer->setRollState(false);
         }
