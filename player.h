@@ -21,10 +21,9 @@ class Player {
   int numRes;
   double debtAmount;
   Player *creditor;
-  GameBoard *g;
 
  public:
-  Player(std::string name, char displayChar, int timCups, double cash, int position, GameBoard *gameBoard, bool isInTimsLine, int timsLineRound);
+  Player(std::string name, char displayChar, int timCups, double cash, int position, bool isInTimsLine, int timsLineRound);
   std::string getName() const;
   double getCash() const;
   char getDisplayChar() const;

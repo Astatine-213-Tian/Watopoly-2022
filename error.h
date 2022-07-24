@@ -89,6 +89,11 @@ class NotEnoughCash: public Error {
   explicit NotEnoughCash(const std::string &playerName);
 };
 
+class CauseDebt: public Error {
+ public:
+  CauseDebt(const std::string &playerName, double debtAmount);
+};
+
 class InvalidCmd : public Error {
  public:
   explicit InvalidCmd(const std::string &cmdName);

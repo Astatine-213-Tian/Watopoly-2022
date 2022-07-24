@@ -37,4 +37,7 @@ BuildingStillWithImprove::BuildingStillWithImprove(const string &name) :
 
 NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName + " don't have enough cash to complete the trade."} {}
 
+CauseDebt::CauseDebt(const std::string &playerName, double debtAmount) :
+    Error{playerName + ", your last action result in debt. Current debt amount: " + to_string(debtAmount) + "."} {}
+
 InvalidCmd::InvalidCmd(const std::string &cmdName) : Error{"You cannot use command " + cmdName + "at this stage."} {}

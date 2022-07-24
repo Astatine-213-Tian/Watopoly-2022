@@ -1,12 +1,11 @@
 #include "player.h"
 #include "error.h"
-#include "gameboard.h"
 
 using namespace std;
 
-Player::Player(std::string name, char displayChar, int timCups, double cash, int position, GameBoard *_g, bool inTims, int timsRound):
+Player::Player(std::string name, char displayChar, int timCups, double cash, int position, bool inTims, int timsRound):
     name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position},
-    isInTimsLine{inTims}, rollTimes{timsRound}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr}, g{_g} {}
+    isInTimsLine{inTims}, rollTimes{timsRound}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
 
 string Player::getName() const{ return name; }
 
@@ -65,25 +64,24 @@ void Player::pay(double value, Player *receiver) {
 
 void Player::forcePay(double value, Player *receiver) {
     if (cash < value) {
-        debtAmount += value;
+        if (receiver) receiver->receiveMoney(cash);
+        cash = 0;
+        debtAmount += value - cash;
         creditor = receiver;
-        throw NotEnoughCash{name};
+        throw CauseDebt{name, debtAmount};
     }
     cash -= value;
     if (receiver) receiver->receiveMoney(value);
 }
 
-double Player::getDebtAmount() const {
-    return debtAmount;
-}
+double Player::getDebtAmount() const { return debtAmount; }
 
 Player* Player::getCreditor() const {
     return creditor;
 }
 
 void Player::payDebt() {
-    pay(debtAmount, creditor);
-    debtAmount = 0;
+    pay(getDebtAmount(), creditor);
     creditor = nullptr;
 }
 

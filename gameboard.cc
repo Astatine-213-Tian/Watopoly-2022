@@ -116,7 +116,7 @@ void GameBoard::setController(Controller *c) {
 }
 
 void GameBoard::addPlayer(const string &name, char displayChar, int position, int timsCups, double money, bool isInTims, int timsRound) {
-    players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, this, isInTims, timsRound));
+    players.emplace_back(make_unique<Player>(name, displayChar, timsCups, money, position, isInTims, timsRound));
     cells[position]->initLandOn(*players[players.size() - 1].get());
 }
 
@@ -149,11 +149,11 @@ void GameBoard::move(int distance) {
     curPlayer->setLocation(dest);
     
     int final = curPlayer->getLocation();
-    if (cells[final]->getCost() != 0 && !cells[final]->getOwner()) {
-        bool willBuy = Controller::askBuyResponse(cells[final]->getName(), cells[final]->getCost());
+    auto *p = dynamic_cast<Property *>(cells[final].get());
+    if (p && !p->getOwner()) {
+        bool willBuy = Controller::askBuyResponse(cells[final]->getName(), p->getCost());
         if (willBuy) {
-            curPlayer->forcePay(cells[final]->getCost());
-            // TODO add gym or res
+            p->boughtBy(*curPlayer, p->getCost());
         } else {
             vector<string> allPlayersName;
             for (auto &i: players) {
@@ -162,7 +162,7 @@ void GameBoard::move(int distance) {
             pair<string, double> bidInfo = Controller::auction(vector<string>{cells[final]->getName()}, allPlayersName);
             Player *bidWinner = getPlayer(bidInfo.first);
             // TODO what if bankrupt here?
-            bidWinner->forcePay(bidInfo.second);
+            p->boughtBy(*bidWinner, bidInfo.second);
         }
     }
 
@@ -416,6 +416,9 @@ void GameBoard::bankrupt() {
         pair<string, double> bidInfo = Controller::auction(propertiesName, otherPlayersName);
         Player *bidWinner = getPlayer(bidInfo.first);
         // TODO what if bankrupt here?
+        for (auto &p: auctionProperties) {
+            p->setOwner(bidWinner);
+        }
         bidWinner->forcePay(bidInfo.second);
     }
 }
