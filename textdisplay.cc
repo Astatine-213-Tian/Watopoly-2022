@@ -94,14 +94,22 @@ void TextDisplay::printMid(ostream &out, const int left, const int right) const 
     const string spaces(cellWidth, ' ');
 
     for (int i = 0; i < cellHeight; i++) {
-        if (i == cellHeight - 1) out << UNDERLINE;
-        out << toPrint[left][i] << "|";
-        out << DEFAULT;
+        if (i == cellHeight - 1) {
+            out << "|" << UNDERLINE << toPrint[left][i].substr(1);
+        } else {
+            out << toPrint[left][i];
+        }
+        out << DEFAULT << "|";
+
         for (int j = 0; j < 9; j++) out << spaces;
         out << spaces << " ";
-        if (i == cellHeight - 1) out << UNDERLINE;
-        out << toPrint[right][i] << "|" << endl;
-        out << DEFAULT;
+
+        if (i == cellHeight - 1) {
+            out << "|" << UNDERLINE << toPrint[right][i].substr(1);
+        } else {
+            out << toPrint[right][i];
+        }
+        out << DEFAULT << "|" << endl;
     }
 }
 
@@ -114,12 +122,14 @@ ostream &operator<< (ostream &out, const TextDisplay& td) {
     out << printLine << endl;
 
     for (int i = 0; i < td.cellHeight; i++) {
-        if (i == td.cellHeight - 1) out << UNDERLINE;
         for (int j = 20; j <= 30; j++) {
-            out << td.toPrint[j][i];
+            if (i == td.cellHeight - 1) {
+                out << "|" << UNDERLINE << td.toPrint[j][i].substr(1);
+            } else {
+                out << td.toPrint[j][i];
+            }
         }
-        out << "|" << endl;
-        out << DEFAULT;
+        out << DEFAULT << "|" << endl;
     }
 
     for (int i = 19; i >= 12; i--) {
@@ -127,24 +137,29 @@ ostream &operator<< (ostream &out, const TextDisplay& td) {
     }
 
     for (int i = 0; i < td.cellHeight; i++) {
-        if (i == td.cellHeight - 1) out << UNDERLINE;
-
-        out << td.toPrint[11][i] << "|";
+        if (i == td.cellHeight - 1) {
+            out << "|" << UNDERLINE << td.toPrint[11][i].substr(1);
+        } else {
+            out << td.toPrint[11][i];
+        }
+        out << "|";
 
         for (int j = 0; j < 9; j++) out << spaces;
         out << spaces << " ";
 
-        out << td.toPrint[39][i] << "|" << endl;
-        if (i == td.cellHeight - 1) out << DEFAULT;
+        out << td.toPrint[39][i];
+        out << DEFAULT << "|" << endl;
     }
 
     for (int i = 0; i < td.cellHeight; i++) {
-        if (i == td.cellHeight - 1) out << UNDERLINE;
         for (int j = 10; j >= 0; j--) {
-            out << td.toPrint[j][i];
+            if (i == td.cellHeight - 1) {
+                out << "|" << UNDERLINE << td.toPrint[j][i].substr(1);
+            } else {
+                out << td.toPrint[j][i];
+            }
         }
-        out << "|" << endl;
-        out << DEFAULT;
+        out << DEFAULT << "|" << endl;
     }
 
     return out;
