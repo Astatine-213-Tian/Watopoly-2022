@@ -11,7 +11,7 @@ class TextDisplay: public Observer {
   std::vector<Info> displayInfo;
   std::vector<std::vector<std::string>> toPrint;
   const int cellWidth = 7;
-  const int cellHeight = 6;
+  const int cellHeight = 5;
 
   void separateCellName(const std::string &cellName, std::vector<std::string> &cell);
   void separatePlayers(const std::vector<char>& p, std::vector<std::string> &cell);
