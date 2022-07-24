@@ -149,11 +149,11 @@ void GameBoard::move(int distance) {
     curPlayer->setLocation(dest);
     
     int final = curPlayer->getLocation();
-    cells[final]->landOn(*curPlayer);
     if (cells[final]->getCost() != 0 && !cells[final]->getOwner()) {
         bool willBuy = Controller::askBuyResponse(cells[final]->getName(), cells[final]->getCost());
         if (willBuy) {
             curPlayer->forcePay(cells[final]->getCost());
+            // TODO add gym or res
         } else {
             vector<string> allPlayersName;
             for (auto &i: players) {
@@ -166,6 +166,7 @@ void GameBoard::move(int distance) {
         }
     }
 
+    cells[final]->landOn(*curPlayer);
     if (curPlayer->getShouldMoveToTims()) {
         cells[final]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);

@@ -15,6 +15,7 @@ class Property : public Cell {
   virtual double calculateRent() const = 0;
   virtual double getImproveValue() const;
   virtual void loadImproveNum(int improveNum) const;
+  void landOnAction(Player &p) override;
 
  public:
   Property(std::string name, double cost);
@@ -28,14 +29,13 @@ class Property : public Cell {
   void loadInfo(int improveNum, bool mortgaged);
 
   // For academic building only;
-  int getImproveNum() const override;
-//  virtual double getImproveCost() const;
+  // virtual double getImproveCost() const;
   virtual void addImprove();
   virtual void removeImprove();
 
   // override from Cell
   void passBy(Player &p) override;
-  void landOnAction(Player &p) override;
+  int getImproveNum() const override;
 };
 
 #endif //WATOPOLY__PROPERTY_H_
