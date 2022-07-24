@@ -180,10 +180,18 @@ void GameBoard::move(int distance) {
 
 bool GameBoard::inTimsLine() { return curPlayer->inTimsLine(); }
 
-void GameBoard::roll() {
+void GameBoard::roll(bool testMode, int d1, int d2) {
     if (!curPlayer->getRollState()) throw InvalidCmd{"roll"};
-    int roll1 = dice1->roll();
-    int roll2 = dice2->roll();
+    int roll1;
+    int roll2;
+    if (testMode) {
+        roll1 = d1;
+        roll2 = d2;
+    } else {
+        roll1 = dice1->roll();
+        roll2 = dice2->roll();
+    }
+    
     curPlayer->addRollTimes();
 
     // TODO TimsLine check
