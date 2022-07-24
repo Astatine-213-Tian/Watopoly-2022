@@ -37,7 +37,7 @@ void AcademicBuilding::removeImprove() {
     notifyObservers();
 }
 
-void AcademicBuilding::loadImproveNum(int num) const {
+void AcademicBuilding::initImproveNum(int num) const {
     mb->initImproveNum(num);
 }
 
