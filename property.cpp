@@ -35,7 +35,6 @@ void Property::landOnAction(Player &p) {
     p.forcePay(rent, owner);
 }
 
-
 bool Property::getMortgageStatus() const { return isMortgaged;}
 
 double Property::getImproveValue() const { return 0; }
