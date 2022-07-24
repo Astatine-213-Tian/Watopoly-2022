@@ -98,7 +98,9 @@ void TextDisplay::printMid(ostream &out, const int left, const int right) const 
         out << toPrint[left][i] << "|";
         out << DEFAULT;
         for (int j = 0; j < 9; j++) out << spaces;
-        out << spaces << " " << UNDERLINE << toPrint[right][i] << "|" << endl;
+        out << spaces << " ";
+        if (i == cellHeight - 1) out << UNDERLINE;
+        out << toPrint[right][i] << "|" << endl;
         out << DEFAULT;
     }
 }
