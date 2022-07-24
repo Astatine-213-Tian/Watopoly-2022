@@ -138,7 +138,7 @@ void GameBoard::move(int distance) {
 
     int size = static_cast<int>(cells.size());
     int dest;
-    for (int i = 1; i <= abs(distance); i++) {
+    for (int i = 1; i <= abs(distance); ++i) {
         if (distance >= 0) {
             dest = (cur + i >= size) ? cur + i - size : cur + i;
         } else {
@@ -147,9 +147,27 @@ void GameBoard::move(int distance) {
         cells[dest]->passBy(*curPlayer);
     }
     curPlayer->setLocation(dest);
-    cells[curPlayer->getLocation()]->landOn(*curPlayer);
+    
+    int final = curPlayer->getLocation();
+    cells[final]->landOn(*curPlayer);
+    if (cells[final]->getCost() != 0 && !cells[final]->getOwner()) {
+        bool willBuy = Controller::askBuyResponse(cells[final]->getName(), cells[final]->getCost());
+        if (willBuy) {
+            curPlayer->forcePay(cells[final]->getCost());
+        } else {
+            vector<string> allPlayersName;
+            for (auto &i: players) {
+                allPlayersName.emplace_back(i->getName());
+            }
+            pair<string, double> bidInfo = Controller::auction(vector<string>{cells[final]->getName()}, allPlayersName);
+            Player *bidWinner = getPlayer(bidInfo.first);
+            // TODO what if bankrupt here?
+            bidWinner->forcePay(bidInfo.second);
+        }
+    }
+
     if (curPlayer->getShouldMoveToTims()) {
-        cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
+        cells[final]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
         curPlayer->setRollState(false);
@@ -181,11 +199,7 @@ void GameBoard::roll() {
             curPlayer->setRollState(false);
         } else {
             move(roll1 + roll2);
-            if (roll1 == roll2) {
-                curPlayer->setRollState(true);
-            } else {
-                curPlayer->setRollState(false);
-            }
+            curPlayer->setRollState(roll1 == roll2);
         }
     }
 }
@@ -238,7 +252,7 @@ Property *GameBoard::getProperty(const string &name) const {
 
 Property *GameBoard::getPlayerProperty(const string &name, Player *player) const {
     Property *property = getProperty(name);
-    if (property->getOwner() != player) {
+    if (property && property->getOwner() != player) {
         throw NotOwner{player->getName(), property->getName()};
     }
     return property;
@@ -246,8 +260,7 @@ Property *GameBoard::getPlayerProperty(const string &name, Player *player) const
 
 
 void GameBoard::noImprovementCheck(Property *property) {
-    auto *ab = dynamic_cast<AcademicBuilding *>(property);
-    if (ab && ab->getImproveNum() != 0) {
+    if (property->getImproveNum() >= 0) {
         throw BuildingStillWithImprove{property->getName() };
     }
 }
@@ -349,10 +362,6 @@ void GameBoard::allAssets() {
     for (auto &i : players) {
         assets(i.get());
     }
-}
-
-void GameBoard::auction(int cellNum) {
-
 }
 
 bool GameBoard::isWin() {

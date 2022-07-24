@@ -1,9 +1,7 @@
 #include <utility>
-#include <iostream>
 #include "property.h"
 #include "player.h"
 #include "error.h"
-#include "info.h"
 
 Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false} {}
 
@@ -17,14 +15,14 @@ void Property::setOwner(Player *p) {
 double Property::getCost() const { return cost; }
 
 void Property::setMortgage() {
-    if (isMortgaged) throw PropertyStillMortgage{name};
-    if (getImproveNum() > 0) throw BuildingStillWithImprove{name};
+    if (isMortgaged) throw PropertyStillMortgage{getName()};
+    if (getImproveNum() > 0) throw BuildingStillWithImprove{getName()};
     owner->receiveMoney( cost / 2);
     isMortgaged = true;
 }
 
 void Property::setUnMortgage() {
-    if (!isMortgaged) throw PropertyStillUnMortage{name};
+    if (!isMortgaged) throw PropertyStillUnMortage{getName()};
     owner->pay(cost * 0.6);
     isMortgaged = false;
 }
@@ -32,27 +30,7 @@ void Property::setUnMortgage() {
 void Property::passBy(Player &p) { }
 
 void Property::landOnAction(Player &p) {
-    if (&p == owner) return;
-
-    // TODO auction part
-    if (!owner) {
-        std::cout << "Do you want to buy the property? (y/n)" << std::endl;
-        std::string ans;
-        while (std::cin >> ans) {
-            if (ans == "Y" || ans == "y" || ans == "Yes" || ans == "yes") {
-                p.pay(cost);
-                owner = &p;
-                return;
-            } else if (ans == "N" || ans == "n" || ans == "No" || ans == "no") {
-                return;
-            } else {
-                std::cout << "Please answer with y/n" << std::endl;
-            }
-        }
-    }
-
-    if (isMortgaged) return;
-
+    if (!owner || &p == owner || isMortgaged) return;
     double rent = calculateRent();
     p.forcePay(rent, owner);
 }
@@ -71,7 +49,7 @@ int Property::getImproveNum() const { return -1; }
 
 //double Property::getImproveCost() const { return 0; }
 
-void Property::loadImproveNum(int improveNum) const {};
+void Property::loadImproveNum(int improveNum) const {}
 
 void Property::loadInfo(int improveNum, bool mortgaged) {
     isMortgaged = mortgaged;
@@ -79,10 +57,6 @@ void Property::loadInfo(int improveNum, bool mortgaged) {
     notifyObservers();
 }
 
-void Property::addImprove() { throw NotAcademicBuilding{name}; }
+void Property::addImprove() { throw NotAcademicBuilding{getName()}; }
 
-void Property::removeImprove() { throw NotAcademicBuilding{name}; }
-
-Info Property::getInfo() const {
-    return Info{ getImproveNum(), cellIndex, name, playersOnCell};
-}
+void Property::removeImprove() { throw NotAcademicBuilding{getName()}; }

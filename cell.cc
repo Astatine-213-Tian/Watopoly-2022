@@ -26,4 +26,8 @@ void Cell::leave(char p) {
     notifyObservers();
 }
 
+Info Cell::getInfo() const {
+    return Info{getImproveNum(), cellIndex, name, playersOnCell};
+}
+
 Cell::~Cell() = default;

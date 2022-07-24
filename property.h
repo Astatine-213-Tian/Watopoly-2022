@@ -18,17 +18,17 @@ class Property : public Cell {
 
  public:
   Property(std::string name, double cost);
-  double getCost() const;
+  double getCost() const override;
   void setMortgage();
   void setUnMortgage();
   bool getMortgageStatus() const;
-  Player *getOwner() const;
+  Player *getOwner() const override;
   void setOwner(Player *p);
   double getTradableValue() const;
   void loadInfo(int improveNum, bool mortgaged);
 
   // For academic building only;
-  virtual int getImproveNum() const;
+  int getImproveNum() const override;
 //  virtual double getImproveCost() const;
   virtual void addImprove();
   virtual void removeImprove();
@@ -36,7 +36,6 @@ class Property : public Cell {
   // override from Cell
   void passBy(Player &p) override;
   void landOnAction(Player &p) override;
-  Info getInfo() const override;
 };
 
 #endif //WATOPOLY__PROPERTY_H_

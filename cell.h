@@ -9,23 +9,24 @@
 class Player;
 
 class Cell: public Subject{
- protected:
-  char owner;
   int cellIndex;
   std::string name;
   std::vector<char> playersOnCell;
   virtual void landOnAction(Player &p) = 0;
+  virtual int getImproveNum() const = 0;
 
  public:
-  Cell(std::string name);
+  explicit Cell(std::string name);
   virtual ~Cell();
+  Info getInfo() const;
   void leave(char p);
   virtual void passBy(Player &p) = 0;
   void initLandOn(Player &p);
   void landOn(Player &p);
   std::string getName() const;
-  void setIndex(const int idx);
-  virtual Info getInfo() const = 0;
+  void setIndex(int idx);
+  virtual double getCost() const = 0;
+  virtual Player *getOwner() const = 0;
 };
 
 #endif

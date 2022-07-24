@@ -7,7 +7,9 @@
 class NonProperty: public Cell {
  public:
   explicit NonProperty(const std::string&);
-  Info getInfo() const override;
+  int getImproveNum() const override;
+  double getCost() const override;
+  Player *getOwner() const override;
 };
 
 #endif

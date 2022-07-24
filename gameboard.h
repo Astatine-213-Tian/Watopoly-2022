@@ -62,7 +62,6 @@ class GameBoard {
   void payDebt();
   void assets();
   void allAssets();
-  void auction(int cellNum);
   bool isWin();
   void bankrupt();
   bool needDealWithDebt();

@@ -252,7 +252,6 @@ void Controller::save(string& filename) {
             int position = get<4>(p);
             ofs << name << ' ' << displayChar << ' ' << numCups << ' ' << cash << ' ' << position << endl;
         }
-        size_t numProperties = properties->size();
         for (auto &p: *properties) {
             string name = get<0>(p);
             string owner = get<1>(p);
@@ -305,6 +304,7 @@ void Controller::load(const string& filename) {
 }
 
 bool Controller::yesOrNoResponse() {
+    cout << "Your response (y/n): " << endl;
     string res;
     while (cin >> res) {
         if (res == "Yes" || res == "yes" || res == "y" || res == "Y") {
@@ -320,8 +320,7 @@ bool Controller::yesOrNoResponse() {
 
 bool Controller::askTradeResponse(const string &currName, const string &toName, const string &currGive, const string &currReceive) {
     cout << "To player " + toName + ": Do you accept this trade?" << endl <<
-     "Trade detail: give player " + currName + " " + currReceive + " in exchange for " + currGive + ")" << endl
-     << "Your response (y/n): " << endl;
+     "Trade detail: give player " + currName + " " + currReceive + " in exchange for " + currGive + ")" << endl;
     if (yesOrNoResponse()) {
         cout << GREEN << "Trade accepted." << DEFAULT << endl;
         return true;
@@ -330,6 +329,11 @@ bool Controller::askTradeResponse(const string &currName, const string &toName, 
         cout << RED << "Trade rejected." << DEFAULT << endl;
         return false;
     }
+}
+
+bool Controller::askBuyResponse(const std::string &propertyName, double cost) {
+    cout << "Do you buy the buy the Property " << propertyName << ", which will cost you $" << cost << "?" << endl;
+    return yesOrNoResponse();
 }
 
 
