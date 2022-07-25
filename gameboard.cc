@@ -133,6 +133,9 @@ void GameBoard::start() {
 }
 
 void GameBoard::move(int distance) {
+    if (distance == 0) return;
+    curPlayer->setNumToMove(0);
+
     int cur = curPlayer->getLocation();
     cells[cur]->leave(curPlayer->getDisplayChar());
 
@@ -149,10 +152,10 @@ void GameBoard::move(int distance) {
     }
     curPlayer->setLocation(dest);
     
-    int final = curPlayer->getLocation();
-    auto *p = dynamic_cast<Property *>(cells[final].get());
+    // int final = curPlayer->getLocation();
+    auto *p = dynamic_cast<Property *>(cells[dest].get());
     if (p && !p->getOwner()) {
-        bool willBuy = Controller::askBuyResponse(cells[final]->getName(), p->getCost());
+        bool willBuy = Controller::askBuyResponse(cells[dest]->getName(), p->getCost());
         if (willBuy) {
             p->boughtBy(*curPlayer, p->getCost());
         } else {
@@ -160,22 +163,32 @@ void GameBoard::move(int distance) {
             for (auto &i: players) {
                 allPlayersName.emplace_back(i->getName());
             }
-            pair<string, double> bidInfo = Controller::auction(vector<string>{cells[final]->getName()}, allPlayersName);
+            pair<string, double> bidInfo = Controller::auction(vector<string>{cells[dest]->getName()}, allPlayersName);
             Player *bidWinner = getPlayer(bidInfo.first);
             // TODO what if bankrupt here?
             p->boughtBy(*bidWinner, bidInfo.second);
         }
     }
 
-    cells[final]->landOn(*curPlayer);
+    cells[dest]->landOn(*curPlayer);
+
+    move(curPlayer->getNumToMove());
+    if (curPlayer->getGoToOSAP()) {
+        curPlayer->setGoToOSAP(false);
+        cells[dest]->leave(curPlayer->getDisplayChar());
+        curPlayer->setLocation(osapIndex);
+        cells[osapIndex]->landOn(*curPlayer);
+    }
     if (curPlayer->getShouldMoveToTims()) {
-        cells[final]->leave(curPlayer->getDisplayChar());
+        cells[dest]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
         controller->next();
     }
 }
 
+// g->isTimsLine: return curPlayer->isTimsLine
+// moveoutTims(int opt) 1-roll() 2-usecup 3-pay (1/2 pay, 3 - forcePay)
 
 bool GameBoard::inTimsLine() { return curPlayer->inTimsLine(); }
 

@@ -13,6 +13,8 @@ class Player {
   double cash;
   int numCup;
   int curLocation;
+  int numToMove;
+  bool goToOSAP;
   bool isInTimsLine;
   int inTimsRound;
   bool shouldMoveToTims;
@@ -29,7 +31,10 @@ class Player {
   double getCash() const;
   char getDisplayChar() const;
   int getNumCup() const;
+  int getLocation() const;
   void setLocation(int index);
+  int getNumToMove() const;
+  void setNumToMove(int num);
   void addCups(int num);
   void useCup();
   void pay(double value, Player *receiver = nullptr); // reject if not enough cash
@@ -39,13 +44,14 @@ class Player {
   void sentToTimsLine(int index);
   void setShouldMoveToTims();
   bool getShouldMoveToTims() const;
+  void setGoToOSAP(bool state);
+  bool getGoToOSAP() const;
   void removeFromTimsLine();
   void addTimsLineRound();
   int getTimsLineRound();
   int getRollTimes() const;
   void addRollTimes();
   void initRollTimes();
-  int getLocation() const;
   bool getRollState() const;
   void setRollState(bool state);
   double getDebtAmount() const;
