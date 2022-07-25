@@ -137,14 +137,15 @@ void GameBoard::move(int distance) {
     cells[cur]->leave(curPlayer->getDisplayChar());
 
     int size = static_cast<int>(cells.size());
-    int dest;
+    int dest = cur;
+
     for (int i = 1; i <= abs(distance); ++i) {
         if (distance >= 0) {
             dest = (cur + i >= size) ? cur + i - size : cur + i;
         } else {
             dest = (cur - i < 0) ? cur - i + size : cur - i;
         }
-        cells[dest]->passBy(*curPlayer);
+        if (i != abs(distance)) cells[dest]->passBy(*curPlayer);
     }
     curPlayer->setLocation(dest);
     
@@ -171,57 +172,83 @@ void GameBoard::move(int distance) {
         cells[final]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
-        curPlayer->setRollState(false);
+        controller->next();
     }
 }
 
-// g->isTimsLine: return curPlayer->isTimsLine
-// moveoutTims(int opt) 1-roll() 2-usecup 3-pay (1/2 pay, 3 - forcePay)
 
 bool GameBoard::inTimsLine() { return curPlayer->inTimsLine(); }
 
-void GameBoard::roll(bool testMode, int d1, int d2) {
-    if (!curPlayer->getRollState()) throw InvalidCmd{"roll"};
-    int roll1;
-    int roll2;
-    if (testMode) {
-        roll1 = d1;
-        roll2 = d2;
+void GameBoard::moveOutTims(int opt) {
+    // 1 for pay, 2 for cup
+    if (opt == 1) {
+        curPlayer->removeFromTimsLine();
+        if (hasRolled) {
+            move(dice1->getValue() + dice2->getValue());
+        }
+        curPlayer->forcePay(50);
     } else {
-        roll1 = dice1->roll();
-        roll2 = dice2->roll();
+        curPlayer->useCup();
+        if (hasRolled) {
+            move(dice1->getValue() + dice2->getValue());
+        }
+        curPlayer->removeFromTimsLine();
     }
-    
-    curPlayer->addRollTimes();
+}
 
-    // TODO TimsLine check
+void GameBoard::roll(int d1, int d2) {
+    if (!curPlayer->getRollState()) throw InvalidRoll{};
+    dice1->setValue(d1);
+    dice2->setValue(d2);
+    processRoll();
+}
+
+void GameBoard::roll() {
+    if (!curPlayer->getRollState()) throw InvalidRoll{};
+    dice1->roll();
+    dice2->roll();
+    processRoll();
+}
+
+void GameBoard::processRoll() {
+    hasRolled = true;
+    curPlayer->addRollTimes();
+    int roll1 = dice1->getValue();
+    int roll2 = dice2->getValue();
+    curPlayer->setRollState(roll1 == roll2);
+
     if (curPlayer->inTimsLine()) {
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
-            curPlayer->setRollState(false);
-        } else if (curPlayer->getRollTimes() == 2) {
-            curPlayer->setRollState(false);
+            move(roll1 + roll2);
         }
+        curPlayer->setRollState(false);
     } else {
         if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
+            cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
             curPlayer->sentToTimsLine(timsLineIndex);
+            cells[timsLineIndex]->landOn(*curPlayer);
             curPlayer->setRollState(false);
+            controller->next();
         } else {
             move(roll1 + roll2);
-            curPlayer->setRollState(roll1 == roll2);
         }
     }
 }
 
 void GameBoard::next() {
-    if (curPlayer->getRollState()) {
-        throw InvalidCmd{"next"};
-    }
+    if (curPlayer->getRollState()) throw StillCanRoll{};
+    else if (hasDebt()) throw HasDebt{};
+    else if (curPlayer->getTimsLineRound() >= 3) throw MaxTimsLine{};
 
+    if (curPlayer->inTimsLine()) {
+        curPlayer->addTimsLineRound();
+    }
     curPlayerIndex = curPlayerIndex == players.size() - 1 ? 0 : curPlayerIndex + 1;
     curPlayer = players[curPlayerIndex].get();
     curPlayer->initRollTimes();
     curPlayer->setRollState(true);
+    hasRolled = false;
 }
 
 string GameBoard::getCurPlayerName() { return curPlayer->getName(); }
@@ -381,13 +408,13 @@ void GameBoard::payDebt() {
     curPlayer->payDebt();
 }
 
-bool GameBoard::needDealWithDebt() {
+bool GameBoard::hasDebt() {
     return curPlayer->getDebtAmount() != 0;
 }
 
 void GameBoard::bankrupt() {
     if (assetsValue() >= curPlayer->getDebtAmount()) {
-        throw InvalidCmd{"bankrupt"};
+        throw InvalidBankrupt{};
     }
 
     Player *creditor = curPlayer->getCreditor();

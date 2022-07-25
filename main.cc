@@ -23,11 +23,12 @@ int main(int argc, char *argv[]) {
     gb.setController(&c);
     c.setGameBoard(&gb);
 
-    if (argc == 1) c.addPlayers();
+    bool addPlayers = true;
 
     for (int i = 1; i < argc; ++i) {
         string theArg = argv[i];
         if (theArg == "-load") {
+            addPlayers = false;
             if (i + 1 < argc) {
                 string filename = argv[++i];
                 ifstream f(filename);
@@ -40,13 +41,13 @@ int main(int argc, char *argv[]) {
                 cerr << "Please provide a filename." << endl;
             }
         } else if (theArg == "-testing") {
-            // TODO set testing
             c.setToTestMode();
         } else if (theArg == "-enhanced") {
             // TODO set enhanced
         }
     }
 
+    if (addPlayers) c.addPlayers();
     c.play();
     return 0;
 }

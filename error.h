@@ -5,6 +5,7 @@
 #include <utility>
 
 class Error : public std::exception {
+ protected:
   std::string msg;
  public:
   explicit Error(const std::string &msg);
@@ -94,9 +95,29 @@ class CauseDebt: public Error {
   CauseDebt(const std::string &playerName, double debtAmount);
 };
 
-class InvalidCmd : public Error {
+class InvalidRoll : public Error {
  public:
-  explicit InvalidCmd(const std::string &cmdName);
+  InvalidRoll();
+};
+
+class StillCanRoll: public Error {
+ public:
+  StillCanRoll();
+};
+
+class HasDebt: public Error {
+ public:
+  HasDebt();
+};
+
+class MaxTimsLine: public Error {
+ public:
+  MaxTimsLine();
+};
+
+class InvalidBankrupt : public Error {
+ public:
+  InvalidBankrupt();
 };
 
 

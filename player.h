@@ -14,6 +14,7 @@ class Player {
   int numCup;
   int curLocation;
   bool isInTimsLine;
+  int inTimsRound;
   bool shouldMoveToTims;
   int rollTimes;
   bool canRoll;
@@ -39,6 +40,8 @@ class Player {
   void setShouldMoveToTims();
   bool getShouldMoveToTims() const;
   void removeFromTimsLine();
+  void addTimsLineRound();
+  int getTimsLineRound();
   int getRollTimes() const;
   void addRollTimes();
   void initRollTimes();

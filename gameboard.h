@@ -25,6 +25,7 @@ class GameBoard {
   std::unique_ptr<Dice> dice2;
   const int timsLineIndex = 10;
   const int osapIndex = 0;
+  bool hasRolled;
 
   Controller *controller = nullptr;
   TextDisplay *td = nullptr;
@@ -39,6 +40,7 @@ class GameBoard {
   double assetsValue();
   static void noImprovementCheck(Property *p) ;
   void assets(Player *p);
+  void processRoll();
 
  public:
   GameBoard();
@@ -47,7 +49,9 @@ class GameBoard {
   void start();
   void setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged);
   void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
-  void roll(bool testMode = false, int d1 = 0, int d2 = 0);
+  void roll();
+  void roll(int d1, int d2);
+  void moveOutTims(int opt);
   bool inTimsLine();
   void next();
   std::string getCurPlayerName();
@@ -63,7 +67,7 @@ class GameBoard {
   void allAssets();
   bool isWin();
   void bankrupt();
-  bool needDealWithDebt();
+  bool hasDebt();
 
   void setTextDisplay(TextDisplay *td);
   friend std::ostream &operator<<(std::ostream &out, const GameBoard &gb);

@@ -7,14 +7,13 @@
 #include "gameboard.h"
 #include "dice.h"
 #include "termcodes.h"
-#include "state.h"
 
 using namespace std;
 
 class Property;
 class AcademicBuilding;
 
-Controller::Controller(): testMode{false} {};
+Controller::Controller(): testMode{false} {}
 
 void Controller::setGameBoard(GameBoard *gb) {
     g = gb;
@@ -24,62 +23,39 @@ void Controller::setGameBoard(GameBoard *gb) {
 void Controller::setToTestMode() { testMode = true; }
 
 void Controller::roll() {
-    // if g->isTimsLine
-        // cout << "mmmmmmmm"
-        // try
-        //  g->moveOutTim(int opt) 1-roll 2-cup 3-pay
-        // catch
-    // else
-    // try
-    //  g->roll()
-    // catch
-
-    // TODO tims, getdicesum
-    try {
-        if (testMode) {
-            int roll1;
-            int roll2;
-            cout << GREEN << "Please enter the first roll: " << DEFAULT;
-            while (!(cin >> roll1)) {
-                cin.clear();
-                cin.ignore();
-                cout << RED << "Please enter a valid number: " << DEFAULT;
-            }
-            cout << GREEN << "Please enter the second roll: " << DEFAULT;
-            while (!(cin >> roll2)) {
-                cin.clear();
-                cin.ignore();
-                cout << RED << "Please enter a valid number: " << DEFAULT;
-            }
-
-            g->roll(true, roll1, roll2);
-        } else {
+    bool inTims = g->inTimsLine();
+    if (testMode) {
+        string s1, s2;
+        cin >> s1 >> s2;
+        int roll1 = -1;
+        int roll2 = -1;
+        istringstream ss1{s1};
+        ss1 >> roll1;
+        istringstream ss2{s2};
+        ss2 >> roll2;
+        if (roll1 < 0 || roll2 < 0) {
+            cout << RED << "Please enter two non-negative number after roll." << DEFAULT << endl;
+            return;
+        }
+        try {
+            g->roll(roll1, roll2);
+        } catch (exception &e) {
+            cout << RED << e.what() << DEFAULT << endl;
+            return;
+        }
+    } else {
+        try {
             g->roll();
+        } catch (exception &e) {
+            cout << RED << e.what() << DEFAULT << endl;
+            return;
         }
-    } catch (exception &e) {
-        cout << e.what() << endl;
-        cout << RED << "You may not roll anymore in this turn." << DEFAULT << endl;
-        return;
-    } catch (inTims &) {
-        cout << "Unfortunately, you are currently in Tims Line. Please choose 1 of the 3 options (1-3):" << endl
-             << "1 - roll (you will get out if you roll double)" << endl
-             << "2 - use Roll Up the Rim cup (if you have)" << endl
-             << "3 - pay 50" << endl;
-        int option;
-        while (!(cin >> option) || option <= 3 || option > 3) {
-            cout << "Invalid input. Please choose a number between 1 and 3: ";
-        }
-        return;
-//        if (option == 1) {
-//            g->roll();
-//            cout << g;
-//        } else if (option == 2) {
-//            g->getCurPlayer()->useCup();
-//        } else {
-//            g->getCurPlayer()->forcePay(50);
-//        }
     }
-    cout << *g;
+    if (!inTims) cout << *g;
+    else if (!g->inTimsLine()) {
+        cout << GREEN << "Congrats! You're moved out of the Tims Line." << DEFAULT << endl;
+        cout << *g;
+    }
 }
 
 void Controller::improve() {
@@ -131,9 +107,15 @@ void Controller::next() {
     try {
         g->next();
     } catch (exception &e) {
-        cout << RED << "Unable to go next. You need to roll another time before finishing your turn." << DEFAULT << endl;
+        cout << RED << e.what() << DEFAULT << endl;
+        return;
     }
-    cout << GREEN << g->getCurPlayerName() << ": it is now your turn." << DEFAULT << endl;
+    cout << GREEN << g->getCurPlayerName() << ": it is now your round." << DEFAULT << endl;
+    if (g->inTimsLine()) {
+        cout << "Unfortunately, you are currently in Tims Line. You're give with two more commands:" << endl
+             << "cup: use roll Up the Rim cup (if you have) to move out of the Tims Line" << endl
+             << "pay: pay $50 move out of the Tims Line" << endl;
+    }
 }
 
 void Controller::mortgage() {
@@ -158,7 +140,7 @@ void Controller::bankrupt() {
     try {
         g->bankrupt();
     } catch (exception &e) {
-        cout << "Not able to bankrupt" << endl;
+        cout << RED << e.what() << DEFAULT << endl;
     }
 }
 
@@ -214,6 +196,27 @@ void Controller::addPlayers() {
     }
 }
 
+void Controller::payTims() {
+    try {
+        g->moveOutTims(1);
+    } catch (exception &e) {
+        cout << RED << e.what() << DEFAULT << endl;
+        return;
+    }
+    cout << GREEN << "Congrats! You're moved out of the Tims Line." << DEFAULT << endl;
+    cout << *g;
+}
+
+void Controller::useCups() {
+    try {
+        g->moveOutTims(2);
+    } catch (exception &e) {
+        cout << RED << e.what() << DEFAULT << endl;
+        return;
+    }
+    cout << GREEN << "Congrats! You're moved out of the Tims Line." << DEFAULT << endl;
+}
+
 void Controller::play() {
     cout << "Game started! Welcome to watopoly!" << endl;
     g->start();
@@ -221,10 +224,10 @@ void Controller::play() {
     cout << g->getCurPlayerName() << ": please enter a command: ";
     while (cin >> cmd) {
         if (cmd == "roll") {
-            if (g->needDealWithDebt()) cout << "You need to pay your debt first." << endl;
+            if (g->hasDebt()) cout << "You need to pay your debt first." << endl;
             else roll();
         } else if (cmd == "next") {
-            if (g->needDealWithDebt()) cout << "You need to pay your debt first." << endl;
+            if (g->hasDebt()) cout << "You need to pay your debt first." << endl;
             else next();
         } else if (cmd == "trade") {
             trade();
@@ -241,23 +244,27 @@ void Controller::play() {
         } else if (cmd == "all") {
             g->allAssets();
         } else if (cmd == "save") {
-            string filename;
-            cin >> filename;
-            save(filename);
-            cout << GREEN << "Successfully saved to file " << filename << DEFAULT << endl;
-        } else if (cmd == "pay" && g->needDealWithDebt()) {
+            save();
+        } else if (cmd == "pay" && g->inTimsLine()) {
+            payTims();
+        } else if (cmd == "cup" && g->inTimsLine()) {
+            useCups();
+        } else if (cmd == "debt" && g->hasDebt()) {
             payDebt();
         } else {
             cout << "Invalid command." << endl;
         }
-        if (g->needDealWithDebt()) {
+        cout << g->getCurPlayerName() << ": ";
+        if (g->hasDebt()) {
             cout << YELLOW << "You currently has debt, do you want to pay the bill or continue raising money?;" << DEFAULT << endl
-                 << "Input pay or other available command: " << endl;
+                 << "Input debt or other available command: " << endl;
         }
     }
 }
 
-void Controller::save(string& filename) {
+void Controller::save() {
+    string filename;
+    cin >> filename;
     ofstream ofs{filename};
     auto players = g->getAllPlayersInfo();
     auto properties = g->getAllPropertiesInfo();
@@ -283,6 +290,7 @@ void Controller::save(string& filename) {
             ofs << name << ' ' << owner << ' ' << improvements << ' ' << endl;
         }
         ofs.close();
+        cout << GREEN << "Successfully saved to file " << filename << DEFAULT << endl;
     } else {
         cout << RED << "Unable to open the file." << DEFAULT << endl;
     }

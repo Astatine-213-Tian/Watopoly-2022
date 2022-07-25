@@ -5,7 +5,7 @@ using namespace std;
 
 Player::Player(std::string name, char displayChar, int timCups, double cash, int position, bool inTims, int timsRound):
     name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position},
-    isInTimsLine{inTims}, rollTimes{timsRound}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
+    isInTimsLine{inTims}, rollTimes{0}, canRoll{true}, inTimsRound{timsRound}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
 
 string Player::getName() const{ return name; }
 
@@ -21,6 +21,8 @@ void Player::sentToTimsLine(int timsIndex) {
     curLocation = timsIndex;
     shouldMoveToTims = false;
     isInTimsLine = true;
+    inTimsRound = 0;
+    canRoll = false;
 }
 
 void Player::addCups(int num) {
@@ -36,7 +38,14 @@ void Player::receiveMoney(double value) { cash += value; }
 
 bool Player::inTimsLine() const{ return isInTimsLine; }
 
-void Player::removeFromTimsLine() { isInTimsLine = false; }
+void Player::addTimsLineRound() { ++inTimsRound; }
+
+int Player::getTimsLineRound() { return inTimsRound; }
+
+void Player::removeFromTimsLine() {
+    isInTimsLine = false;
+    inTimsRound = 0;
+}
 
 void Player::setShouldMoveToTims() { shouldMoveToTims = true; }
 
@@ -50,7 +59,9 @@ void Player::initRollTimes() { rollTimes = 0; }
 
 int Player::getLocation() const{ return curLocation; }
 
-bool Player::getRollState() const{ return canRoll; }
+bool Player::getRollState() const{
+    return canRoll;
+}
 
 void Player::setRollState(bool state) { canRoll = state; }
 

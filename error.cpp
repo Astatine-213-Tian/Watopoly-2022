@@ -40,4 +40,12 @@ NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName +
 CauseDebt::CauseDebt(const std::string &playerName, double debtAmount) :
     Error{playerName + ", your last action result in debt. Current debt amount: " + to_string(debtAmount) + "."} {}
 
-InvalidCmd::InvalidCmd(const std::string &cmdName) : Error{"You cannot use command " + cmdName + "at this stage."} {}
+InvalidRoll::InvalidRoll() : Error{"You cannot roll anymore this round."} {}
+
+StillCanRoll::StillCanRoll() : Error{"You still can roll."} {}
+
+HasDebt::HasDebt() : Error{"You currently has debt. Please solve it first. "} {}
+
+MaxTimsLine::MaxTimsLine() : Error{"It's your third turn in DC. Please move out."} {}
+
+InvalidBankrupt::InvalidBankrupt() : Error{"You still have enough assets. Cannot bankrupt at this stage."} {}

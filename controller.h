@@ -8,8 +8,8 @@ class GameBoard;
 
 class Controller {
   GameBoard *g = nullptr;
+  bool testMode;
 //  void processUsualCmd(const std::string &cmd);
-  void next();
   void roll();
   void trade();
   void improve();
@@ -17,9 +17,10 @@ class Controller {
   void unmortgage();
   void payDebt();
   void bankrupt();
-  void save(std::string& filename);
+  void save();
+  void payTims();
+  void useCups();
   static bool yesOrNoResponse();
-  bool testMode;
 
  public:
   Controller();
@@ -27,6 +28,7 @@ class Controller {
   void addPlayers();
   void setToTestMode();
   void play();
+  void next();
   void load(const std::string& filename);
   static bool askTradeResponse(const std::string &curName, const std::string &toName, const std::string &curGive, const std::string &curReceive);
   static bool askBuyResponse(const std::string &propertyName, double cost);
