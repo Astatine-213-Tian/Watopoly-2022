@@ -111,11 +111,6 @@ void Controller::next() {
         return;
     }
     cout << GREEN << g->getCurPlayerName() << ": it is now your round." << DEFAULT << endl;
-    if (g->inTimsLine()) {
-        cout << "Unfortunately, you are currently in Tims Line. You're give with two more commands:" << endl
-             << "cup: use roll Up the Rim cup (if you have) to move out of the Tims Line" << endl
-             << "pay: pay $50 move out of the Tims Line" << endl;
-    }
 }
 
 void Controller::mortgage() {
@@ -245,20 +240,44 @@ void Controller::play() {
             g->allAssets();
         } else if (cmd == "save") {
             save();
-        } else if (cmd == "pay" && g->inTimsLine()) {
-            payTims();
-        } else if (cmd == "cup" && g->inTimsLine()) {
-            useCups();
         } else if (cmd == "debt" && g->hasDebt()) {
             payDebt();
         } else {
-            cout << "Invalid command." << endl;
+            cout << RED << "Invalid command." << DEFAULT << endl;
         }
-        cout << g->getCurPlayerName() << ": ";
+
+        if (g->askToLeaveTims()) {
+            leaveDC();
+        }
         if (g->hasDebt()) {
             cout << YELLOW << "You currently has debt, do you want to pay the bill or continue raising money?;" << DEFAULT << endl
-                 << "Input debt or other available command: " << endl;
+                 << "Input debt or other available command. " << endl;
         }
+        cout << g->getCurPlayerName() << ": ";
+    }
+}
+
+void Controller::leaveDC() {
+    cout << YELLOW << "You are currently stuck at DC Tim Line, please use roll/cup/pay to leave (you may only choose one once): " << DEFAULT << endl;
+    string cmd;
+    while (cin >> cmd) {
+        if (cmd == "roll") {
+            roll();
+            if (g->inTimsLine()) {
+                if (g->inTimsRound() >= 3) {
+                    cout << YELLOW << "It's your third round now, please choose pay or cup: " << DEFAULT << endl;
+                    continue;
+                }
+                cout << YELLOW << "Oooops, you're still stuck at DC." << DEFAULT << endl;
+            }
+            break;
+        } else if (cmd == "pay") {
+            payTims();
+            if (!g->inTimsLine()) break;
+        } else if (cmd == "cup") {
+            useCups();
+            if (!g->inTimsLine()) break;
+        } else cout << RED << "Invalid command." << DEFAULT << endl;
     }
 }
 

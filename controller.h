@@ -20,6 +20,7 @@ class Controller {
   void save();
   void payTims();
   void useCups();
+  void leaveDC();
   static bool yesOrNoResponse();
 
  public:

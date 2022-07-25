@@ -23,7 +23,7 @@
 
 using namespace std;
 
-GameBoard::GameBoard() : curPlayer{nullptr}, curPlayerIndex{0}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()} {}
+GameBoard::GameBoard() : curPlayer{nullptr}, curPlayerIndex{0}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()}, hasRolled{false} {}
 
 void GameBoard::init() {
     blocks.emplace_back(make_unique<MonopolyBlock>("Art1", 50));
@@ -187,22 +187,30 @@ void GameBoard::move(int distance) {
     }
 }
 
-// g->isTimsLine: return curPlayer->isTimsLine
-// moveoutTims(int opt) 1-roll() 2-usecup 3-pay (1/2 pay, 3 - forcePay)
 
-bool GameBoard::inTimsLine() { return curPlayer->inTimsLine(); }
+bool GameBoard::inTimsLine() {
+    return curPlayer->inTimsLine();
+}
+
+bool GameBoard::askToLeaveTims() {
+    return curPlayer->inTimsLine() && !hasRolled;
+}
+
+int GameBoard::inTimsRound() {
+    return curPlayer->getTimsLineRound();
+}
 
 void GameBoard::moveOutTims(int opt) {
     // 1 for pay, 2 for cup
     if (opt == 1) {
-        curPlayer->removeFromTimsLine();
-        if (hasRolled) {
+        if (hasRolled && curPlayer->getTimsLineRound() >= 3) {
             move(dice1->getValue() + dice2->getValue());
         }
+        curPlayer->removeFromTimsLine();
         curPlayer->forcePay(50);
     } else {
         curPlayer->useCup();
-        if (hasRolled) {
+        if (hasRolled && curPlayer->getTimsLineRound() >= 3) {
             move(dice1->getValue() + dice2->getValue());
         }
         curPlayer->removeFromTimsLine();
@@ -252,7 +260,6 @@ void GameBoard::processRoll() {
 void GameBoard::next() {
     if (curPlayer->getRollState()) throw StillCanRoll{};
     else if (hasDebt()) throw HasDebt{};
-    else if (curPlayer->getTimsLineRound() >= 3) throw MaxTimsLine{};
 
     if (curPlayer->inTimsLine()) {
         curPlayer->addTimsLineRound();

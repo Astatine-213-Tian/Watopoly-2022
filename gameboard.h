@@ -53,6 +53,8 @@ class GameBoard {
   void roll(int d1, int d2);
   void moveOutTims(int opt);
   bool inTimsLine();
+  bool askToLeaveTims();
+  int inTimsRound();
   void next();
   std::string getCurPlayerName();
   std::unique_ptr<std::vector<std::tuple<std::string, char, int, double, int>>> getAllPlayersInfo();
