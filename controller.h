@@ -18,9 +18,7 @@ class Controller {
   void payDebt();
   void bankrupt();
   void save();
-  void payTims();
-  void useCups();
-  void leaveDC();
+  void leaveTims();
   static bool yesOrNoResponse();
 
  public:

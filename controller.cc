@@ -191,26 +191,6 @@ void Controller::addPlayers() {
     }
 }
 
-void Controller::payTims() {
-    try {
-        g->moveOutTims(1);
-    } catch (exception &e) {
-        cout << RED << e.what() << DEFAULT << endl;
-        return;
-    }
-    cout << GREEN << "Congrats! You're moved out of the Tims Line." << DEFAULT << endl;
-    cout << *g;
-}
-
-void Controller::useCups() {
-    try {
-        g->moveOutTims(2);
-    } catch (exception &e) {
-        cout << RED << e.what() << DEFAULT << endl;
-        return;
-    }
-    cout << GREEN << "Congrats! You're moved out of the Tims Line." << DEFAULT << endl;
-}
 
 void Controller::play() {
     cout << "Game started! Welcome to watopoly!" << endl;
@@ -247,7 +227,7 @@ void Controller::play() {
         }
 
         if (g->askToLeaveTims()) {
-            leaveDC();
+            leaveTims();
         }
         if (g->hasDebt()) {
             cout << YELLOW << "You currently has debt, do you want to pay the bill or continue raising money?;" << DEFAULT << endl
@@ -257,27 +237,39 @@ void Controller::play() {
     }
 }
 
-void Controller::leaveDC() {
-    cout << YELLOW << "You are currently stuck at DC Tim Line, please use roll/cup/pay to leave (you may only choose one once): " << DEFAULT << endl;
+
+void Controller::leaveTims() {
+    cout << YELLOW << "You are currently stuck at DC Tims Line, please use roll/cup/pay to leave (you may only choose one once): " << DEFAULT << endl;
     string cmd;
     while (cin >> cmd) {
         if (cmd == "roll") {
             roll();
-            if (g->inTimsLine()) {
-                if (g->inTimsRound() >= 3) {
-                    cout << YELLOW << "It's your third round now, please choose pay or cup: " << DEFAULT << endl;
-                    continue;
-                }
-                cout << YELLOW << "Oooops, you're still stuck at DC." << DEFAULT << endl;
+            if (g->mustLeaveTims()) {
+                cout << YELLOW << "Oops, it's your third round at Tims Line now, you must leave by pay or cup: " << DEFAULT << endl;
+                continue;
             }
             break;
         } else if (cmd == "pay") {
-            payTims();
-            if (!g->inTimsLine()) break;
+            try {
+                g->moveOutTims(1);
+            } catch (exception &e) {
+                cout << RED << e.what() << DEFAULT << endl;
+            }
+            break;
         } else if (cmd == "cup") {
-            useCups();
-            if (!g->inTimsLine()) break;
+            try {
+                g->moveOutTims(2);
+            } catch (exception &e) {
+                cout << RED << e.what() << DEFAULT << endl;
+                continue;
+            }
         } else cout << RED << "Invalid command." << DEFAULT << endl;
+    }
+    if (!g->inTimsLine()) {
+        cout << GREEN << "Congrats! You moved out from the Tims Line." << DEFAULT << endl;
+        cout << *g;
+    } else {
+        cout << YELLOW << "Oooops, you're still stuck at DC Tims Line." << DEFAULT << endl;
     }
 }
 

@@ -196,21 +196,22 @@ bool GameBoard::askToLeaveTims() {
     return curPlayer->inTimsLine() && !hasRolled;
 }
 
-int GameBoard::inTimsRound() {
-    return curPlayer->getTimsLineRound();
+bool GameBoard::mustLeaveTims() {
+    return hasRolled && curPlayer->getTimsLineRound() >= 3;
 }
 
 void GameBoard::moveOutTims(int opt) {
     // 1 for pay, 2 for cup
+    bool forceOut = hasRolled && curPlayer->getTimsLineRound() >= 3;
     if (opt == 1) {
-        if (hasRolled && curPlayer->getTimsLineRound() >= 3) {
+        if (forceOut) {
             move(dice1->getValue() + dice2->getValue());
         }
         curPlayer->removeFromTimsLine();
         curPlayer->forcePay(50);
     } else {
         curPlayer->useCup();
-        if (hasRolled && curPlayer->getTimsLineRound() >= 3) {
+        if (forceOut) {
             move(dice1->getValue() + dice2->getValue());
         }
         curPlayer->removeFromTimsLine();

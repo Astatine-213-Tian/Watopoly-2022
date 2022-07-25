@@ -110,11 +110,6 @@ class HasDebt: public Error {
   HasDebt();
 };
 
-class MaxTimsLine: public Error {
- public:
-  MaxTimsLine();
-};
-
 class InvalidBankrupt : public Error {
  public:
   InvalidBankrupt();

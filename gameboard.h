@@ -54,7 +54,7 @@ class GameBoard {
   void moveOutTims(int opt);
   bool inTimsLine();
   bool askToLeaveTims();
-  int inTimsRound();
+  bool mustLeaveTims();
   void next();
   std::string getCurPlayerName();
   std::unique_ptr<std::vector<std::tuple<std::string, char, int, double, int>>> getAllPlayersInfo();

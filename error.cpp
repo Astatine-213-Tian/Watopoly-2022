@@ -46,6 +46,4 @@ StillCanRoll::StillCanRoll() : Error{"You still can roll."} {}
 
 HasDebt::HasDebt() : Error{"You currently has debt. Please solve it first. "} {}
 
-MaxTimsLine::MaxTimsLine() : Error{"It's your third turn in DC. Please move out."} {}
-
 InvalidBankrupt::InvalidBankrupt() : Error{"You still have enough assets. Cannot bankrupt at this stage."} {}
