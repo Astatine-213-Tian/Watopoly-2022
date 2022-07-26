@@ -30,15 +30,12 @@ PropertyStillUnMortage::PropertyStillUnMortage(const string &name) : Error{name 
 
 TradeMoneyWithMoney::TradeMoneyWithMoney() : Error{"You're trying to trade money with money."} {}
 
-NotEnoughCup::NotEnoughCup() : Error{"You don't have enough cup to use!"} {}
+NotEnoughCup::NotEnoughCup() : Error{"You don't have enough cup to use! Try another way to leave."} {}
 
 BuildingStillWithImprove::BuildingStillWithImprove(const string &name) :
     Error{name + " still have improvements. All improvements need to be sold before further action"}, propertyName{name} {}
 
 NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName + " don't have enough cash to complete the trade."} {}
-
-CauseDebt::CauseDebt(const std::string &playerName, double debtAmount) :
-    Error{playerName + ", your last action result in debt. Current debt amount: " + to_string(debtAmount) + "."} {}
 
 InvalidRoll::InvalidRoll() : Error{"You cannot roll anymore this round."} {}
 

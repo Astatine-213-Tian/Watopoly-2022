@@ -19,7 +19,6 @@ class GameBoard {
   std::vector<std::shared_ptr<Cell>> cells;
   std::vector<std::unique_ptr<MonopolyBlock>> blocks;
   std::vector<std::shared_ptr<Property>> properties;
-  Player *curPlayer;
   int curPlayerIndex;
   std::unique_ptr<Dice> dice1;
   std::unique_ptr<Dice> dice2;
@@ -39,24 +38,27 @@ class GameBoard {
   void trade(Player &toWhom, Property &property, double value);
   double assetsValue();
   static void noImprovementCheck(Property *p) ;
-  void assets(Player *p);
+  void assets(int playerIndex);
   void processRoll();
+  void moveToNextPlayer();
+  int totalCups();
 
  public:
   GameBoard();
   void init();
   void setController(Controller *c);
-  void start();
   void setProperty(const std::string &name, const std::string &owner, int improvements, bool mortgaged);
   void addPlayer(const std::string &name, char displayChar, int position, int timsCups = 0, double money = 1500, bool isInTims = false, int timsRound = 0);
-  void roll();
+  std::pair<int, int> roll();
   void roll(int d1, int d2);
-  void moveOutTims(int opt);
+  void payTims();
+  void useCups();
   bool inTimsLine();
   bool askToLeaveTims();
   bool mustLeaveTims();
   void next();
   std::string getCurPlayerName();
+  std::vector<std::string> getAllPlayersName();
   std::unique_ptr<std::vector<std::tuple<std::string, char, int, double, int>>> getAllPlayersInfo();
   std::unique_ptr<std::vector<std::tuple<std::string, std::string, int, bool>>> getAllPropertiesInfo();
   void trade(const std::string &name, const std::string &give, const std::string &receive);
@@ -69,7 +71,7 @@ class GameBoard {
   void allAssets();
   bool isWin();
   void bankrupt();
-  bool hasDebt();
+  double debtAmount();
 
   void setTextDisplay(TextDisplay *td);
   friend std::ostream &operator<<(std::ostream &out, const GameBoard &gb);

@@ -3,7 +3,7 @@
 #include "player.h"
 #include "error.h"
 
-Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, isMortgaged{false} {}
+Property::Property(std::string name, double cost): Cell{std::move(name)}, cost{cost}, owner{nullptr}, mortgage{false} {}
 
 Player *Property::getOwner() const { return owner; }
 
@@ -15,43 +15,41 @@ void Property::setOwner(Player *p) {
 double Property::getCost() const { return cost; }
 
 void Property::setMortgage() {
-    if (isMortgaged) throw PropertyStillMortgage{getName()};
+    if (mortgage) throw PropertyStillMortgage{getName()};
     if (getImproveNum() > 0) throw BuildingStillWithImprove{getName()};
     owner->receiveMoney( cost / 2);
-    isMortgaged = true;
+    mortgage = true;
 }
 
 void Property::setUnMortgage() {
-    if (!isMortgaged) throw PropertyStillUnMortage{getName()};
+    if (!mortgage) throw PropertyStillUnMortage{getName()};
     owner->pay(cost * 0.6);
-    isMortgaged = false;
+    mortgage = false;
 }
 
 void Property::passBy(Player &p) { }
 
 void Property::landOnAction(Player &p) {
-    if (!owner || &p == owner || isMortgaged) return;
+    if (!owner || &p == owner || mortgage) return;
     double rent = calculateRent();
     p.forcePay(rent, owner);
 }
 
-bool Property::getMortgageStatus() const { return isMortgaged;}
+bool Property::isMortgage() const { return mortgage;}
 
 double Property::getImproveValue() const { return 0; }
 
 double Property::getTradableValue() const {
-    if (isMortgaged) return 0;
+    if (mortgage) return 0;
     else return cost / 2 + getImproveValue();
 }
 
 int Property::getImproveNum() const { return -1; }
 
-//double Property::getImproveCost() const { return 0; }
-
 void Property::initImproveNum(int improveNum) const {}
 
 void Property::loadInfo(int improveNum, bool mortgaged) {
-    isMortgaged = mortgaged;
+    mortgage = mortgaged;
     initImproveNum(improveNum);
     notifyObservers();
 }

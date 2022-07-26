@@ -3,7 +3,6 @@
 #include <random>
 #include <chrono>
 #include "dice.h"
-#include "iostream"
 
 using namespace std;
 
@@ -16,8 +15,6 @@ int Dice::getValue() const { return value; }
 int Dice::roll() {
     shuffle(diceNums.begin(), diceNums.end(), rng );
     value = diceNums[0];
-    cout << "Dice value: " << value << endl;
-    return value;
 }
 
 void Dice::setValue(int _v) { value = _v; }

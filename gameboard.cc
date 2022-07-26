@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
-#include <algorithm>
 #include "gameboard.h"
 #include "property.h"
 #include "academicBuilding.h"
@@ -19,11 +18,10 @@
 #include "goToTims.h"
 #include "coop.h"
 #include "textdisplay.h"
-//#include "state.h"
 
 using namespace std;
 
-GameBoard::GameBoard() : curPlayer{nullptr}, curPlayerIndex{0}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()}, hasRolled{false} {}
+GameBoard::GameBoard() : curPlayerIndex{0}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()}, hasRolled{false} {}
 
 void GameBoard::init() {
     blocks.emplace_back(make_unique<MonopolyBlock>("Art1", 50));
@@ -120,6 +118,13 @@ void GameBoard::addPlayer(const string &name, char displayChar, int position, in
     cells[position]->initLandOn(*players[players.size() - 1].get());
 }
 
+int GameBoard::totalCups() {
+    int total = 0;
+    for (auto &p: players) {
+        total += p->getNumCup();
+    }
+    return total;
+}
 
 void GameBoard::setProperty(const string &name, const string &owner, int improvements, bool mortgaged) {
     Property *property = getProperty(name);
@@ -128,12 +133,9 @@ void GameBoard::setProperty(const string &name, const string &owner, int improve
     property->loadInfo(improvements, mortgaged);
 }
 
-void GameBoard::start() {
-    curPlayer = players[0].get();
-}
-
 void GameBoard::move(int distance) {
     if (distance == 0) return;
+    Player *curPlayer = players[curPlayerIndex].get();
     curPlayer->setNumToMove(0);
 
     int cur = curPlayer->getLocation();
@@ -152,100 +154,98 @@ void GameBoard::move(int distance) {
     }
     curPlayer->setLocation(dest);
     
-    // int final = curPlayer->getLocation();
     auto *p = dynamic_cast<Property *>(cells[dest].get());
     if (p && !p->getOwner()) {
         bool willBuy = Controller::askBuyResponse(cells[dest]->getName(), p->getCost());
         if (willBuy) {
             p->boughtBy(*curPlayer, p->getCost());
         } else {
-            vector<string> allPlayersName;
-            for (auto &i: players) {
-                allPlayersName.emplace_back(i->getName());
-            }
-            pair<string, double> bidInfo = Controller::auction(vector<string>{cells[dest]->getName()}, allPlayersName);
+            pair<string, double> bidInfo = controller->auction(vector<string>{cells[dest]->getName()});
             Player *bidWinner = getPlayer(bidInfo.first);
-            // TODO what if bankrupt here?
             p->boughtBy(*bidWinner, bidInfo.second);
         }
     }
 
     cells[dest]->landOn(*curPlayer);
 
-    move(curPlayer->getNumToMove());
+    if (totalCups() > 4) curPlayer->addCups(-1);
     if (curPlayer->getGoToOSAP()) {
         curPlayer->setGoToOSAP(false);
         cells[dest]->leave(curPlayer->getDisplayChar());
         curPlayer->setLocation(osapIndex);
         cells[osapIndex]->landOn(*curPlayer);
-    }
-    if (curPlayer->getShouldMoveToTims()) {
+    } else if (curPlayer->getGoToTims()) {
         cells[dest]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
         controller->next();
+    } else if (curPlayer->getNumToMove() != 0) {
+        move(curPlayer->getNumToMove());
     }
 }
 
 
 bool GameBoard::inTimsLine() {
-    return curPlayer->inTimsLine();
+    return players[curPlayerIndex]->inTimsLine();
 }
 
 bool GameBoard::askToLeaveTims() {
-    return curPlayer->inTimsLine() && !hasRolled;
+    return players[curPlayerIndex]->inTimsLine() && !hasRolled;
 }
 
 bool GameBoard::mustLeaveTims() {
-    return hasRolled && curPlayer->getTimsLineRound() >= 3;
+    return hasRolled && players[curPlayerIndex]->getTimsLineRound() >= 3;
 }
 
-void GameBoard::moveOutTims(int opt) {
-    // 1 for pay, 2 for cup
-    bool forceOut = hasRolled && curPlayer->getTimsLineRound() >= 3;
-    if (opt == 1) {
-        if (forceOut) {
-            move(dice1->getValue() + dice2->getValue());
-        }
-        curPlayer->removeFromTimsLine();
-        curPlayer->forcePay(50);
-    } else {
-        curPlayer->useCup();
-        if (forceOut) {
-            move(dice1->getValue() + dice2->getValue());
-        }
-        curPlayer->removeFromTimsLine();
+void GameBoard::payTims() {
+    Player *curPlayer = players[curPlayerIndex].get();
+    curPlayer->removeFromTimsLine();
+    if (mustLeaveTims()) {
+        move(dice1->getValue() + dice2->getValue());
+    }
+    curPlayer->forcePay(50);
+}
+
+void GameBoard::useCups() {
+    Player *curPlayer = players[curPlayerIndex].get();
+    curPlayer->useCup();
+    curPlayer->removeFromTimsLine();
+    if (mustLeaveTims()) {
+        move(dice1->getValue() + dice2->getValue());
     }
 }
 
+
 void GameBoard::roll(int d1, int d2) {
-    if (!curPlayer->getRollState()) throw InvalidRoll{};
+    if (!players[curPlayerIndex]->getRollState()) throw InvalidRoll{};
     dice1->setValue(d1);
     dice2->setValue(d2);
     processRoll();
 }
 
-void GameBoard::roll() {
-    if (!curPlayer->getRollState()) throw InvalidRoll{};
+pair<int, int> GameBoard::roll() {
+    if (!players[curPlayerIndex]->getRollState()) throw InvalidRoll{};
     dice1->roll();
     dice2->roll();
     processRoll();
+    return make_pair(dice1->getValue(), dice2->getValue());
 }
 
 void GameBoard::processRoll() {
+    Player *curPlayer = players[curPlayerIndex].get();
     hasRolled = true;
     curPlayer->addRollTimes();
     int roll1 = dice1->getValue();
     int roll2 = dice2->getValue();
-    curPlayer->setRollState(roll1 == roll2);
 
     if (curPlayer->inTimsLine()) {
+        curPlayer->setRollState(false);
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
             move(roll1 + roll2);
         }
-        curPlayer->setRollState(false);
     } else {
+        curPlayer->setRollState(roll1 == roll2);
         if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
             cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
             curPlayer->sentToTimsLine(timsLineIndex);
@@ -258,21 +258,36 @@ void GameBoard::processRoll() {
     }
 }
 
-void GameBoard::next() {
-    if (curPlayer->getRollState()) throw StillCanRoll{};
-    else if (hasDebt()) throw HasDebt{};
-
-    if (curPlayer->inTimsLine()) {
-        curPlayer->addTimsLineRound();
-    }
+void GameBoard::moveToNextPlayer() {
     curPlayerIndex = curPlayerIndex == players.size() - 1 ? 0 : curPlayerIndex + 1;
-    curPlayer = players[curPlayerIndex].get();
+    auto curPlayer = players[curPlayerIndex].get();
     curPlayer->initRollTimes();
     curPlayer->setRollState(true);
     hasRolled = false;
 }
 
-string GameBoard::getCurPlayerName() { return curPlayer->getName(); }
+void GameBoard::next() {
+    Player *curPlayer = players[curPlayerIndex].get();
+    if (curPlayer->getRollState()) throw StillCanRoll{};
+    else if (curPlayer->getDebtAmount() != 0) throw HasDebt{};
+
+    if (curPlayer->inTimsLine()) {
+        curPlayer->addTimsLineRound();
+    }
+
+    moveToNextPlayer();
+}
+
+string GameBoard::getCurPlayerName() { return players[curPlayerIndex]->getName(); }
+
+std::vector<std::string> GameBoard::getAllPlayersName() {
+    vector<string> allPlayersName;
+    allPlayersName.reserve(players.size());
+    for (auto &i: players) {
+        allPlayersName.emplace_back(i->getName());
+    }
+    return allPlayersName;
+}
 
 unique_ptr<vector<tuple<string, char, int, double, int>>> GameBoard::getAllPlayersInfo() {
     auto res = make_unique<vector<tuple<string, char, int, double, int>>>();
@@ -287,7 +302,7 @@ unique_ptr<vector<tuple<string, string, int, bool>>> GameBoard::getAllProperties
     res->reserve(properties.size());
     for (auto &p: properties) {
         string ownerName = p->getOwner() ? p->getOwner()->getName() : "BANK";
-        res->emplace_back(p->getName(), ownerName, p->getImproveNum(), p->getMortgageStatus());
+        res->emplace_back(p->getName(), ownerName, p->getImproveNum(), p->isMortgage());
     }
     return res;
 }
@@ -323,6 +338,7 @@ void GameBoard::noImprovementCheck(Property *property) {
 }
 
 void GameBoard::trade(const string &name, const string &give, const string &receive) {
+    Player *curPlayer = players[curPlayerIndex].get();
     Player *toWhom = getPlayer(name);
     istringstream ssGive(give);
     istringstream ssReceive(receive);
@@ -335,13 +351,13 @@ void GameBoard::trade(const string &name, const string &give, const string &rece
         }
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
         noImprovementCheck(receiveProperty);
-        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), "$" + to_string(giveMoney), receiveProperty->getName())) {
+        if (controller->askTradeResponse(toWhom->getName(), "$" + to_string(giveMoney), receiveProperty->getName())) {
             trade(*toWhom, giveMoney, *receiveProperty);
         }
     } else if (ssReceive >> receiveMoney) {
         Property *giveProperty = getPlayerProperty(give, curPlayer);
         noImprovementCheck(giveProperty);
-        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), "$" + to_string(receiveMoney))) {
+        if (controller->askTradeResponse(toWhom->getName(), giveProperty->getName(), "$" + to_string(receiveMoney))) {
             trade(*toWhom, *giveProperty, receiveMoney);
         }
     } else {
@@ -349,7 +365,7 @@ void GameBoard::trade(const string &name, const string &give, const string &rece
         noImprovementCheck(giveProperty);
         Property *receiveProperty = getPlayerProperty(receive, toWhom);
         noImprovementCheck(receiveProperty);
-        if (Controller::askTradeResponse(curPlayer->getName(), toWhom->getName(), giveProperty->getName(), receiveProperty->getName())) {
+        if (controller->askTradeResponse(toWhom->getName(), giveProperty->getName(), receiveProperty->getName())) {
             trade(*toWhom, *giveProperty, *receiveProperty);
         }
     }
@@ -357,52 +373,55 @@ void GameBoard::trade(const string &name, const string &give, const string &rece
 
 
 void GameBoard::trade(Player &toWhom, double value, Property &property) {
+    Player *curPlayer = players[curPlayerIndex].get();
     curPlayer->pay(value, &toWhom);
     property.setOwner(curPlayer);
 }
 
 void GameBoard::trade(Player &toWhom, Property &p1, Property &p2) {
     p1.setOwner(&toWhom);
-    p2.setOwner(curPlayer);
+    p2.setOwner( players[curPlayerIndex].get());
 }
 
 void GameBoard::trade(Player &toWhom, Property &property, double value) {
-    toWhom.pay(value, curPlayer);
+    toWhom.pay(value, players[curPlayerIndex].get());
     property.setOwner(&toWhom);
 }
 
 void GameBoard::buyImprove(const string &name) {
-    Property *p = getPlayerProperty(name, curPlayer);
+    Property *p = getPlayerProperty(name, players[curPlayerIndex].get());
     p->addImprove();
 }
 
 void GameBoard::sellImprove(const string &name) {
-    Property *p = getPlayerProperty(name, curPlayer);
+    Property *p = getPlayerProperty(name, players[curPlayerIndex].get());
     p->removeImprove();
 }
 
 
 void GameBoard::mortgage(const string &name) {
-    Property *p = getPlayerProperty(name, curPlayer);
+    Property *p = getPlayerProperty(name, players[curPlayerIndex].get());
     p->setMortgage();
 }
 
 void GameBoard::unmortgage(const string &name) {
-    Property *p = getPlayerProperty(name, curPlayer);
+    Property *p = getPlayerProperty(name, players[curPlayerIndex].get());
     p->setUnMortgage();
 }
 
 double GameBoard::assetsValue() {
     double value = 0;
+    Player *curPlayer = players[curPlayerIndex].get();
     for (auto &i: properties) {
         if (i->getOwner() == curPlayer) value+= i->getTradableValue();
     }
     return value;
 }
 
-void GameBoard::assets() { assets(curPlayer); }
+void GameBoard::assets() { assets(curPlayerIndex); }
 
-void GameBoard::assets(Player *p) {
+void GameBoard::assets(int index) {
+    Player *p = players[index].get();
     cout << "Player " << p->getName() << endl;
     cout << "Current Saving: $" << p->getCash() << endl;
     cout << "Current cups: " << p->getNumCup() << endl;
@@ -416,8 +435,8 @@ void GameBoard::assets(Player *p) {
 }
 
 void GameBoard::allAssets() {
-    for (auto &i : players) {
-        assets(i.get());
+    for (int i = 0; i < players.size(); ++i) {
+        assets(i);
     }
 }
 
@@ -426,14 +445,15 @@ bool GameBoard::isWin() {
 }
 
 void GameBoard::payDebt() {
-    curPlayer->payDebt();
+    players[curPlayerIndex]->payDebt();
 }
 
-bool GameBoard::hasDebt() {
-    return curPlayer->getDebtAmount() != 0;
+double GameBoard::debtAmount() {
+    return players[curPlayerIndex]->getDebtAmount();
 }
 
 void GameBoard::bankrupt() {
+    Player *curPlayer = players[curPlayerIndex].get();
     if (assetsValue() >= curPlayer->getDebtAmount()) {
         throw InvalidBankrupt{};
     }
@@ -442,10 +462,19 @@ void GameBoard::bankrupt() {
     vector<Property *> auctionProperties;
     if (creditor) {
         creditor->receiveMoney(curPlayer->getCash());
+        creditor->addCups(curPlayer->getNumCup());
         for (auto &property: properties) {
             if (property->getOwner() == curPlayer) {
-                // TODO ask immediately unmortgage or pay 10%
-                // if unmortgage pay, else forcepay property->getCost() * 0.1
+                property->setOwner(creditor);
+                if (property->isMortgage()) {
+                    bool unmortgage = controller->askUnMortgage(creditor->getName(), property->getName());
+                    if (unmortgage) {
+                        property->setUnMortgage();
+                        creditor->forcePay(property->getCost() * 0.6);
+                    } else {
+                        creditor->forcePay(property->getCost() * 0.1);
+                    }
+                }
             }
         }
     } else {
@@ -455,23 +484,19 @@ void GameBoard::bankrupt() {
             }
         }
     }
-    players.erase(remove_if(players.begin(), players.end(), [this](unique_ptr<Player> &p) { return p.get() == this->curPlayer; }), players.end());
+
+    players.erase(players.begin() + curPlayerIndex);
+    moveToNextPlayer();
 
     if (!auctionProperties.empty()) {
-        vector<string> otherPlayersName;
-        for (auto &i: players) {
-            if (i.get() != curPlayer) otherPlayersName.emplace_back(i->getName());
-        }
-
         vector<string> propertiesName;
         propertiesName.reserve(auctionProperties.size());
         for(auto &auctionProperty: auctionProperties) {
             propertiesName.emplace_back(auctionProperty->getName());
         }
 
-        pair<string, double> bidInfo = Controller::auction(propertiesName, otherPlayersName);
+        pair<string, double> bidInfo = controller->auction(propertiesName);
         Player *bidWinner = getPlayer(bidInfo.first);
-        // TODO what if bankrupt here?
         for (auto &p: auctionProperties) {
             p->setOwner(bidWinner);
         }

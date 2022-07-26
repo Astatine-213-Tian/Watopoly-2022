@@ -29,9 +29,10 @@ class Controller {
   void play();
   void next();
   void load(const std::string& filename);
-  static bool askTradeResponse(const std::string &curName, const std::string &toName, const std::string &curGive, const std::string &curReceive);
+  bool askTradeResponse(const std::string &toName, const std::string &curGive, const std::string &curReceive);
   static bool askBuyResponse(const std::string &propertyName, double cost);
-  static std::pair<std::string, double> auction(const std::vector<std::string> &properties, const std::vector<std::string> &playersName);
+  bool askUnMortgage(const std::string &receiverName, const std::string &propertyName);
+  std::pair<std::string, double> auction(const std::vector<std::string> &properties);
 };
 
 #endif

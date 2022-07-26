@@ -8,7 +8,7 @@ class Dice {
   std::default_random_engine rng;
   int value;
  public:
-  Dice(int min = 1, int max = 6);
+  explicit Dice(int min = 1, int max = 6);
   int getValue() const;
   void setValue(int _v);
   int roll();

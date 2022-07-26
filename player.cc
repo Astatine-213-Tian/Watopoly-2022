@@ -25,7 +25,7 @@ void Player::setNumToMove(int num) { numToMove = num; }
 
 void Player::sentToTimsLine(int timsIndex) {
     curLocation = timsIndex;
-    shouldMoveToTims = false;
+    goToTims = false;
     isInTimsLine = true;
     inTimsRound = 0;
     canRoll = false;
@@ -53,9 +53,9 @@ void Player::removeFromTimsLine() {
     inTimsRound = 0;
 }
 
-void Player::setShouldMoveToTims() { shouldMoveToTims = true; }
+void Player::setGoToTims() { goToTims = true; }
 
-bool Player::getShouldMoveToTims() const { return shouldMoveToTims; }
+bool Player::getGoToTims() const { return goToTims; }
 
 void Player::setGoToOSAP(bool state) { goToOSAP = state; }
 
@@ -85,7 +85,6 @@ void Player::forcePay(double value, Player *receiver) {
         cash = 0;
         debtAmount += value - cash;
         creditor = receiver;
-        throw CauseDebt{name, debtAmount};
     }
     cash -= value;
     if (receiver) receiver->receiveMoney(value);

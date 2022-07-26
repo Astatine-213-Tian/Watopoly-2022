@@ -17,7 +17,7 @@ class Player {
   bool goToOSAP;
   bool isInTimsLine;
   int inTimsRound;
-  bool shouldMoveToTims;
+  bool goToTims;
   int rollTimes;
   bool canRoll;
   int numGym;
@@ -42,8 +42,8 @@ class Player {
   void receiveMoney(double value);
   bool inTimsLine() const;
   void sentToTimsLine(int index);
-  void setShouldMoveToTims();
-  bool getShouldMoveToTims() const;
+  void setGoToTims();
+  bool getGoToTims() const;
   void setGoToOSAP(bool state);
   bool getGoToOSAP() const;
   void removeFromTimsLine();

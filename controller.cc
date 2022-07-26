@@ -45,7 +45,8 @@ void Controller::roll() {
         }
     } else {
         try {
-            g->roll();
+            pair<int, int> res = g->roll();
+            cout << "Dice values: " << get<0>(res) << get<1>(res) << endl;
         } catch (exception &e) {
             cout << RED << e.what() << DEFAULT << endl;
             return;
@@ -110,7 +111,7 @@ void Controller::next() {
         cout << RED << e.what() << DEFAULT << endl;
         return;
     }
-    cout << GREEN << g->getCurPlayerName() << ": it is now your round." << DEFAULT << endl;
+    cout << GREEN << g->getCurPlayerName() << ", it is now your round." << DEFAULT << endl;
 }
 
 void Controller::mortgage() {
@@ -132,11 +133,15 @@ void Controller::payDebt() {
 }
 
 void Controller::bankrupt() {
+    string name = g->getCurPlayerName();
     try {
         g->bankrupt();
     } catch (exception &e) {
         cout << RED << e.what() << DEFAULT << endl;
+        return;
     }
+    cout << YELLOW << "Player " << name << "was bankrupt and removed from the game." << DEFAULT << endl;
+    cout << GREEN << g->getCurPlayerName() << ", it is now your round." << DEFAULT << endl;
 }
 
 void Controller::addPlayers() {
@@ -194,16 +199,17 @@ void Controller::addPlayers() {
 
 void Controller::play() {
     cout << "Game started! Welcome to watopoly!" << endl;
-    g->start();
     string cmd;
-    cout << g->getCurPlayerName() << ": please enter a command: ";
-    while (cin >> cmd) {
+    while (true) {
+        if (g->askToLeaveTims()) {
+            leaveTims();
+        }
+        cout << g->getCurPlayerName() << ": ";
+        cin >> cmd;
         if (cmd == "roll") {
-            if (g->hasDebt()) cout << "You need to pay your debt first." << endl;
-            else roll();
+            roll();
         } else if (cmd == "next") {
-            if (g->hasDebt()) cout << "You need to pay your debt first." << endl;
-            else next();
+            next();
         } else if (cmd == "trade") {
             trade();
         } else if (cmd == "improve") {
@@ -220,56 +226,50 @@ void Controller::play() {
             g->allAssets();
         } else if (cmd == "save") {
             save();
-        } else if (cmd == "debt" && g->hasDebt()) {
+        } else if (cmd == "debt" && g->debtAmount() > 0) {
             payDebt();
         } else {
             cout << RED << "Invalid command." << DEFAULT << endl;
         }
-
-        if (g->askToLeaveTims()) {
-            leaveTims();
+        if (g->isWin()) {
+            cout << "Congratulations! You win the game." << endl;
+            break;
         }
-        if (g->hasDebt()) {
-            cout << YELLOW << "You currently has debt, do you want to pay the bill or continue raising money?;" << DEFAULT << endl
-                 << "Input debt or other available command. " << endl;
+        if (g->debtAmount() > 0) {
+            cout << YELLOW << "You currently owes debt $" << g->debtAmount() << ", you're provided with the debt to pay your debt." << DEFAULT << endl;
         }
-        cout << g->getCurPlayerName() << ": ";
     }
 }
 
 
 void Controller::leaveTims() {
-    cout << YELLOW << "You are currently stuck at DC Tims Line, please use roll/cup/pay to leave (you may only choose one once): " << DEFAULT << endl;
+    cout << YELLOW << "You are currently stuck at DC Tims Line, please use roll/cup/pay to leave (you may only choose once): " << DEFAULT << endl;
     string cmd;
     while (cin >> cmd) {
         if (cmd == "roll") {
             roll();
             if (g->mustLeaveTims()) {
-                cout << YELLOW << "Oops, it's your third round at Tims Line now, you must leave by pay or cup: " << DEFAULT << endl;
+                cout << YELLOW << "Oops, it's your third round at Tims Line now, you must leave by pay or use cup: " << DEFAULT << endl;
                 continue;
             }
             break;
         } else if (cmd == "pay") {
-            try {
-                g->moveOutTims(1);
-            } catch (exception &e) {
-                cout << RED << e.what() << DEFAULT << endl;
-            }
+            g->payTims();
             break;
         } else if (cmd == "cup") {
             try {
-                g->moveOutTims(2);
+                g->useCups();
+                break;
             } catch (exception &e) {
                 cout << RED << e.what() << DEFAULT << endl;
-                continue;
             }
         } else cout << RED << "Invalid command." << DEFAULT << endl;
     }
     if (!g->inTimsLine()) {
-        cout << GREEN << "Congrats! You moved out from the Tims Line." << DEFAULT << endl;
+        cout << GREEN << "Congrats! You move out of the Tims Line." << DEFAULT << endl;
         cout << *g;
     } else {
-        cout << YELLOW << "Oooops, you're still stuck at DC Tims Line." << DEFAULT << endl;
+        cout << YELLOW << "Oooops, you're still stuck at DC Tims Line. Try to leave next round!" << DEFAULT << endl;
     }
 }
 
@@ -357,9 +357,9 @@ bool Controller::yesOrNoResponse() {
     return false;
 }
 
-bool Controller::askTradeResponse(const string &currName, const string &toName, const string &currGive, const string &currReceive) {
+bool Controller::askTradeResponse(const string &toName, const string &currGive, const string &currReceive) {
     cout << "To player " + toName + ": Do you accept this trade?" << endl <<
-     "Trade detail: give player " + currName + " " + currReceive + " in exchange for " + currGive + ")" << endl;
+     "Trade detail: give player " + g->getCurPlayerName() + " " + currReceive + " in exchange for " + currGive + ")" << endl;
     if (yesOrNoResponse()) {
         cout << GREEN << "Trade accepted." << DEFAULT << endl;
         return true;
@@ -375,12 +375,29 @@ bool Controller::askBuyResponse(const std::string &propertyName, double cost) {
     return yesOrNoResponse();
 }
 
+bool Controller::askUnMortgage(const std::string &receiverName, const std::string &propertyName) {
+    cout << YELLOW << "To Player " << receiverName << ": you're receiving a mortgaged property" << propertyName << " from "
+    << g->getCurPlayerName() << ". Do you want to unmortgage it immediately (1) or pay 10% of the property cost to keep it mortgage (2)?"
+    << DEFAULT << endl << "Please choose 1 / 2: ";
+    string cmd;
+    while (cin >> cmd) {
+        if (cmd == "1") {
+            return true;
+        } else if (cmd == "2") {
+            return false;
+        } else {
+            cout << RED << "Please choose 1 / 2: " << DEFAULT;
+        }
+    }
+    return false;
+}
 
-pair<string, double> Controller::auction(const vector<string>& properties, const vector<string>& playersName) {
+
+pair<string, double> Controller::auction(const vector<string>& properties) {
     cout << "Auction for ";
     for (auto &name: properties) cout << name << " ";
     cout << "started!" << endl;
-
+    auto playersName = g->getAllPlayersName();
     vector<pair<string, bool>> participants;
     participants.reserve(playersName.size());
     for (auto & name : playersName) { participants.emplace_back(name, true); }

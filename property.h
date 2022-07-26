@@ -11,7 +11,7 @@ class Property : public Cell {
  protected:
   double cost;
   Player *owner;
-  bool isMortgaged;
+  bool mortgage;
   virtual double calculateRent() const = 0;
   virtual double getImproveValue() const;
   virtual void initImproveNum(int improveNum) const;
@@ -24,14 +24,13 @@ class Property : public Cell {
   double getCost() const;
   void setMortgage();
   void setUnMortgage();
-  bool getMortgageStatus() const;
+  bool isMortgage() const;
   Player *getOwner() const;
   void setOwner(Player *p);
   double getTradableValue() const;
   void loadInfo(int improveNum, bool mortgaged);
 
   // For academic building only;
-  // virtual double getImproveCost() const;
   virtual void addImprove();
   virtual void removeImprove();
 

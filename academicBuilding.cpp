@@ -22,7 +22,7 @@ int AcademicBuilding::getImproveNum() const {
 }
 
 void AcademicBuilding::addImprove() {
-    if (isMortgaged) throw PropertyStillMortgage{getName()};
+    if (mortgage) throw PropertyStillMortgage{getName()};
     if (!mb->isMonopolized()) throw NotMonopolized{mb->getName()};
     if (mb->getImproveNum() >= 5) throw MaxImprove{mb->getName()};
     owner->pay(mb->getImproveCost());
