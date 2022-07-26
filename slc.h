@@ -7,11 +7,13 @@
 #include "nonProperty.h"
 
 class Player;
+class Dice;
 
 class SLC: public NonProperty {
-    std::vector<std::string> cards;
-    static std::vector<std::string> curDeck;
+    static std::vector<std::string> cards;
     std::default_random_engine rng;
+    std::unique_ptr<Dice> dice;
+    static void initCard();
 
  public:
     SLC();

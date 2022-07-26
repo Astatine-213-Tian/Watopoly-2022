@@ -1,14 +1,21 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
-#include <random>
-#include <chrono>
+#include <sstream>
 #include "needleshall.h"
 #include "player.h"
+#include "dice.h"
 
 using namespace std;
 
-NH::NH(): NonProperty{"NEEDLES HALL"}, cards{vector<int>(18)}, rng{static_cast<unsigned>(chrono::system_clock::now().time_since_epoch().count())} {
+NH::NH(): NonProperty{"NH"}, rng{static_cast<unsigned>(chrono::system_clock::now().time_since_epoch().count())}, dice{
+    make_unique<Dice>(1, 100)} {}
+
+vector<int> NH::cards;
+
+void NH::passBy(Player &p) {}
+
+void NH::initCard() {
     for (int i = 0; i < 2; i++) {
         cards.emplace_back(-100);
         cards.emplace_back(100);
@@ -23,18 +30,17 @@ NH::NH(): NonProperty{"NEEDLES HALL"}, cards{vector<int>(18)}, rng{static_cast<u
     cards.emplace_back(200);
 }
 
-vector<int> NH::curDeck;
-
-void NH::passBy(Player &p) {}
-
 void NH::landOnAction(Player &p) {
-    if ((int)curDeck.size() == 0) {
-        shuffle(cards.begin(), cards.end(), rng);
-        curDeck = cards;
+    if (dice->roll() == 23) {
+        p.addCups(1);
+        return;
     }
-    int firstCard = curDeck[0];
-    curDeck.erase(curDeck.begin());
-
+    if ((int)cards.size() == 0) {
+        initCard();
+        shuffle(cards.begin(), cards.end(), rng);
+    }
+    int firstCard = cards[0];
+    cards.erase(cards.begin());
     if (firstCard > 0) {
         p.receiveMoney(firstCard);
     } else {
