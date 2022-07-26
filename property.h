@@ -31,6 +31,7 @@ class Property : public Cell {
   void loadInfo(int improveNum, bool mortgaged);
 
   // For academic building only;
+  virtual double getImproveCost() const;
   virtual void addImprove();
   virtual void removeImprove();
 

@@ -54,6 +54,8 @@ void Property::loadInfo(int improveNum, bool mortgaged) {
     notifyObservers();
 }
 
+double Property::getImproveCost() const { return 0; }
+
 void Property::addImprove() { throw NotAcademicBuilding{getName()}; }
 
 void Property::removeImprove() { throw NotAcademicBuilding{getName()}; }

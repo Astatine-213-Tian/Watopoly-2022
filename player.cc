@@ -61,6 +61,10 @@ void Player::setGoToOSAP(bool state) { goToOSAP = state; }
 
 bool Player::getGoToOSAP() const { return goToOSAP; }
 
+void Player::setPayTuition(bool state) { payTuition = state; }
+
+bool Player::getPayTuition() { return payTuition; }
+
 int Player::getRollTimes() const{ return rollTimes; }
 
 void Player::addRollTimes() { rollTimes++; }

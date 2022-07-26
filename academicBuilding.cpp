@@ -41,9 +41,9 @@ void AcademicBuilding::initImproveNum(int num) const {
     mb->initImproveNum(num);
 }
 
-//double AcademicBuilding::getImproveCost() const {
-//    return mb->getImproveCost();
-//}
+double AcademicBuilding::getImproveCost() const {
+    return mb->getImproveCost();
+}
 
 double AcademicBuilding::getImproveValue() const {
     return mb->getImproveCost() / 2 * mb->getImproveNum();

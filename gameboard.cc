@@ -179,6 +179,12 @@ void GameBoard::move(int distance) {
         curPlayer->sentToTimsLine(timsLineIndex);
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
         controller->next();
+    } else if (curPlayer->getPayTuition()) {
+        if (Controller::askPayTuition()) {
+            curPlayer->forcePay(300);
+        } else {
+            curPlayer->forcePay(assetsValue());
+        }
     } else if (curPlayer->getNumToMove() != 0) {
         move(curPlayer->getNumToMove());
     }
@@ -410,6 +416,18 @@ void GameBoard::unmortgage(const string &name) {
 }
 
 double GameBoard::assetsValue() {
+    auto player = players[curPlayerIndex].get();
+    double total = player->getCash();
+    for (auto &p: properties) {
+        if (p->getOwner() == player) {
+            total += p->getCost();
+            total += p->getImproveNum() * p->getImproveCost();
+        }
+    }
+    return total;
+}
+
+double GameBoard::tradableValue() {
     double value = 0;
     Player *curPlayer = players[curPlayerIndex].get();
     for (auto &i: properties) {
@@ -431,7 +449,8 @@ void GameBoard::assets(int index) {
             cout << i->getName() << endl;
         }
     }
-    cout << "Total value (mortgage + sell) " << assetsValue() << endl;
+    cout << "Total assets value" << assetsValue() << endl;
+    cout << "Total tradable value (mortgage + sell improvement) " << tradableValue() << endl;
 }
 
 void GameBoard::allAssets() {
@@ -454,7 +473,7 @@ double GameBoard::debtAmount() {
 
 void GameBoard::bankrupt() {
     Player *curPlayer = players[curPlayerIndex].get();
-    if (assetsValue() >= curPlayer->getDebtAmount()) {
+    if (tradableValue() >= curPlayer->getDebtAmount()) {
         throw InvalidBankrupt{};
     }
 

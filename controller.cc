@@ -375,6 +375,18 @@ bool Controller::askBuyResponse(const std::string &propertyName, double cost) {
     return yesOrNoResponse();
 }
 
+bool Controller::askPayTuition() {
+    cout << YELLOW << "Opps, you need to pay tuition. Payment can be completed by either paying $300 (1) or paying 10% of your assets value (2)." << DEFAULT << endl
+    << "Please choose 1 /2: ";
+    string cmd;
+    while (cin >> cmd) {
+        if (cmd == "1") return true;
+        else if (cmd == "2") return false;
+        else cout << RED << "Please choose 1 / 2: " << DEFAULT;
+    }
+    return false;
+}
+
 bool Controller::askUnMortgage(const std::string &receiverName, const std::string &propertyName) {
     cout << YELLOW << "To Player " << receiverName << ": you're receiving a mortgaged property" << propertyName << " from "
     << g->getCurPlayerName() << ". Do you want to unmortgage it immediately (1) or pay 10% of the property cost to keep it mortgage (2)?"

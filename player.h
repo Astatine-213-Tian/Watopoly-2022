@@ -14,10 +14,11 @@ class Player {
   int numCup;
   int curLocation;
   int numToMove;
+  bool payTuition;
   bool goToOSAP;
+  bool goToTims;
   bool isInTimsLine;
   int inTimsRound;
-  bool goToTims;
   int rollTimes;
   bool canRoll;
   int numGym;
@@ -46,6 +47,8 @@ class Player {
   bool getGoToTims() const;
   void setGoToOSAP(bool state);
   bool getGoToOSAP() const;
+  void setPayTuition(bool state);
+  bool getPayTuition();
   void removeFromTimsLine();
   void addTimsLineRound();
   int getTimsLineRound();

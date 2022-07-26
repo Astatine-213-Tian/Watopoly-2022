@@ -36,6 +36,7 @@ class GameBoard {
   void trade(Player &toWhom, double value, Property &property);
   void trade(Player &toWhom, Property &p1, Property &p2);
   void trade(Player &toWhom, Property &property, double value);
+  double tradableValue();
   double assetsValue();
   static void noImprovementCheck(Property *p) ;
   void assets(int playerIndex);
