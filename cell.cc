@@ -1,6 +1,7 @@
 #include "cell.h"
 #include "player.h"
 #include <utility>
+#include <algorithm>
 
 using namespace std;
 

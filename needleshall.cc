@@ -3,6 +3,7 @@
 #include <numeric>
 #include <sstream>
 #include <iostream>
+#include <chrono>
 #include "needleshall.h"
 #include "player.h"
 #include "dice.h"

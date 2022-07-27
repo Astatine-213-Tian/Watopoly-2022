@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <sstream>
+#include <chrono>
 #include "slc.h"
 #include "player.h"
 #include "dice.h"
