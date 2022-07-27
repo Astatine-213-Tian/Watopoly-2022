@@ -150,12 +150,13 @@ void Controller::addPlayers() {
     int numPlayers = 0;
     vector<tuple<char, string, bool>> players = {
         {'G', "Goose", false},
-        {'B', "GRT Bus", false},
+        {'B', "GRT-Bus", false},
         {'P', "Professor", false},
         {'S', "Student", false},
         {'$', "Money", false},
         {'L', "Laptop", false},
-        {'T', "Pink tie", false},
+        {'T', "Pink-tie", false},
+        {'D', "Tim-Hortons-Doughnut", false}
     };
 
     cout << "Please start adding players!" << endl;
