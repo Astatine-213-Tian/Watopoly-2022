@@ -23,7 +23,6 @@ void Property::setMortgage() {
 
 void Property::setUnMortgage() {
     if (!mortgage) throw PropertyStillUnMortage{getName()};
-    owner->pay(cost * 0.6);
     mortgage = false;
 }
 

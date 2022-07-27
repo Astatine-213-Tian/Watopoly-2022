@@ -39,7 +39,6 @@ class GameBoard {
   double tradableValue();
   double assetsValue();
   static void noImprovementCheck(Property *p) ;
-  void assets(int playerIndex);
   void processRoll();
   void moveToNextPlayer();
   int totalCups();
@@ -68,8 +67,9 @@ class GameBoard {
   void mortgage(const std::string &name);
   void unmortgage(const std::string &name);
   void payDebt();
-  void assets();
-  void allAssets();
+  std::tuple<std::string, double, int, std::vector<std::string>> assets();
+  std::tuple<std::string, double, int, std::vector<std::string>> assets(int playerIndex);
+  int getTotalPlayersNum();
   bool isWin();
   void bankrupt();
   double debtAmount();

@@ -27,14 +27,12 @@ void AcademicBuilding::addImprove() {
     if (mb->getImproveNum() >= 5) throw MaxImprove{mb->getName()};
     owner->pay(mb->getImproveCost());
     mb->addImprove();
-    notifyObservers();
 }
 
 void AcademicBuilding::removeImprove() {
     if (mb->getImproveNum() <= 0) throw ZeroImprove{mb->getName()};
     mb->removeImprove();
     owner->receiveMoney(mb->getImproveCost() / 2);
-    notifyObservers();
 }
 
 void AcademicBuilding::initImproveNum(int num) const {

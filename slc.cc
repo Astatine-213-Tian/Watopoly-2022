@@ -6,6 +6,8 @@
 #include "slc.h"
 #include "player.h"
 #include "dice.h"
+#include "iostream"
+#include "termcodes.h"
 
 using namespace std;
 
@@ -47,10 +49,13 @@ void SLC::landOnAction(Player &p) {
     int moveDistance;
 
     if (option >> moveDistance) {
+        cout << YELLOW << "You're going to move by distance " << moveDistance << DEFAULT << endl;
         p.setNumToMove(moveDistance);
     } else if (firstCard == "Tims") {
+        cout << YELLOW << "You're going to DC TIMS LINE! "<< DEFAULT << endl;
         p.setGoToTims();
     } else if (firstCard == "OSAP") {
+        cout << GREEN << "You're going to receive support from OSAP!" << DEFAULT << endl;
         p.setGoToOSAP(true);
     }
 }

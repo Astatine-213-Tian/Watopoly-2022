@@ -134,7 +134,6 @@ void GameBoard::setProperty(const string &name, const string &owner, int improve
 }
 
 void GameBoard::move(int distance) {
-    if (distance == 0) return;
     Player *curPlayer = players[curPlayerIndex].get();
     curPlayer->setNumToMove(0);
 
@@ -183,7 +182,8 @@ void GameBoard::move(int distance) {
         if (Controller::askPayTuition()) {
             curPlayer->forcePay(300);
         } else {
-            curPlayer->forcePay(assetsValue());
+            double cash = curPlayer->getCash();
+            curPlayer->forcePay((assetsValue() + cash) * 0.1);
         }
     } else if (curPlayer->getNumToMove() != 0) {
         move(curPlayer->getNumToMove());
@@ -205,20 +205,20 @@ bool GameBoard::mustLeaveTims() {
 
 void GameBoard::payTims() {
     Player *curPlayer = players[curPlayerIndex].get();
-    curPlayer->removeFromTimsLine();
     if (mustLeaveTims()) {
         move(dice1->getValue() + dice2->getValue());
     }
+    curPlayer->removeFromTimsLine();
     curPlayer->forcePay(50);
 }
 
 void GameBoard::useCups() {
     Player *curPlayer = players[curPlayerIndex].get();
     curPlayer->useCup();
-    curPlayer->removeFromTimsLine();
     if (mustLeaveTims()) {
         move(dice1->getValue() + dice2->getValue());
     }
+    curPlayer->removeFromTimsLine();
 }
 
 
@@ -265,7 +265,10 @@ void GameBoard::processRoll() {
 }
 
 void GameBoard::moveToNextPlayer() {
-    curPlayerIndex = curPlayerIndex == players.size() - 1 ? 0 : curPlayerIndex + 1;
+    ++curPlayerIndex;
+    if (curPlayerIndex >= players.size()) {
+        curPlayerIndex = 0;
+    }
     auto curPlayer = players[curPlayerIndex].get();
     curPlayer->initRollTimes();
     curPlayer->setRollState(true);
@@ -338,7 +341,7 @@ Property *GameBoard::getPlayerProperty(const string &name, Player *player) const
 
 
 void GameBoard::noImprovementCheck(Property *property) {
-    if (property->getImproveNum() >= 0) {
+    if (property->getImproveNum() > 0) {
         throw BuildingStillWithImprove{property->getName() };
     }
 }
@@ -411,13 +414,15 @@ void GameBoard::mortgage(const string &name) {
 }
 
 void GameBoard::unmortgage(const string &name) {
-    Property *p = getPlayerProperty(name, players[curPlayerIndex].get());
+    Player *curPlayer = players[curPlayerIndex].get();
+    Property *p = getPlayerProperty(name, curPlayer);
+    curPlayer->pay(p->getCost() * 0.6);
     p->setUnMortgage();
 }
 
 double GameBoard::assetsValue() {
     auto player = players[curPlayerIndex].get();
-    double total = player->getCash();
+    double total = 0;
     for (auto &p: properties) {
         if (p->getOwner() == player) {
             total += p->getCost();
@@ -436,27 +441,23 @@ double GameBoard::tradableValue() {
     return value;
 }
 
-void GameBoard::assets() { assets(curPlayerIndex); }
-
-void GameBoard::assets(int index) {
-    Player *p = players[index].get();
-    cout << "Player " << p->getName() << endl;
-    cout << "Current Saving: $" << p->getCash() << endl;
-    cout << "Current cups: " << p->getNumCup() << endl;
-    cout << "Properties: " << endl;
-    for (auto &i : properties) {
-        if (i->getOwner() == p) {
-            cout << i->getName() << endl;
-        }
-    }
-    cout << "Total assets value" << assetsValue() << endl;
-    cout << "Total tradable value (mortgage + sell improvement) " << tradableValue() << endl;
+tuple<string, double, int, vector<string>> GameBoard::assets() {
+    return assets(curPlayerIndex);
 }
 
-void GameBoard::allAssets() {
-    for (int i = 0; i < players.size(); ++i) {
-        assets(i);
+tuple<string, double, int, vector<string>> GameBoard::assets(int index) {
+    Player *p = players[index].get();
+    vector<string> propertiesName;
+    for (auto &i : properties) {
+        if (i->getOwner() == p) {
+            propertiesName.emplace_back(i->getName());
+        }
     }
+    return make_tuple(p->getName(), p->getCash(), p->getNumCup(), propertiesName);
+}
+
+int GameBoard::getTotalPlayersNum() {
+    return (int)players.size();
 }
 
 bool GameBoard::isWin() {
@@ -499,6 +500,7 @@ void GameBoard::bankrupt() {
     } else {
         for (auto &property: properties) {
             if (property->getOwner() == curPlayer) {
+                property->setUnMortgage();
                 auctionProperties.emplace_back(property.get());
             }
         }

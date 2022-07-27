@@ -10,9 +10,19 @@ double MonopolyBlock::getImproveCost() const { return improveCost; }
 
 int MonopolyBlock::getImproveNum() const { return numImprove; }
 
-void MonopolyBlock::addImprove() { ++numImprove; }
+void MonopolyBlock::addImprove() {
+    ++numImprove;
+    for (auto &ab: buildings) {
+        ab->notifyObservers();
+    }
+}
 
-void MonopolyBlock::removeImprove() { --numImprove; }
+void MonopolyBlock::removeImprove() {
+    --numImprove;
+    for (auto &ab: buildings) {
+        ab->notifyObservers();
+    }
+}
 
 bool MonopolyBlock::isMonopolized() const {
     if (buildings.empty()) return false;

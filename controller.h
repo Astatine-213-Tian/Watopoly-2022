@@ -20,6 +20,7 @@ class Controller {
   void save();
   void leaveTims();
   static bool yesOrNoResponse();
+  void printAssets(std::tuple<std::string, double, int, std::vector<std::string>> &info);
 
  public:
   Controller();

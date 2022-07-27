@@ -15,6 +15,7 @@ int Dice::getValue() const { return value; }
 int Dice::roll() {
     shuffle(diceNums.begin(), diceNums.end(), rng );
     value = diceNums[0];
+    return value;
 }
 
 void Dice::setValue(int _v) { value = _v; }

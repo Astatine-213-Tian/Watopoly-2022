@@ -1,11 +1,13 @@
 #include "player.h"
 #include "error.h"
+#include "iostream"
+#include "termcodes.h"
 
 using namespace std;
 
 Player::Player(std::string name, char displayChar, int timCups, double cash, int position, bool inTims, int timsRound):
     name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position}, numToMove{0}, goToOSAP{false},
-    isInTimsLine{inTims}, rollTimes{timsRound}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
+    isInTimsLine{inTims}, inTimsRound{timsRound}, rollTimes{0}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
 
 string Player::getName() const{ return name; }
 
@@ -40,7 +42,10 @@ void Player::useCup() {
     numCup--;
 }
 
-void Player::receiveMoney(double value) { cash += value; }
+void Player::receiveMoney(double value) {
+    cash += value;
+    cout << GREEN << name << " receives $" << value << DEFAULT << endl;
+}
 
 bool Player::inTimsLine() const{ return isInTimsLine; }
 
@@ -80,18 +85,31 @@ void Player::pay(double value, Player *receiver) {
         throw NotEnoughCash{name};
     }
     cash -= value;
-    if (receiver) receiver->receiveMoney(value);
+    if (receiver) {
+        cout << " to " << receiver->getName()<< DEFAULT << endl;
+        receiver->receiveMoney(value);
+    } else {
+        cout << YELLOW << "Paying $" << value << DEFAULT << endl;
+    }
 }
 
 void Player::forcePay(double value, Player *receiver) {
+    double receiveValue = value;
     if (cash < value) {
-        if (receiver) receiver->receiveMoney(cash);
-        cash = 0;
+        receiveValue = cash;
         debtAmount += value - cash;
+        cash = 0;
         creditor = receiver;
+    } else {
+        cash -= value;
     }
-    cash -= value;
-    if (receiver) receiver->receiveMoney(value);
+
+    if (receiver) {
+        cout << YELLOW << "Paying $" << value << " to " << receiver->getName() << DEFAULT << endl;
+        receiver->receiveMoney(receiveValue);
+    } else {
+        cout << YELLOW << "Paying $" << value << DEFAULT << endl;
+    }
 }
 
 double Player::getDebtAmount() const { return debtAmount; }
@@ -102,6 +120,7 @@ Player* Player::getCreditor() const {
 
 void Player::payDebt() {
     pay(getDebtAmount(), creditor);
+    debtAmount = 0;
     creditor = nullptr;
 }
 
