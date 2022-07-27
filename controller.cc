@@ -53,10 +53,6 @@ void Controller::roll() {
         }
     }
     if (!inTims) cout << *g;
-    else if (!g->inTimsLine()) {
-        cout << GREEN << "Congrats! You're moved out of the Tims Line." << DEFAULT << endl;
-        cout << *g;
-    }
 }
 
 void Controller::improve() {

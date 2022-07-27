@@ -12,14 +12,14 @@ int MonopolyBlock::getImproveNum() const { return numImprove; }
 
 void MonopolyBlock::addImprove() {
     ++numImprove;
-    for (auto &ab: buildings) {
+    for (auto ab: buildings) {
         ab->notifyObservers();
     }
 }
 
 void MonopolyBlock::removeImprove() {
     --numImprove;
-    for (auto &ab: buildings) {
+    for (auto ab: buildings) {
         ab->notifyObservers();
     }
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <numeric>
 #include <sstream>
+#include <iostream>
 #include "needleshall.h"
 #include "player.h"
 #include "dice.h"
@@ -41,9 +42,12 @@ void NH::landOnAction(Player &p) {
     }
     int firstCard = cards[0];
     cards.erase(cards.begin());
+    cout << "Needles Hall Card: ";
     if (firstCard > 0) {
+        cout << "receiving $" << firstCard << endl;
         p.receiveMoney(firstCard);
     } else {
+        cout << "losing $" << firstCard << endl;
         p.forcePay(abs(firstCard));
     }
 }

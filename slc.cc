@@ -48,14 +48,16 @@ void SLC::landOnAction(Player &p) {
     istringstream option{firstCard};
     int moveDistance;
 
+    cout << YELLOW << "SLC Card: ";
     if (option >> moveDistance) {
-        cout << YELLOW << "You're going to move by distance " << moveDistance << DEFAULT << endl;
+        cout << "moving by distance " << moveDistance;
         p.setNumToMove(moveDistance);
     } else if (firstCard == "Tims") {
-        cout << YELLOW << "You're going to DC TIMS LINE! "<< DEFAULT << endl;
+        cout << "sent to DC TIMS LINE! ";
         p.setGoToTims();
     } else if (firstCard == "OSAP") {
-        cout << GREEN << "You're going to receive support from OSAP!" << DEFAULT << endl;
+        cout << "sent to OSAP!";
         p.setGoToOSAP(true);
     }
+    cout << DEFAULT << endl;
 }

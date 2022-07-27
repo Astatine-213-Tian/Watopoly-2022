@@ -9,7 +9,6 @@ class GameBoard;
 class Controller {
   GameBoard *g = nullptr;
   bool testMode;
-//  void processUsualCmd(const std::string &cmd);
   void roll();
   void trade();
   void improve();

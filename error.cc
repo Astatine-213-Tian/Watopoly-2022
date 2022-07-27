@@ -35,7 +35,7 @@ NotEnoughCup::NotEnoughCup() : Error{"You don't have enough cup to use! Try anot
 BuildingStillWithImprove::BuildingStillWithImprove(const string &name) :
     Error{name + " still have improvements. All improvements need to be sold before further action"}, propertyName{name} {}
 
-NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName + " don't have enough cash to complete the trade."} {}
+NotEnoughCash::NotEnoughCash(const std::string &playerName) : Error{playerName + " don't have enough cash to complete this action."} {}
 
 InvalidRoll::InvalidRoll() : Error{"You cannot roll anymore this round."} {}
 
