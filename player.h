@@ -19,8 +19,6 @@ class Player {
   bool goToTims;
   bool isInTimsLine;
   int inTimsRound;
-  int rollTimes;
-  bool canRoll;
   int numGym;
   int numRes;
   double debtAmount;
@@ -52,11 +50,6 @@ class Player {
   void removeFromTimsLine();
   void addTimsLineRound();
   int getTimsLineRound();
-  int getRollTimes() const;
-  void addRollTimes();
-  void initRollTimes();
-  bool getRollState() const;
-  void setRollState(bool state);
   double getDebtAmount() const;
   Player *getCreditor() const;
   void payDebt();

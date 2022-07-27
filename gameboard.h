@@ -20,6 +20,8 @@ class GameBoard {
   std::vector<std::unique_ptr<MonopolyBlock>> blocks;
   std::vector<std::shared_ptr<Property>> properties;
   int curPlayerIndex;
+  int rollTimes;
+  bool canRoll;
   std::unique_ptr<Dice> dice1;
   std::unique_ptr<Dice> dice2;
   const int timsLineIndex = 10;

@@ -7,7 +7,7 @@ using namespace std;
 
 Player::Player(std::string name, char displayChar, int timCups, double cash, int position, bool inTims, int timsRound):
     name{name}, displayChar{displayChar}, cash{cash}, numCup{timCups}, curLocation{position}, numToMove{0}, goToOSAP{false},
-    isInTimsLine{inTims}, inTimsRound{timsRound}, rollTimes{0}, canRoll{true}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
+    isInTimsLine{inTims}, inTimsRound{timsRound}, numGym{0}, numRes{0}, debtAmount{0}, creditor{nullptr} {}
 
 string Player::getName() const{ return name; }
 
@@ -30,7 +30,6 @@ void Player::sentToTimsLine(int timsIndex) {
     goToTims = false;
     isInTimsLine = true;
     inTimsRound = 0;
-    canRoll = false;
 }
 
 void Player::addCups(int num) {
@@ -70,16 +69,6 @@ void Player::setPayTuition(bool state) { payTuition = state; }
 
 bool Player::getPayTuition() { return payTuition; }
 
-int Player::getRollTimes() const{ return rollTimes; }
-
-void Player::addRollTimes() { rollTimes++; }
-
-void Player::initRollTimes() { rollTimes = 0; }
-
-bool Player::getRollState() const{ return canRoll; }
-
-void Player::setRollState(bool state) { canRoll = state; }
-
 void Player::pay(double value, Player *receiver) {
     if (cash < value) {
         throw NotEnoughCash{name};
@@ -104,11 +93,18 @@ void Player::forcePay(double value, Player *receiver) {
         cash -= value;
     }
 
+    cout << YELLOW;
+    if (receiveValue < value) {
+         cout << "Attempt to pay $" << value;
+    } else {
+        cout << "Paying $" << value;
+    }
+
     if (receiver) {
-        cout << YELLOW << "Paying $" << value << " to " << receiver->getName() << DEFAULT << endl;
+        cout << " to " << receiver->getName() << DEFAULT << endl;
         receiver->receiveMoney(receiveValue);
     } else {
-        cout << YELLOW << "Paying $" << value << DEFAULT << endl;
+        cout << DEFAULT << endl;
     }
 }
 

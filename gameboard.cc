@@ -21,7 +21,7 @@
 
 using namespace std;
 
-GameBoard::GameBoard() : curPlayerIndex{0}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()}, hasRolled{false} {}
+GameBoard::GameBoard() : curPlayerIndex{0}, rollTimes{0}, canRoll{true}, dice1{make_unique<Dice>()}, dice2{make_unique<Dice>()}, hasRolled{false} {}
 
 void GameBoard::init() {
     blocks.emplace_back(make_unique<MonopolyBlock>("Art1", 50));
@@ -176,6 +176,7 @@ void GameBoard::move(int distance) {
     } else if (curPlayer->getGoToTims()) {
         cells[dest]->leave(curPlayer->getDisplayChar());
         curPlayer->sentToTimsLine(timsLineIndex);
+        canRoll = false;
         cells[curPlayer->getLocation()]->landOn(*curPlayer);
         controller->next();
     } else if (curPlayer->getPayTuition()) {
@@ -205,11 +206,11 @@ bool GameBoard::mustLeaveTims() {
 
 void GameBoard::payTims() {
     Player *curPlayer = players[curPlayerIndex].get();
+    curPlayer->forcePay(50);
     if (mustLeaveTims()) {
         move(dice1->getValue() + dice2->getValue());
     }
     curPlayer->removeFromTimsLine();
-    curPlayer->forcePay(50);
 }
 
 void GameBoard::useCups() {
@@ -223,14 +224,14 @@ void GameBoard::useCups() {
 
 
 void GameBoard::roll(int d1, int d2) {
-    if (!players[curPlayerIndex]->getRollState()) throw InvalidRoll{};
+    if (!canRoll) throw InvalidRoll{};
     dice1->setValue(d1);
     dice2->setValue(d2);
     processRoll();
 }
 
 pair<int, int> GameBoard::roll() {
-    if (!players[curPlayerIndex]->getRollState()) throw InvalidRoll{};
+    if (!canRoll) throw InvalidRoll{};
     dice1->roll();
     dice2->roll();
     processRoll();
@@ -240,23 +241,23 @@ pair<int, int> GameBoard::roll() {
 void GameBoard::processRoll() {
     Player *curPlayer = players[curPlayerIndex].get();
     hasRolled = true;
-    curPlayer->addRollTimes();
+    ++rollTimes;
     int roll1 = dice1->getValue();
     int roll2 = dice2->getValue();
 
     if (curPlayer->inTimsLine()) {
-        curPlayer->setRollState(false);
+        canRoll = false;
         if (roll1 == roll2) {
             curPlayer->removeFromTimsLine();
             move(roll1 + roll2);
         }
     } else {
-        curPlayer->setRollState(roll1 == roll2);
-        if (curPlayer->getRollTimes() == 3 && roll1 == roll2) {
+        canRoll = roll1 == roll2;
+        if (rollTimes == 3 && roll1 == roll2) {
             cells[curPlayer->getLocation()]->leave(curPlayer->getDisplayChar());
             curPlayer->sentToTimsLine(timsLineIndex);
             cells[timsLineIndex]->landOn(*curPlayer);
-            curPlayer->setRollState(false);
+            canRoll = false;
             controller->next();
         } else {
             move(roll1 + roll2);
@@ -269,15 +270,14 @@ void GameBoard::moveToNextPlayer() {
     if (curPlayerIndex >= players.size()) {
         curPlayerIndex = 0;
     }
-    auto curPlayer = players[curPlayerIndex].get();
-    curPlayer->initRollTimes();
-    curPlayer->setRollState(true);
+    rollTimes = 0;
+    canRoll = true;
     hasRolled = false;
 }
 
 void GameBoard::next() {
     Player *curPlayer = players[curPlayerIndex].get();
-    if (curPlayer->getRollState()) throw StillCanRoll{};
+    if (canRoll) throw StillCanRoll{};
     else if (curPlayer->getDebtAmount() != 0) throw HasDebt{};
 
     if (curPlayer->inTimsLine()) {
