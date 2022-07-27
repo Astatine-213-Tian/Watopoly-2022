@@ -206,7 +206,8 @@ void Controller::printAssets(std::tuple<std::string, double, int, std::vector<st
 }
 
 void Controller::play() {
-    cout << "Game started! Welcome to watopoly!" << endl;
+    cout << GREEN << "Game started! Welcome to watopoly!" << DEFAULT << endl;
+    cout << "Type help to see available commands." << endl;
     string cmd;
     while (true) {
         if (g->askToLeaveTims()) {
@@ -236,11 +237,23 @@ void Controller::play() {
             for (int i = 0; i < num; ++i) {
                 auto info = g->assets(i);
                 printAssets(info);
+                cout << "-----------------" << endl;
             }
         } else if (cmd == "save") {
             save();
         } else if (cmd == "debt" && g->debtAmount() > 0) {
             payDebt();
+        } else if (cmd == "help") {
+            cout << "- roll: rolls two dices" << endl
+            << "- next: give control to next player" << endl
+            << "- trade <name> <give> <receive>" << endl
+            << "- improve <property> buy/sell" << endl
+            << "- mortgage <property>" << endl
+            << "- unmortgage <property>" << endl
+            << "- bankrupt: quit the game" << endl
+            << "- assets: check assets" << endl
+            << "- all: check assets of all players" << endl
+            << "- save <filename>: save current game progress" << endl;
         } else {
             cout << RED << "Invalid command." << DEFAULT << endl;
         }
