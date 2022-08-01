@@ -135,8 +135,6 @@ void GameBoard::setProperty(const string &name, const string &owner, int improve
 
 void GameBoard::move(int distance) {
     Player *curPlayer = players[curPlayerIndex].get();
-    curPlayer->setNumToMove(0);
-
     int cur = curPlayer->getLocation();
     cells[cur]->leave(curPlayer->getDisplayChar());
 
@@ -186,8 +184,11 @@ void GameBoard::move(int distance) {
             double cash = curPlayer->getCash();
             curPlayer->forcePay((assetsValue() + cash) * 0.1);
         }
+        curPlayer->setPayTuition(false);
     } else if (curPlayer->getNumToMove() != 0) {
-        move(curPlayer->getNumToMove());
+        int toMove = curPlayer->getNumToMove();
+        curPlayer->setNumToMove(0);
+        move(toMove);
     }
 }
 
